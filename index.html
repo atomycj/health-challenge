@@ -1,0 +1,1101 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>헬스 챌린지 트래커</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=Bebas+Neue&display=swap" rel="stylesheet">
+
+<!-- ★★★ Firebase SDK ★★★ -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getDatabase, ref, set, get, update, remove, onValue, push }
+    from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+  // ════════════════════════════════════════
+  // ★ 여기에 본인의 Firebase 설정을 붙여넣으세요 ★
+  // ════════════════════════════════════════
+  const firebaseConfig = {
+    apiKey:            "AIzaSyAwJyMMhtCJmDe0QGWHJMeAN-IrgO9UULo",
+    authDomain:        "health-challenge-990fd.firebaseapp.com",
+    databaseURL:       "https://health-challenge-990fd-default-rtdb.firebaseio.com",
+    projectId:         "health-challenge-990fd",
+    storageBucket:     "health-challenge-990fd.firebasestorage.app",
+    messagingSenderId: "519481744840",
+    appId:             "1:519481744840:web:d92de5e21a00129a5cb4fd"
+  };
+  // ════════════════════════════════════════
+
+  const app = initializeApp(firebaseConfig);
+  const db  = getDatabase(app);
+
+  // DB 접근 헬퍼
+  window._db = {
+    ref, set, get, update, remove, onValue, push,
+    db,
+    path: (p) => ref(db, p),
+  };
+
+  // Firebase 준비 완료 이벤트
+  window.dispatchEvent(new Event("firebaseReady"));
+</script>
+
+<style>
+:root {
+  --bg:#0a0e1a; --surface:#111827; --card:#1a2235; --border:#1f2d47;
+  --accent:#00e5ff; --accent2:#7c3aed; --accent3:#10b981;
+  --warn:#f59e0b; --danger:#ef4444; --text:#e2e8f0; --muted:#64748b;
+  --gold:#fbbf24; --silver:#94a3b8; --bronze:#c17c43; --admin:#f59e0b;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'Noto Sans KR',sans-serif;min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,229,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(0,229,255,.025) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0}
+.container{max-width:1100px;margin:0 auto;padding:0 20px;position:relative;z-index:1}
+
+/* ── SPLASH ── */
+#splash{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:300;flex-direction:column;gap:16px}
+.splash-logo{font-family:'Bebas Neue',sans-serif;font-size:2.4rem;letter-spacing:5px;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.spinner{width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.splash-msg{font-size:.8rem;color:var(--muted);letter-spacing:1px}
+
+/* ── CONFIG SCREEN ── */
+#configScreen{position:fixed;inset:0;background:var(--bg);display:none;align-items:center;justify-content:center;z-index:250;padding:20px;overflow-y:auto}
+.config-box{background:var(--card);border:1px solid rgba(245,158,11,.4);border-radius:20px;padding:36px;width:100%;max-width:600px}
+.config-title{font-family:'Bebas Neue',sans-serif;font-size:1.6rem;letter-spacing:3px;color:var(--admin);margin-bottom:6px}
+.config-sub{font-size:.75rem;color:var(--muted);margin-bottom:24px;line-height:1.6}
+.config-section{margin-bottom:20px}
+.config-section-title{font-size:.72rem;letter-spacing:2px;color:var(--accent);text-transform:uppercase;margin-bottom:10px;font-weight:700}
+.config-note{background:rgba(0,229,255,.05);border:1px solid rgba(0,229,255,.2);border-radius:8px;padding:12px 16px;font-size:.78rem;color:var(--muted);line-height:1.7;margin-bottom:16px}
+.config-note code{background:rgba(0,229,255,.1);color:var(--accent);padding:1px 6px;border-radius:4px;font-family:monospace}
+
+/* ── LOGIN ── */
+#loginScreen{position:fixed;inset:0;background:var(--bg);display:none;align-items:center;justify-content:center;z-index:200;padding:20px}
+.login-box{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:40px 36px;width:100%;max-width:400px}
+.login-logo{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:4px;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:4px}
+.login-sub{font-size:.7rem;color:var(--muted);letter-spacing:2px;margin-bottom:28px}
+.login-tabs{display:flex;gap:4px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:3px;margin-bottom:22px}
+.login-tab{flex:1;padding:9px;border-radius:7px;border:none;background:transparent;color:var(--muted);font-family:'Noto Sans KR',sans-serif;font-size:.82rem;font-weight:500;cursor:pointer;transition:all .2s}
+.login-tab.active{background:linear-gradient(135deg,rgba(0,229,255,.15),rgba(124,58,237,.15));color:var(--text);border:1px solid rgba(0,229,255,.25)}
+.login-form{display:flex;flex-direction:column;gap:14px}
+.login-error{color:var(--danger);font-size:.78rem;text-align:center;min-height:18px}
+
+/* ── FORMS ── */
+.form-group{display:flex;flex-direction:column;gap:6px}
+.form-label{font-size:.72rem;color:var(--muted);letter-spacing:1px;text-transform:uppercase}
+.form-input{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:11px 14px;color:var(--text);font-family:'Noto Sans KR',sans-serif;font-size:.9rem;outline:none;transition:border-color .2s;width:100%}
+.form-input:focus{border-color:var(--accent);box-shadow:0 0 0 2px rgba(0,229,255,.1)}
+.form-input::placeholder{color:var(--muted)}
+select.form-input{cursor:pointer}
+.form-hint{font-size:.67rem;color:var(--muted)}
+.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;margin-bottom:16px}
+.form-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px;margin-bottom:20px}
+.form-title{font-size:.95rem;font-weight:700;margin-bottom:18px;color:var(--accent);letter-spacing:1px}
+
+/* ── BUTTONS ── */
+.btn{padding:12px 28px;border-radius:8px;border:none;font-family:'Noto Sans KR',sans-serif;font-size:.9rem;font-weight:700;cursor:pointer;transition:all .2s;letter-spacing:.5px}
+.btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#000;width:100%;margin-top:4px}
+.btn-primary:hover{opacity:.85;transform:translateY(-1px)}
+.btn-primary:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.btn-outline{background:transparent;border:1px solid var(--border);color:var(--text)}
+.btn-outline:hover{border-color:var(--accent);color:var(--accent)}
+.btn-danger{background:transparent;border:1px solid var(--danger);color:var(--danger);font-size:.75rem;padding:6px 14px}
+.btn-admin{background:transparent;border:1px solid var(--admin);color:var(--admin);font-size:.75rem;padding:6px 14px}
+.btn-sm{padding:6px 14px;font-size:.75rem}
+
+/* ── HEADER ── */
+#mainApp{display:none}
+header{padding:22px 0 18px;border-bottom:1px solid var(--border);margin-bottom:28px}
+.header-inner{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+.logo{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:4px;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.logo span{font-family:'Noto Sans KR',sans-serif;font-size:.65rem;letter-spacing:2px;color:var(--muted);display:block;-webkit-text-fill-color:var(--muted)}
+.header-right{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.header-stats{display:flex;gap:20px}
+.hstat{text-align:center}
+.hstat-val{font-size:1.3rem;font-weight:700;color:var(--accent)}
+.hstat-label{font-size:.6rem;color:var(--muted);letter-spacing:1px;text-transform:uppercase}
+.user-badge{display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--border);border-radius:999px;padding:6px 14px;font-size:.8rem}
+.user-badge.admin-badge{border-color:rgba(245,158,11,.4);color:var(--admin)}
+.user-badge.member-badge{border-color:rgba(0,229,255,.3);color:var(--accent)}
+
+/* ── TABS ── */
+.tabs{display:flex;gap:4px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:4px;margin-bottom:28px;overflow-x:auto}
+.tab{flex:1;min-width:90px;padding:9px 16px;border-radius:8px;border:none;background:transparent;color:var(--muted);font-family:'Noto Sans KR',sans-serif;font-size:.82rem;font-weight:500;cursor:pointer;transition:all .2s;white-space:nowrap}
+.tab.active{background:linear-gradient(135deg,rgba(0,229,255,.15),rgba(124,58,237,.15));color:var(--text);border:1px solid rgba(0,229,255,.3)}
+.tab:hover:not(.active){background:var(--card);color:var(--text)}
+.panel{display:none}
+.panel.active{display:block;animation:fadeIn .3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── LEADERBOARD ── */
+.leaderboard-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.section-title{font-size:1rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--accent)}
+.last-updated{font-size:.72rem;color:var(--muted)}
+.rank-list{display:flex;flex-direction:column;gap:10px}
+.rank-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px 20px;display:grid;grid-template-columns:44px 1fr auto auto;align-items:center;gap:16px;transition:all .2s;position:relative;overflow:hidden}
+.rank-card.clickable{cursor:pointer}
+.rank-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:transparent}
+.rank-card.rank-1::before{background:var(--gold)}
+.rank-card.rank-2::before{background:var(--silver)}
+.rank-card.rank-3::before{background:var(--bronze)}
+.rank-card.rank-mine{border-color:rgba(0,229,255,.4);background:rgba(0,229,255,.04)}
+.rank-card.clickable:hover{border-color:rgba(0,229,255,.3);transform:translateY(-1px)}
+.rank-num{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.85rem;background:var(--border);color:var(--muted)}
+.rank-1 .rank-num{background:linear-gradient(135deg,#f59e0b,#fbbf24);color:#000}
+.rank-2 .rank-num{background:linear-gradient(135deg,#64748b,#94a3b8);color:#000}
+.rank-3 .rank-num{background:linear-gradient(135deg,#92400e,#c17c43);color:#fff}
+.rank-info{min-width:0}
+.rank-name{font-weight:700;font-size:1rem;margin-bottom:4px}
+.rank-bars{display:flex;gap:8px;flex-wrap:wrap}
+.mini-bar{display:flex;align-items:center;gap:4px;font-size:.7rem;color:var(--muted)}
+.mini-bar-fill{width:40px;height:4px;border-radius:2px;background:var(--border);overflow:hidden}
+.mini-bar-fill div{height:100%;border-radius:2px;transition:width .8s ease}
+.bar-blood{background:var(--danger)}
+.bar-body{background:var(--accent2)}
+.bar-weight{background:var(--accent3)}
+.rank-score{text-align:right}
+.score-val{font-family:'Bebas Neue',sans-serif;font-size:2rem;line-height:1;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.score-label{font-size:.65rem;color:var(--muted);letter-spacing:1px}
+.rank-days{font-size:.7rem;color:var(--muted);text-align:right}
+.rank-days span{color:var(--text);font-weight:500}
+.mine-tag{display:inline-block;background:rgba(0,229,255,.15);border:1px solid rgba(0,229,255,.3);border-radius:4px;padding:1px 6px;font-size:.6rem;color:var(--accent);font-weight:700;margin-left:6px;letter-spacing:.5px}
+
+/* ── FORMULA ── */
+.formula-card{background:var(--card);border:1px solid rgba(0,229,255,.2);border-radius:12px;padding:16px 20px;margin-bottom:20px}
+.formula-title{font-size:.72rem;letter-spacing:2px;color:var(--accent);text-transform:uppercase;margin-bottom:10px}
+.formula-weights{display:flex;gap:16px;flex-wrap:wrap}
+.fw-item{display:flex;align-items:center;gap:8px;font-size:.8rem}
+.fw-dot{width:10px;height:10px;border-radius:50%}
+
+/* ── SCORE PREVIEW ── */
+.score-preview{background:var(--surface);border:1px solid rgba(0,229,255,.15);border-radius:12px;padding:16px 20px;margin-top:14px;display:none}
+.score-preview.show{display:block;animation:fadeIn .3s ease}
+.preview-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:12px}
+.preview-item{text-align:center}
+.preview-val{font-size:1.4rem;font-weight:700;margin-bottom:2px}
+.preview-label{font-size:.65rem;color:var(--muted);letter-spacing:1px}
+.preview-total{text-align:center;border-top:1px solid var(--border);padding-top:12px}
+.preview-total-val{font-family:'Bebas Neue',sans-serif;font-size:2.6rem;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1}
+
+/* ── STATS ── */
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:20px}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px;text-align:center}
+.stat-val{font-size:1.5rem;font-weight:700;margin-bottom:4px}
+.stat-label{font-size:.65rem;color:var(--muted);letter-spacing:1px}
+
+/* ── CHART ── */
+.chart-container{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:14px}
+.chart-title{font-size:.72rem;letter-spacing:1px;color:var(--muted);text-transform:uppercase;margin-bottom:14px}
+.chart-bars{display:flex;align-items:flex-end;gap:8px;height:110px}
+.chart-bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;height:100%;justify-content:flex-end}
+.chart-bar{width:100%;border-radius:4px 4px 0 0;min-height:4px;transition:height .6s ease}
+.chart-bar-label{font-size:.6rem;color:var(--muted);white-space:nowrap}
+
+/* ── TABLE ── */
+.history-table{width:100%;border-collapse:collapse;font-size:.82rem}
+.history-table th{text-align:left;padding:9px 12px;color:var(--muted);font-size:.68rem;letter-spacing:1px;text-transform:uppercase;border-bottom:1px solid var(--border);font-weight:500}
+.history-table td{padding:11px 12px;border-bottom:1px solid rgba(31,45,71,.5);color:var(--text);vertical-align:middle}
+.history-table tr:hover td{background:rgba(0,229,255,.02)}
+
+/* ── BADGES ── */
+.badge{display:inline-block;padding:2px 10px;border-radius:999px;font-size:.65rem;font-weight:700;letter-spacing:.5px;text-transform:uppercase}
+.badge-blood{background:rgba(239,68,68,.15);color:var(--danger);border:1px solid rgba(239,68,68,.3)}
+.badge-body{background:rgba(124,58,237,.15);color:#a78bfa;border:1px solid rgba(124,58,237,.3)}
+.badge-weight{background:rgba(16,185,129,.15);color:var(--accent3);border:1px solid rgba(16,185,129,.3)}
+.badge-admin{background:rgba(245,158,11,.15);color:var(--admin);border:1px solid rgba(245,158,11,.3)}
+.badge-locked{background:rgba(100,116,139,.15);color:var(--muted);border:1px solid rgba(100,116,139,.3)}
+.badge-live{background:rgba(16,185,129,.15);color:var(--accent3);border:1px solid rgba(16,185,129,.3);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+
+/* ── MISC ── */
+.member-info-card{background:var(--card);border:1px solid rgba(0,229,255,.2);border-radius:12px;padding:16px 20px;margin-bottom:20px;display:flex;gap:20px;flex-wrap:wrap;align-items:center}
+.member-info-item{text-align:center}
+.member-info-val{font-size:1rem;font-weight:700;color:var(--accent)}
+.member-info-label{font-size:.62rem;color:var(--muted);letter-spacing:1px}
+.admin-header{display:flex;align-items:center;gap:10px;margin-bottom:20px}
+.member-select-bar{display:flex;gap:12px;align-items:center;margin-bottom:20px;flex-wrap:wrap}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:100;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .2s}
+.modal-overlay.show{opacity:1;pointer-events:all}
+.modal{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:28px;width:100%;max-width:500px;transform:translateY(20px);transition:transform .2s;max-height:90vh;overflow-y:auto}
+.modal-overlay.show .modal{transform:translateY(0)}
+.modal-title{font-size:1rem;font-weight:700;margin-bottom:20px;color:var(--accent)}
+.modal-footer{display:flex;gap:10px;justify-content:flex-end;margin-top:20px}
+.toast{position:fixed;bottom:24px;right:24px;background:var(--surface);border:1px solid var(--accent3);border-radius:10px;padding:14px 20px;font-size:.85rem;color:var(--accent3);z-index:999;transform:translateY(80px);opacity:0;transition:all .3s ease;max-width:300px}
+.toast.show{transform:translateY(0);opacity:1}
+.empty{text-align:center;padding:48px 20px;color:var(--muted)}
+.empty-icon{font-size:2.5rem;margin-bottom:12px}
+.empty-text{font-size:.85rem}
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+@media(max-width:600px){.rank-card{grid-template-columns:36px 1fr auto}.rank-days{display:none}.login-box{padding:28px 20px}}
+</style>
+</head>
+<body>
+
+<!-- SPLASH -->
+<div id="splash">
+  <div class="splash-logo">HEALTH CHALLENGE</div>
+  <div class="spinner"></div>
+  <div class="splash-msg" id="splashMsg">Firebase 연결 중...</div>
+</div>
+
+<!-- CONFIG (Firebase 미설정시) -->
+<div id="configScreen">
+  <div class="config-box">
+    <div class="config-title">🔧 Firebase 설정 필요</div>
+    <div class="config-sub">index.html 파일 상단의 firebaseConfig를 실제 값으로 교체해주세요.</div>
+    <div class="config-section">
+      <div class="config-section-title">설정 방법</div>
+      <div class="config-note">
+        1. <a href="https://console.firebase.google.com" target="_blank" style="color:var(--accent)">Firebase Console</a> → 프로젝트 선택<br>
+        2. ⚙️ 프로젝트 설정 → 앱 추가(웹) → <code>firebaseConfig</code> 복사<br>
+        3. <code>index.html</code> 상단 <code>firebaseConfig</code> 객체에 붙여넣기<br>
+        4. GitHub에 push → Vercel이 자동 재배포
+      </div>
+    </div>
+    <div class="config-section">
+      <div class="config-section-title">Realtime Database 규칙</div>
+      <div class="config-note">
+        Firebase Console → Realtime Database → 규칙 탭에 아래를 붙여넣고 게시:<br><br>
+        <code>{ "rules": { ".read": true, ".write": true } }</code><br><br>
+        ⚠️ 테스트 용도입니다. 챌린지 종료 후 규칙을 강화하세요.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- LOGIN -->
+<div id="loginScreen">
+  <div class="login-box">
+    <div class="login-logo">HEALTH CHALLENGE</div>
+    <div class="login-sub" id="loginSubTitle">헬스 챌린지 트래커</div>
+    <div class="login-tabs">
+      <button class="login-tab active" id="ltMember" onclick="switchLoginTab('member')">👤 참여자 로그인</button>
+      <button class="login-tab" id="ltAdmin" onclick="switchLoginTab('admin')">👑 관리자 로그인</button>
+    </div>
+    <div id="loginMemberForm" class="login-form">
+      <div class="form-group">
+        <label class="form-label">이름 선택</label>
+        <select class="form-input" id="loginMemberSelect"><option value="">-- 이름을 선택하세요 --</option></select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">비밀번호</label>
+        <input type="password" class="form-input" id="loginMemberPw" placeholder="비밀번호" maxlength="20" onkeydown="if(event.key==='Enter')doMemberLogin()">
+      </div>
+      <div class="login-error" id="memberLoginError"></div>
+      <button class="btn btn-primary" id="btnMemberLogin" onclick="doMemberLogin()">로그인 →</button>
+    </div>
+    <div id="loginAdminForm" class="login-form" style="display:none">
+      <div class="form-group">
+        <label class="form-label">관리자 비밀번호</label>
+        <input type="password" class="form-input" id="loginAdminPw" placeholder="관리자 비밀번호" onkeydown="if(event.key==='Enter')doAdminLogin()">
+      </div>
+      <div class="login-error" id="adminLoginError"></div>
+      <button class="btn btn-primary" id="btnAdminLogin" onclick="doAdminLogin()">관리자 로그인 →</button>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="mainApp">
+  <div class="container">
+    <header>
+      <div class="header-inner">
+        <div class="logo">HEALTH CHALLENGE<span id="challengeTitle">헬스 챌린지 트래커</span></div>
+        <div class="header-right">
+          <div class="header-stats">
+            <div class="hstat"><div class="hstat-val" id="totalMembers">0</div><div class="hstat-label">참여자</div></div>
+            <div class="hstat"><div class="hstat-val" id="challengeDays">0</div><div class="hstat-label">진행일</div></div>
+          </div>
+          <span class="badge badge-live">● LIVE</span>
+          <div class="user-badge" id="userBadge"></div>
+          <button class="btn btn-outline btn-sm" onclick="doLogout()">로그아웃</button>
+        </div>
+      </div>
+    </header>
+
+    <!-- MEMBER TABS -->
+    <div class="tabs" id="memberTabs">
+      <button class="tab active" data-tab="leaderboard">🏆 순위표</button>
+      <button class="tab" data-tab="record">📝 기록 입력</button>
+      <button class="tab" data-tab="myrecords">📊 내 기록</button>
+    </div>
+
+    <!-- ADMIN TABS -->
+    <div class="tabs" id="adminTabs" style="display:none">
+      <button class="tab active" data-tab="leaderboard">🏆 순위표</button>
+      <button class="tab" data-tab="admin-records">📋 전체 기록 관리</button>
+      <button class="tab" data-tab="admin-members">👥 참여자 관리</button>
+      <button class="tab" data-tab="admin-settings">⚙️ 설정</button>
+    </div>
+
+    <!-- LEADERBOARD -->
+    <div id="tab-leaderboard" class="panel active">
+      <div class="formula-card">
+        <div class="formula-title">📐 종합점수 산정 공식</div>
+        <div class="formula-weights" id="formulaWeights"></div>
+      </div>
+      <div class="leaderboard-header">
+        <div class="section-title">실시간 순위</div>
+        <div class="last-updated" id="lastUpdated">-</div>
+      </div>
+      <div class="rank-list" id="rankList"></div>
+    </div>
+
+    <!-- RECORD INPUT -->
+    <div id="tab-record" class="panel">
+      <div class="form-card">
+        <div class="form-title">📅 오늘의 기록 입력</div>
+        <div id="recordFormInner"></div>
+      </div>
+    </div>
+
+    <!-- MY RECORDS -->
+    <div id="tab-myrecords" class="panel">
+      <div id="myRecordContent"></div>
+    </div>
+
+    <!-- ADMIN: ALL RECORDS -->
+    <div id="tab-admin-records" class="panel">
+      <div class="admin-header"><span style="font-size:1.2rem">👑</span><div class="section-title">전체 기록 관리</div><span class="badge badge-admin">ADMIN</span></div>
+      <div class="member-select-bar">
+        <select class="form-input" id="adminMemberSelect" style="max-width:220px" onchange="loadAdminRecords()">
+          <option value="">-- 참여자 선택 --</option>
+        </select>
+      </div>
+      <div id="adminRecordsContent"><div class="empty"><div class="empty-icon">👤</div><div class="empty-text">참여자를 선택하면 기록을 확인할 수 있습니다.</div></div></div>
+    </div>
+
+    <!-- ADMIN: MEMBERS -->
+    <div id="tab-admin-members" class="panel">
+      <div class="admin-header"><span style="font-size:1.2rem">👑</span><div class="section-title">참여자 관리</div><span class="badge badge-admin">ADMIN</span></div>
+      <div class="form-card">
+        <div class="form-title">➕ 새 참여자 등록</div>
+        <div class="form-grid">
+          <div class="form-group"><label class="form-label">이름</label><input type="text" class="form-input" id="newName" placeholder="이름"></div>
+          <div class="form-group"><label class="form-label">비밀번호 (4자 이상)</label><input type="password" class="form-input" id="newPw" placeholder="참여자 로그인 비밀번호" maxlength="20"></div>
+          <div class="form-group"><label class="form-label">초기 공복혈당 (mg/dL)</label><input type="number" class="form-input" id="newBlood" placeholder="예: 115"></div>
+          <div class="form-group"><label class="form-label">초기 체지방률 (%)</label><input type="number" class="form-input" id="newFat" placeholder="예: 28.0" step="0.1"></div>
+          <div class="form-group"><label class="form-label">초기 골격근량 (kg)</label><input type="number" class="form-input" id="newMuscle" placeholder="예: 26.0" step="0.1"></div>
+          <div class="form-group"><label class="form-label">초기 체중 (kg)</label><input type="number" class="form-input" id="newWeight" placeholder="예: 78.0" step="0.1"></div>
+          <div class="form-group"><label class="form-label">목표 체중 (kg)</label><input type="number" class="form-input" id="newTarget" placeholder="예: 68.0" step="0.1"></div>
+          <div class="form-group"><label class="form-label">챌린지 시작일</label><input type="date" class="form-input" id="newStart"></div>
+        </div>
+        <button class="btn btn-primary" style="width:auto;padding:12px 28px" onclick="addMember()">참여자 등록</button>
+      </div>
+      <div class="leaderboard-header"><div class="section-title">참여자 목록</div></div>
+      <div id="memberList" style="display:flex;flex-direction:column;gap:10px"></div>
+    </div>
+
+    <!-- ADMIN: SETTINGS -->
+    <div id="tab-admin-settings" class="panel">
+      <div class="admin-header"><span style="font-size:1.2rem">👑</span><div class="section-title">시스템 설정</div><span class="badge badge-admin">ADMIN</span></div>
+      <div class="form-card">
+        <div class="form-title">🏷️ 챌린지 이름</div>
+        <div class="form-grid" style="grid-template-columns:1fr">
+          <div class="form-group"><label class="form-label">챌린지 제목</label><input type="text" class="form-input" id="challengeName" placeholder="예: 2026 상반기 헬스 챌린지"></div>
+        </div>
+        <button class="btn btn-outline" style="width:auto;padding:10px 22px" onclick="saveChallengeName()">저장</button>
+      </div>
+      <div class="form-card">
+        <div class="form-title">🔑 관리자 비밀번호 변경</div>
+        <div class="form-grid" style="grid-template-columns:1fr 1fr">
+          <div class="form-group"><label class="form-label">현재 비밀번호</label><input type="password" class="form-input" id="curAdminPw" placeholder="현재 비밀번호"></div>
+          <div class="form-group"><label class="form-label">새 비밀번호</label><input type="password" class="form-input" id="newAdminPw" placeholder="새 비밀번호 (4자 이상)"></div>
+        </div>
+        <button class="btn btn-outline" style="width:auto;padding:10px 22px" onclick="changeAdminPw()">비밀번호 변경</button>
+      </div>
+      <div class="form-card">
+        <div class="form-title">⚖️ 점수 가중치 설정</div>
+        <div class="form-grid" style="grid-template-columns:1fr 1fr 1fr">
+          <div class="form-group"><label class="form-label">혈당 가중치 (%)</label><input type="number" class="form-input" id="wBlood" min="0" max="100" oninput="updateWeightSum()"></div>
+          <div class="form-group"><label class="form-label">인바디 가중치 (%)</label><input type="number" class="form-input" id="wBody" min="0" max="100" oninput="updateWeightSum()"></div>
+          <div class="form-group"><label class="form-label">체중 가중치 (%)</label><input type="number" class="form-input" id="wWeight" min="0" max="100" oninput="updateWeightSum()"></div>
+        </div>
+        <div id="weightSum" style="font-size:.8rem;color:var(--muted);margin-bottom:14px">합계: 100%</div>
+        <button class="btn btn-outline" style="width:auto;padding:10px 22px" onclick="saveWeights()">가중치 저장</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- EDIT RECORD MODAL -->
+<div class="modal-overlay" id="editModal">
+  <div class="modal">
+    <div class="modal-title">✏️ 기록 수정 <span class="badge badge-admin" style="font-size:.6rem">ADMIN ONLY</span></div>
+    <input type="hidden" id="editRecordId"><input type="hidden" id="editRecordMemberId">
+    <div class="form-grid">
+      <div class="form-group"><label class="form-label">날짜</label><input type="date" class="form-input" id="editDate"></div>
+      <div class="form-group"><label class="form-label">공복혈당 (mg/dL)</label><input type="number" class="form-input" id="editBlood"></div>
+      <div class="form-group"><label class="form-label">체지방률 (%)</label><input type="number" class="form-input" id="editFat" step="0.1"></div>
+      <div class="form-group"><label class="form-label">골격근량 (kg)</label><input type="number" class="form-input" id="editMuscle" step="0.1"></div>
+      <div class="form-group"><label class="form-label">체중 (kg)</label><input type="number" class="form-input" id="editWeight" step="0.1"></div>
+      <div class="form-group"><label class="form-label">메모</label><input type="text" class="form-input" id="editMemo"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline btn-sm" onclick="closeModal('editModal')">취소</button>
+      <button class="btn btn-admin btn-sm" onclick="saveEditRecord()">수정 저장</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- ════════════════════════════════
+     APP LOGIC
+════════════════════════════════ -->
+<script type="module">
+// Wait for Firebase
+await new Promise(resolve => {
+  if (window._db) return resolve();
+  window.addEventListener('firebaseReady', resolve, { once: true });
+});
+
+const { ref, set, get, update, remove, onValue, push, db, path } = window._db;
+
+// ─── State ───────────────────────────────────
+let appData = { members:{}, records:{}, settings:{} };
+let session = null;
+const isAdmin  = () => session?.role === 'admin';
+const isMember = () => session?.role === 'member';
+const myId     = () => session?.memberId;
+
+// ─── Firebase helpers ─────────────────────────
+async function dbSet(p, val)    { await set(path(p), val); }
+async function dbGet(p)         { const s = await get(path(p)); return s.exists() ? s.val() : null; }
+async function dbUpdate(p, val) { await update(path(p), val); }
+async function dbRemove(p)      { await remove(path(p)); }
+async function dbPush(p, val)   { const r = await push(path(p), val); return r.key; }
+
+// ─── Boot ─────────────────────────────────────
+async function boot() {
+  const splash = document.getElementById('splash');
+  const msg    = document.getElementById('splashMsg');
+
+  // Check Firebase config
+  try {
+    msg.textContent = 'DB 연결 중...';
+    const testSnap = await get(path('settings/adminPw'));
+    // If this throws, Firebase config is wrong
+  } catch(e) {
+    splash.style.display = 'none';
+    document.getElementById('configScreen').style.display = 'flex';
+    return;
+  }
+
+  msg.textContent = '데이터 로딩 중...';
+
+  // Load data once
+  const [membersSnap, recordsSnap, settingsSnap] = await Promise.all([
+    get(path('members')),
+    get(path('records')),
+    get(path('settings'))
+  ]);
+
+  appData.members  = membersSnap.exists()  ? membersSnap.val()  : {};
+  appData.records  = recordsSnap.exists()  ? recordsSnap.val()  : {};
+  appData.settings = settingsSnap.exists() ? settingsSnap.val() : {};
+
+  // Defaults
+  if (!appData.settings.adminPw)   await dbSet('settings/adminPw', 'admin1234');
+  if (!appData.settings.weights)   await dbSet('settings/weights', { blood:40, body:35, weight:25 });
+  if (!appData.settings.startDate) await dbSet('settings/startDate', new Date().toISOString().split('T')[0]);
+
+  // Re-read after defaults
+  const settSnap2 = await get(path('settings'));
+  appData.settings = settSnap2.val();
+
+  // Real-time listeners (순위표 자동 갱신)
+  onValue(path('members'), snap => {
+    appData.members = snap.exists() ? snap.val() : {};
+    if (session) { refreshLoginSelect(); renderLeaderboard(); updateHeaderStats(); }
+  });
+  onValue(path('records'), snap => {
+    appData.records = snap.exists() ? snap.val() : {};
+    if (session) renderLeaderboard();
+  });
+  onValue(path('settings'), snap => {
+    if (snap.exists()) appData.settings = snap.val();
+    if (session) { renderFormulaWeights(); updateHeaderStats(); }
+  });
+
+  splash.style.display = 'none';
+  refreshLoginSelect();
+  document.getElementById('loginScreen').style.display = 'flex';
+}
+
+// ─── Score calc ───────────────────────────────
+function getWeights() { return appData.settings.weights || { blood:40, body:35, weight:25 }; }
+
+function calcBloodScore(init, cur) {
+  if (!init||!cur) return null;
+  return Math.min(100, Math.max(0, (init-cur)/init*100*5));
+}
+function calcBodyScore(iF, iM, cF, cM) {
+  if (!iF||!cF) return null;
+  const fR = (iF-cF)/iF*100;
+  const mR = (iM&&cM) ? (cM-iM)/iM*100 : 0;
+  return Math.min(100, Math.max(0, fR*3+mR*2));
+}
+function calcWeightScore(init, target, cur) {
+  if (!init||!target||!cur) return null;
+  const g = init-target; if(g<=0) return 50;
+  return Math.min(100, Math.max(0, (init-cur)/g*100));
+}
+function calcComposite(bs, body, ws) {
+  const w = getWeights();
+  const wT = w.blood+w.body+w.weight; if(!wT) return null;
+  let sc=0, wt=0;
+  if(bs!==null)   {sc+=bs  *(w.blood /wT);wt+=w.blood /wT;}
+  if(body!==null) {sc+=body*(w.body  /wT);wt+=w.body  /wT;}
+  if(ws!==null)   {sc+=ws  *(w.weight/wT);wt+=w.weight/wT;}
+  return wt ? sc/wt*wt : null;
+}
+function getLatestRecord(memberId) {
+  const recs = Object.values(appData.records).filter(r => r.memberId===memberId);
+  return recs.sort((a,b)=>b.date.localeCompare(a.date))[0] || null;
+}
+function getMemberScores(member) {
+  const latest = getLatestRecord(member.id);
+  if (!latest) return null;
+  const bs   = calcBloodScore(member.initBlood, latest.blood);
+  const body = calcBodyScore(member.initFat, member.initMuscle, latest.fat, latest.muscle);
+  const ws   = calcWeightScore(member.initWeight, member.targetWeight, latest.weight);
+  return { bs, body, ws, composite:calcComposite(bs,body,ws), latest };
+}
+function fmtScore(n) { return (n!==null&&n!==undefined)?Math.round(n):'-'; }
+
+// ─── Login ────────────────────────────────────
+window.switchLoginTab = (tab) => {
+  document.getElementById('ltMember').classList.toggle('active', tab==='member');
+  document.getElementById('ltAdmin').classList.toggle('active', tab==='admin');
+  document.getElementById('loginMemberForm').style.display  = tab==='member'?'flex':'none';
+  document.getElementById('loginAdminForm').style.display   = tab==='admin'?'flex':'none';
+  document.getElementById('memberLoginError').textContent = '';
+  document.getElementById('adminLoginError').textContent  = '';
+};
+
+function refreshLoginSelect() {
+  const sel = document.getElementById('loginMemberSelect');
+  const members = Object.values(appData.members);
+  sel.innerHTML = '<option value="">-- 이름을 선택하세요 --</option>' +
+    members.map(m=>`<option value="${m.id}">${m.name}</option>`).join('');
+}
+
+window.doMemberLogin = async () => {
+  const btn = document.getElementById('btnMemberLogin');
+  const memberId = document.getElementById('loginMemberSelect').value;
+  const pw = document.getElementById('loginMemberPw').value;
+  const err = document.getElementById('memberLoginError');
+  if (!memberId) { err.textContent='이름을 선택해주세요.'; return; }
+  const member = appData.members[memberId];
+  if (!member || member.password !== pw) { err.textContent='비밀번호가 올바르지 않습니다.'; return; }
+  btn.textContent = '...'; btn.disabled = true;
+  session = { role:'member', memberId:member.id, name:member.name };
+  startApp();
+  btn.textContent = '로그인 →'; btn.disabled = false;
+};
+
+window.doAdminLogin = async () => {
+  const pw = document.getElementById('loginAdminPw').value;
+  const err = document.getElementById('adminLoginError');
+  const adminPw = appData.settings.adminPw || 'admin1234';
+  if (pw !== adminPw) { err.textContent='비밀번호가 올바르지 않습니다.'; return; }
+  session = { role:'admin' };
+  startApp();
+};
+
+window.doLogout = () => {
+  session = null;
+  document.getElementById('mainApp').style.display = 'none';
+  document.getElementById('loginScreen').style.display = 'flex';
+  document.getElementById('loginMemberPw').value = '';
+  document.getElementById('loginAdminPw').value = '';
+  document.getElementById('memberLoginError').textContent = '';
+  document.getElementById('adminLoginError').textContent = '';
+};
+
+// ─── App Start ────────────────────────────────
+function startApp() {
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('mainApp').style.display = 'block';
+  if (isAdmin()) {
+    document.getElementById('memberTabs').style.display = 'none';
+    document.getElementById('adminTabs').style.display = 'flex';
+    document.getElementById('userBadge').className = 'user-badge admin-badge';
+    document.getElementById('userBadge').innerHTML = '👑 관리자';
+    refreshAdminSelects();
+    renderAdminMemberList();
+    loadWeightInputs();
+    const cn = appData.settings.challengeName || '';
+    document.getElementById('challengeName').value = cn;
+  } else {
+    document.getElementById('memberTabs').style.display = 'flex';
+    document.getElementById('adminTabs').style.display = 'none';
+    document.getElementById('userBadge').className = 'user-badge member-badge';
+    document.getElementById('userBadge').innerHTML = `👤 ${session.name}`;
+  }
+  showTab('leaderboard');
+  updateHeaderStats();
+  renderFormulaWeights();
+  renderLeaderboard();
+  if (isMember()) { renderRecordForm(); loadMyRecords(); }
+  document.getElementById('newStart').value = new Date().toISOString().split('T')[0];
+}
+
+// ─── Tabs ─────────────────────────────────────
+function showTab(tabId) {
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  const panel = document.getElementById('tab-'+tabId);
+  if (panel) panel.classList.add('active');
+  const bar = isAdmin() ? document.getElementById('adminTabs') : document.getElementById('memberTabs');
+  bar.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active', t.dataset.tab===tabId));
+}
+document.addEventListener('click', e=>{
+  const tab = e.target.closest('.tab');
+  if (!tab||!tab.dataset.tab) return;
+  const id = tab.dataset.tab;
+  showTab(id);
+  if (id==='leaderboard') renderLeaderboard();
+  if (id==='record'&&isMember()) renderRecordForm();
+  if (id==='myrecords'&&isMember()) loadMyRecords();
+  if (id==='admin-records') { refreshAdminSelects(); loadAdminRecords(); }
+  if (id==='admin-members') { refreshAdminSelects(); renderAdminMemberList(); }
+  if (id==='admin-settings') loadWeightInputs();
+});
+
+// ─── Header ───────────────────────────────────
+function updateHeaderStats() {
+  const members = Object.values(appData.members);
+  document.getElementById('totalMembers').textContent = members.length;
+  const start = new Date(appData.settings.startDate || new Date());
+  document.getElementById('challengeDays').textContent = Math.max(0, Math.round((new Date()-start)/86400000));
+  const name = appData.settings.challengeName || '헬스 챌린지 트래커';
+  document.getElementById('challengeTitle').textContent = name;
+  document.getElementById('loginSubTitle').textContent = name;
+}
+function renderFormulaWeights() {
+  const w = getWeights();
+  document.getElementById('formulaWeights').innerHTML = `
+    <div class="fw-item"><div class="fw-dot" style="background:var(--danger)"></div><span>혈당 <strong>×${w.blood}%</strong></span></div>
+    <div class="fw-item"><div class="fw-dot" style="background:#a78bfa"></div><span>인바디 <strong>×${w.body}%</strong></span></div>
+    <div class="fw-item"><div class="fw-dot" style="background:var(--accent3)"></div><span>체중 <strong>×${w.weight}%</strong></span></div>
+    <div class="fw-item" style="margin-left:auto;font-size:.72rem;color:var(--muted)">각 지표 0~100점 → 가중 합산</div>`;
+}
+
+// ─── Leaderboard ──────────────────────────────
+function renderLeaderboard() {
+  const container = document.getElementById('rankList');
+  document.getElementById('lastUpdated').textContent = '업데이트: '+new Date().toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'});
+  const members = Object.values(appData.members);
+  const ranked = members.map(m=>({member:m,scores:getMemberScores(m)})).filter(x=>x.scores)
+    .sort((a,b)=>(b.scores.composite||0)-(a.scores.composite||0));
+  if (!ranked.length) {
+    container.innerHTML = members.length
+      ? '<div class="empty"><div class="empty-icon">📝</div><div class="empty-text">아직 기록이 없습니다.</div></div>'
+      : '<div class="empty"><div class="empty-icon">🏁</div><div class="empty-text">참여자를 등록하고 챌린지를 시작하세요!</div></div>';
+    return;
+  }
+  const noRecord = members.filter(m=>!getLatestRecord(m.id));
+  container.innerHTML = ranked.map(({member:m,scores:s},i)=>{
+    const rank=i+1, isMe=isMember()&&m.id===myId();
+    const medal=rank===1?'🥇':rank===2?'🥈':rank===3?'🥉':rank;
+    const cnt = Object.values(appData.records).filter(r=>r.memberId===m.id).length;
+    const clickable = isAdmin()||isMe;
+    const oc = isAdmin()?`onclick="adminViewMember('${m.id}')"`
+                        :isMe?`onclick="showTabGlobal('myrecords');loadMyRecords()"` :'';
+    return `<div class="rank-card ${rank<=3?'rank-'+rank:''} ${isMe?'rank-mine':''} ${clickable?'clickable':''}" ${oc}>
+      <div class="rank-num">${medal}</div>
+      <div class="rank-info">
+        <div class="rank-name">${m.name}${isMe?'<span class="mine-tag">나</span>':''}</div>
+        <div class="rank-bars">
+          <div class="mini-bar"><span style="color:var(--danger);font-size:.65rem">혈</span><div class="mini-bar-fill"><div class="bar-blood" style="width:${s.bs||0}%"></div></div><span>${fmtScore(s.bs)}</span></div>
+          <div class="mini-bar"><span style="color:#a78bfa;font-size:.65rem">인</span><div class="mini-bar-fill"><div class="bar-body" style="width:${s.body||0}%"></div></div><span>${fmtScore(s.body)}</span></div>
+          <div class="mini-bar"><span style="color:var(--accent3);font-size:.65rem">체</span><div class="mini-bar-fill"><div class="bar-weight" style="width:${s.ws||0}%"></div></div><span>${fmtScore(s.ws)}</span></div>
+        </div>
+      </div>
+      <div class="rank-days"><span>${cnt}</span>회 기록<br><span style="font-size:.65rem;color:var(--muted)">${s.latest?.date||''}</span></div>
+      <div class="rank-score"><div class="score-val">${fmtScore(s.composite)}</div><div class="score-label">점</div></div>
+    </div>`;
+  }).join('')+(noRecord.length?`<div style="margin-top:10px;padding:10px 14px;border:1px dashed var(--border);border-radius:8px;font-size:.78rem;color:var(--muted)">미기록: ${noRecord.map(m=>m.name).join(', ')}</div>`:'');
+}
+window.showTabGlobal = (id) => { showTab(id); };
+
+// ─── Record Form ──────────────────────────────
+function renderRecordForm() {
+  if (!isMember()) return;
+  const member = appData.members[myId()];
+  if (!member) return;
+  const today = new Date().toISOString().split('T')[0];
+  const records = Object.values(appData.records);
+  const existing = records.find(r=>r.memberId===member.id&&r.date===today);
+  let html = `<div class="member-info-card">
+    <div class="member-info-item"><div class="member-info-val">${member.initBlood||'-'}</div><div class="member-info-label">초기혈당</div></div>
+    <div class="member-info-item"><div class="member-info-val">${member.initFat||'-'}%</div><div class="member-info-label">초기체지방</div></div>
+    <div class="member-info-item"><div class="member-info-val">${member.initWeight||'-'}kg</div><div class="member-info-label">초기체중</div></div>
+    <div class="member-info-item"><div class="member-info-val">${member.targetWeight||'-'}kg</div><div class="member-info-label">목표체중</div></div>
+    <div style="margin-left:auto;font-size:.73rem;color:var(--muted)">시작: ${member.startDate||'-'}</div>
+  </div>`;
+  if (existing) {
+    const bs=calcBloodScore(member.initBlood,existing.blood);
+    const body=calcBodyScore(member.initFat,member.initMuscle,existing.fat,existing.muscle);
+    const ws=calcWeightScore(member.initWeight,member.targetWeight,existing.weight);
+    const comp=calcComposite(bs,body,ws);
+    html+=`<div style="background:rgba(16,185,129,.07);border:1px solid rgba(16,185,129,.3);border-radius:12px;padding:24px;text-align:center">
+      <div style="font-size:1.8rem;margin-bottom:8px">✅</div>
+      <div style="font-weight:700;font-size:1rem;margin-bottom:6px">오늘(${today}) 기록 완료!</div>
+      <div style="font-size:.8rem;color:var(--muted);margin-bottom:20px;padding:8px 16px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);border-radius:8px;display:inline-block">🔒 제출된 기록은 변경할 수 없습니다</div>
+      <div class="stats-grid" style="max-width:380px;margin:0 auto">
+        <div class="stat-card"><div class="stat-val" style="color:var(--danger)">${fmtScore(bs)}</div><div class="stat-label">혈당점수</div></div>
+        <div class="stat-card"><div class="stat-val" style="color:#a78bfa">${fmtScore(body)}</div><div class="stat-label">인바디점수</div></div>
+        <div class="stat-card"><div class="stat-val" style="color:var(--accent3)">${fmtScore(ws)}</div><div class="stat-label">체중점수</div></div>
+      </div>
+      <div style="margin-top:18px;font-family:'Bebas Neue',sans-serif;font-size:3.2rem;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1">${fmtScore(comp)}</div>
+      <div style="font-size:.65rem;color:var(--muted);letter-spacing:2px;margin-top:4px">오늘의 종합점수</div>
+    </div>`;
+  } else {
+    html+=`<div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;align-items:center">
+      <span class="badge badge-blood">혈당</span><span class="badge badge-body">인바디</span><span class="badge badge-weight">체중</span>
+      <span class="badge badge-locked" style="margin-left:auto">🔒 제출 후 수정 불가</span>
+    </div>
+    <div class="form-grid">
+      <div class="form-group"><label class="form-label">날짜</label><input type="date" class="form-input" value="${today}" readonly style="cursor:not-allowed;opacity:.55"></div>
+      <div class="form-group"><label class="form-label">공복혈당 (mg/dL)</label><input type="number" class="form-input" id="recBlood" placeholder="예: 105" oninput="updateScorePreview()"><span class="form-hint">정상: 70~99 mg/dL</span></div>
+      <div class="form-group"><label class="form-label">체지방률 (%)</label><input type="number" class="form-input" id="recFat" placeholder="예: 24.5" step="0.1" oninput="updateScorePreview()"></div>
+      <div class="form-group"><label class="form-label">골격근량 (kg)</label><input type="number" class="form-input" id="recMuscle" placeholder="예: 28.3" step="0.1" oninput="updateScorePreview()"></div>
+      <div class="form-group"><label class="form-label">체중 (kg)</label><input type="number" class="form-input" id="recWeight" placeholder="예: 72.5" step="0.1" oninput="updateScorePreview()"></div>
+      <div class="form-group"><label class="form-label">메모 (선택)</label><input type="text" class="form-input" id="recMemo" placeholder="오늘의 컨디션 등"></div>
+    </div>
+    <div class="score-preview" id="scorePreview">
+      <div style="font-size:.7rem;color:var(--muted);letter-spacing:1px;margin-bottom:10px">📊 예상 점수 미리보기</div>
+      <div class="preview-grid">
+        <div class="preview-item"><div class="preview-val" id="prev-blood" style="color:var(--danger)">-</div><div class="preview-label">혈당점수</div></div>
+        <div class="preview-item"><div class="preview-val" id="prev-body" style="color:#a78bfa">-</div><div class="preview-label">인바디점수</div></div>
+        <div class="preview-item"><div class="preview-val" id="prev-weight" style="color:var(--accent3)">-</div><div class="preview-label">체중점수</div></div>
+      </div>
+      <div class="preview-total"><div class="preview-total-val" id="prev-total">-</div><div style="font-size:.65rem;color:var(--muted);letter-spacing:1px">종합 점수</div></div>
+    </div>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-top:18px">
+      <button class="btn btn-primary" style="width:auto;padding:12px 28px" id="submitBtn" onclick="submitRecord()">기록 최종 제출 →</button>
+      <span style="font-size:.72rem;color:var(--danger)">⚠️ 제출 후 수정 불가</span>
+    </div>`;
+  }
+  document.getElementById('recordFormInner').innerHTML = html;
+}
+
+window.updateScorePreview = () => {
+  const member = appData.members[myId()];
+  if (!member) return;
+  const blood=parseFloat(document.getElementById('recBlood')?.value)||null;
+  const fat=parseFloat(document.getElementById('recFat')?.value)||null;
+  const muscle=parseFloat(document.getElementById('recMuscle')?.value)||null;
+  const weight=parseFloat(document.getElementById('recWeight')?.value)||null;
+  const preview=document.getElementById('scorePreview');
+  if (!blood&&!fat&&!weight) { preview?.classList.remove('show'); return; }
+  const bs=calcBloodScore(member.initBlood,blood);
+  const body=calcBodyScore(member.initFat,member.initMuscle,fat,muscle);
+  const ws=calcWeightScore(member.initWeight,member.targetWeight,weight);
+  const comp=calcComposite(bs,body,ws);
+  document.getElementById('prev-blood').textContent=fmtScore(bs);
+  document.getElementById('prev-body').textContent=fmtScore(body);
+  document.getElementById('prev-weight').textContent=fmtScore(ws);
+  document.getElementById('prev-total').textContent=fmtScore(comp);
+  preview.classList.add('show');
+};
+
+window.submitRecord = async () => {
+  const member = appData.members[myId()];
+  if (!member) return;
+  const today = new Date().toISOString().split('T')[0];
+  const dup = Object.values(appData.records).find(r=>r.memberId===member.id&&r.date===today);
+  if (dup) { toast('오늘 기록은 이미 제출되었습니다.','warn'); return; }
+  const blood=parseFloat(document.getElementById('recBlood').value)||null;
+  const fat=parseFloat(document.getElementById('recFat').value)||null;
+  const muscle=parseFloat(document.getElementById('recMuscle').value)||null;
+  const weight=parseFloat(document.getElementById('recWeight').value)||null;
+  const memo=document.getElementById('recMemo').value;
+  if (!blood&&!fat&&!weight) { toast('최소 1개 수치를 입력해주세요.','warn'); return; }
+  if (!confirm('⚠️ 제출 후에는 수정할 수 없습니다.\n기록을 최종 제출할까요?')) return;
+  const btn=document.getElementById('submitBtn');
+  btn.textContent='저장 중...'; btn.disabled=true;
+  try {
+    const newKey = await dbPush('records', { memberId:member.id, date:today, blood, fat, muscle, weight, memo, createdAt:new Date().toISOString() });
+    toast('기록이 제출되었습니다! 📈');
+    renderRecordForm();
+    loadMyRecords();
+  } catch(e) {
+    toast('저장 실패: '+e.message,'error');
+    btn.textContent='기록 최종 제출 →'; btn.disabled=false;
+  }
+};
+
+// ─── My Records ───────────────────────────────
+function loadMyRecords() {
+  if (!isMember()) return;
+  const member = appData.members[myId()];
+  renderRecordView(member, document.getElementById('myRecordContent'), false);
+}
+
+function renderRecordView(member, container, adminView) {
+  if (!member) { container.innerHTML='<div class="empty"><div class="empty-icon">👤</div><div class="empty-text">참여자를 찾을 수 없습니다.</div></div>'; return; }
+  const records = Object.values(appData.records).filter(r=>r.memberId===member.id).sort((a,b)=>a.date.localeCompare(b.date));
+  const scores = getMemberScores(member);
+  const members = Object.values(appData.members);
+  const ranked = members.map(m=>({id:m.id,s:getMemberScores(m)})).filter(x=>x.s).sort((a,b)=>(b.s.composite||0)-(a.s.composite||0));
+  const myRank = ranked.findIndex(x=>x.id===member.id)+1;
+  let html=`<div class="stats-grid">`;
+  if (myRank>0) {
+    const medal=myRank===1?'🥇':myRank===2?'🥈':myRank===3?'🥉':`${myRank}위`;
+    html+=`<div class="stat-card" style="border-color:rgba(0,229,255,.3)"><div class="stat-val" style="font-size:1.8rem">${medal}</div><div class="stat-label">현재 순위 / ${ranked.length}명</div></div>`;
+  }
+  if (scores) {
+    html+=`<div class="stat-card"><div class="stat-val" style="color:var(--danger)">${fmtScore(scores.bs)}</div><div class="stat-label">혈당 점수</div></div>`;
+    html+=`<div class="stat-card"><div class="stat-val" style="color:#a78bfa">${fmtScore(scores.body)}</div><div class="stat-label">인바디 점수</div></div>`;
+    html+=`<div class="stat-card"><div class="stat-val" style="color:var(--accent3)">${fmtScore(scores.ws)}</div><div class="stat-label">체중 달성도</div></div>`;
+    html+=`<div class="stat-card" style="border-color:rgba(0,229,255,.3)"><div class="stat-val" style="background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">${fmtScore(scores.composite)}</div><div class="stat-label">종합 점수</div></div>`;
+  }
+  html+=`</div>`;
+  if (records.length>0) {
+    const last8=records.slice(-8);
+    const maxSc=Math.max(...last8.map(r=>{
+      const bs=calcBloodScore(member.initBlood,r.blood);
+      const body=calcBodyScore(member.initFat,member.initMuscle,r.fat,r.muscle);
+      const ws=calcWeightScore(member.initWeight,member.targetWeight,r.weight);
+      return calcComposite(bs,body,ws)||0;
+    }))||1;
+    html+=`<div class="chart-container"><div class="chart-title">📈 종합점수 추이 (최근 ${last8.length}일)</div><div class="chart-bars">`;
+    last8.forEach(r=>{
+      const bs=calcBloodScore(member.initBlood,r.blood);
+      const body=calcBodyScore(member.initFat,member.initMuscle,r.fat,r.muscle);
+      const ws=calcWeightScore(member.initWeight,member.targetWeight,r.weight);
+      const comp=calcComposite(bs,body,ws)||0;
+      html+=`<div class="chart-bar-wrap"><div class="chart-bar" style="height:${Math.max(4,(comp/maxSc)*100)}%;background:linear-gradient(to top,var(--accent2),var(--accent))"></div><div class="chart-bar-label">${r.date.slice(5)}</div></div>`;
+    });
+    html+=`</div></div>`;
+    html+=`<div class="chart-container"><div class="chart-title">📋 기록 이력${adminView?` <span class="badge badge-admin" style="float:right">ADMIN 편집 가능</span>`:''}</div><div style="overflow-x:auto"><table class="history-table"><thead><tr>
+      <th>날짜</th><th>혈당</th><th>체지방률</th><th>근육량</th><th>체중</th><th>종합점수</th><th>메모</th>${adminView?'<th>관리</th>':''}
+    </tr></thead><tbody>`;
+    // Find record keys for admin edit
+    const recordEntries = Object.entries(appData.records).filter(([,r])=>r.memberId===member.id).sort(([,a],[,b])=>b.date.localeCompare(a.date));
+    recordEntries.forEach(([key,r])=>{
+      const bs=calcBloodScore(member.initBlood,r.blood);
+      const body=calcBodyScore(member.initFat,member.initMuscle,r.fat,r.muscle);
+      const ws=calcWeightScore(member.initWeight,member.targetWeight,r.weight);
+      const comp=calcComposite(bs,body,ws);
+      const edited=r.adminEdited?'<span title="관리자 수정됨" style="color:var(--admin);font-size:.7rem;margin-left:4px">✏️</span>':'';
+      html+=`<tr>
+        <td>${r.date}${edited}</td>
+        <td>${r.blood!=null?r.blood+' mg/dL':'-'}</td>
+        <td>${r.fat!=null?r.fat+'%':'-'}</td>
+        <td>${r.muscle!=null?r.muscle+' kg':'-'}</td>
+        <td>${r.weight!=null?r.weight+' kg':'-'}</td>
+        <td><strong style="color:var(--accent)">${comp!==null?fmtScore(comp):'-'}점</strong></td>
+        <td style="color:var(--muted);font-size:.75rem">${r.memo||''}</td>
+        ${adminView?`<td style="white-space:nowrap"><button class="btn btn-admin btn-sm" onclick="openEditModal('${key}','${member.id}')">수정</button> <button class="btn btn-danger btn-sm" onclick="adminDeleteRecord('${key}','${member.id}')">삭제</button></td>`:''}
+      </tr>`;
+    });
+    html+=`</tbody></table></div></div>`;
+  } else {
+    html+=`<div class="empty"><div class="empty-icon">📝</div><div class="empty-text">아직 기록이 없습니다.</div></div>`;
+  }
+  container.innerHTML=html;
+}
+
+// ─── Admin: Records ───────────────────────────
+function refreshAdminSelects() {
+  const members=Object.values(appData.members);
+  const opts=members.map(m=>`<option value="${m.id}">${m.name}</option>`).join('');
+  const sel=document.getElementById('adminMemberSelect');
+  if(sel) sel.innerHTML='<option value="">-- 참여자 선택 --</option>'+opts;
+}
+function loadAdminRecords() {
+  const memberId=document.getElementById('adminMemberSelect').value;
+  const container=document.getElementById('adminRecordsContent');
+  if(!memberId){container.innerHTML='<div class="empty"><div class="empty-icon">👤</div><div class="empty-text">참여자를 선택하면 기록을 확인할 수 있습니다.</div></div>';return;}
+  const member=appData.members[memberId];
+  renderRecordView(member,container,true);
+}
+window.adminViewMember=(memberId)=>{
+  showTab('admin-records');
+  refreshAdminSelects();
+  document.getElementById('adminMemberSelect').value=memberId;
+  loadAdminRecords();
+};
+window.openEditModal=(key,memberId)=>{
+  const r=appData.records[key];
+  if(!r) return;
+  document.getElementById('editRecordId').value=key;
+  document.getElementById('editRecordMemberId').value=memberId;
+  document.getElementById('editDate').value=r.date;
+  document.getElementById('editBlood').value=r.blood??'';
+  document.getElementById('editFat').value=r.fat??'';
+  document.getElementById('editMuscle').value=r.muscle??'';
+  document.getElementById('editWeight').value=r.weight??'';
+  document.getElementById('editMemo').value=r.memo??'';
+  document.getElementById('editModal').classList.add('show');
+};
+window.saveEditRecord=async()=>{
+  const key=document.getElementById('editRecordId').value;
+  const memberId=document.getElementById('editRecordMemberId').value;
+  const updates={
+    date:document.getElementById('editDate').value,
+    blood:parseFloat(document.getElementById('editBlood').value)||null,
+    fat:parseFloat(document.getElementById('editFat').value)||null,
+    muscle:parseFloat(document.getElementById('editMuscle').value)||null,
+    weight:parseFloat(document.getElementById('editWeight').value)||null,
+    memo:document.getElementById('editMemo').value,
+    adminEdited:true, editedAt:new Date().toISOString()
+  };
+  try {
+    await dbUpdate(`records/${key}`, updates);
+    closeModal('editModal');
+    toast('기록이 수정되었습니다. (관리자)');
+    loadAdminRecords();
+  } catch(e) { toast('수정 실패: '+e.message,'error'); }
+};
+window.adminDeleteRecord=async(key,memberId)=>{
+  if(!confirm('이 기록을 삭제할까요?')) return;
+  try {
+    await dbRemove(`records/${key}`);
+    toast('기록이 삭제되었습니다.');
+    loadAdminRecords();
+  } catch(e) { toast('삭제 실패: '+e.message,'error'); }
+};
+window.closeModal=(id)=>document.getElementById(id).classList.remove('show');
+
+// ─── Admin: Members ───────────────────────────
+function renderAdminMemberList() {
+  const container=document.getElementById('memberList');
+  const members=Object.values(appData.members);
+  if(!members.length){container.innerHTML='<div class="empty"><div class="empty-icon">👥</div><div class="empty-text">등록된 참여자가 없습니다.</div></div>';return;}
+  container.innerHTML=members.map(m=>{
+    const cnt=Object.values(appData.records).filter(r=>r.memberId===m.id).length;
+    return `<div class="rank-card">
+      <div class="rank-num" style="font-size:1.1rem">👤</div>
+      <div class="rank-info">
+        <div class="rank-name">${m.name}</div>
+        <div style="font-size:.73rem;color:var(--muted);margin-top:3px">혈당 ${m.initBlood||'-'} · 체지방 ${m.initFat||'-'}% · 체중 ${m.initWeight||'-'}→목표 ${m.targetWeight||'-'}kg</div>
+      </div>
+      <div class="rank-days" style="display:block"><span>${cnt}</span>회 기록</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <button class="btn btn-admin btn-sm" onclick="editMemberQuick('${m.id}')">수정</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteMember('${m.id}')">삭제</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+window.addMember=async()=>{
+  const name=document.getElementById('newName').value.trim();
+  const pw=document.getElementById('newPw').value;
+  if(!name){toast('이름을 입력해주세요.','warn');return;}
+  if(!pw||pw.length<4){toast('비밀번호를 4자 이상 입력해주세요.','warn');return;}
+  if(Object.values(appData.members).find(m=>m.name===name)){toast('동일한 이름의 참여자가 있습니다.','warn');return;}
+  const blood=parseFloat(document.getElementById('newBlood').value);
+  const fat=parseFloat(document.getElementById('newFat').value);
+  const muscle=parseFloat(document.getElementById('newMuscle').value);
+  const weight=parseFloat(document.getElementById('newWeight').value);
+  const target=parseFloat(document.getElementById('newTarget').value);
+  const start=document.getElementById('newStart').value||new Date().toISOString().split('T')[0];
+  if(!blood||!fat||!weight||!target){toast('초기 수치와 목표 체중을 입력해주세요.','warn');return;}
+  try {
+    const newKey=await dbPush('members',{name,password:pw,initBlood:blood,initFat:fat,initMuscle:muscle,initWeight:weight,targetWeight:target,startDate:start,createdAt:new Date().toISOString()});
+    // Store id in the record itself for easy access
+    await dbUpdate(`members/${newKey}`,{id:newKey});
+    toast(`${name} 참여자가 등록되었습니다! 🎉`);
+    ['newName','newPw','newBlood','newFat','newMuscle','newWeight','newTarget'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('newStart').value='';
+  } catch(e){toast('등록 실패: '+e.message,'error');}
+};
+window.deleteMember=async(id)=>{
+  const m=appData.members[id];
+  if(!m||!confirm(`${m.name} 참여자와 모든 기록을 삭제할까요?`)) return;
+  try {
+    await dbRemove(`members/${id}`);
+    const toDelete=Object.entries(appData.records).filter(([,r])=>r.memberId===id).map(([k])=>k);
+    await Promise.all(toDelete.map(k=>dbRemove(`records/${k}`)));
+    toast(`${m.name} 참여자가 삭제되었습니다.`);
+    renderAdminMemberList();
+    refreshAdminSelects();
+  } catch(e){toast('삭제 실패: '+e.message,'error');}
+};
+window.editMemberQuick=async(id)=>{
+  const m=appData.members[id];
+  if(!m) return;
+  const choice=prompt(`${m.name} 수정:\n1: 비밀번호 변경\n2: 목표체중 변경\n\n번호 입력:`);
+  if(!choice) return;
+  if(choice==='1'){
+    const nPw=prompt('새 비밀번호 (4자 이상):');
+    if(!nPw||nPw.length<4){toast('4자 이상 입력해주세요.','warn');return;}
+    await dbUpdate(`members/${id}`,{password:nPw});
+    toast(`${m.name} 비밀번호가 변경되었습니다.`);
+  } else if(choice==='2'){
+    const nT=prompt(`새 목표체중 (현재: ${m.targetWeight}kg):`);
+    if(!nT) return;
+    const v=parseFloat(nT);
+    if(isNaN(v)){toast('올바른 숫자를 입력해주세요.','warn');return;}
+    await dbUpdate(`members/${id}`,{targetWeight:v});
+    toast(`목표체중이 ${v}kg으로 변경되었습니다.`);
+  }
+  renderAdminMemberList();
+};
+
+// ─── Admin: Settings ──────────────────────────
+function loadWeightInputs(){
+  const w=getWeights();
+  document.getElementById('wBlood').value=w.blood;
+  document.getElementById('wBody').value=w.body;
+  document.getElementById('wWeight').value=w.weight;
+  updateWeightSum();
+  const cn=appData.settings.challengeName||'';
+  document.getElementById('challengeName').value=cn;
+}
+window.updateWeightSum=()=>{
+  const b=parseFloat(document.getElementById('wBlood')?.value)||0;
+  const bo=parseFloat(document.getElementById('wBody')?.value)||0;
+  const w=parseFloat(document.getElementById('wWeight')?.value)||0;
+  const sum=b+bo+w;
+  const el=document.getElementById('weightSum');
+  if(el) el.innerHTML=`합계: <strong style="color:${sum===100?'var(--accent3)':'var(--danger)'}">${sum}%</strong> ${sum===100?'✅':'⚠️ 합계가 100%여야 합니다'}`;
+};
+window.saveWeights=async()=>{
+  const b=parseFloat(document.getElementById('wBlood').value)||0;
+  const bo=parseFloat(document.getElementById('wBody').value)||0;
+  const w=parseFloat(document.getElementById('wWeight').value)||0;
+  if(b+bo+w!==100){toast('가중치 합계가 100%여야 합니다.','warn');return;}
+  await dbUpdate('settings',{weights:{blood:b,body:bo,weight:w}});
+  toast('가중치가 저장되고 점수가 재계산되었습니다.');
+};
+window.saveChallengeName=async()=>{
+  const name=document.getElementById('challengeName').value.trim();
+  await dbUpdate('settings',{challengeName:name||'헬스 챌린지 트래커'});
+  toast('챌린지 이름이 저장되었습니다.');
+};
+window.changeAdminPw=async()=>{
+  const cur=document.getElementById('curAdminPw').value;
+  const nw=document.getElementById('newAdminPw').value;
+  const adminPw=appData.settings.adminPw||'admin1234';
+  if(cur!==adminPw){toast('현재 비밀번호가 올바르지 않습니다.','warn');return;}
+  if(!nw||nw.length<4){toast('새 비밀번호를 4자 이상 입력해주세요.','warn');return;}
+  await dbUpdate('settings',{adminPw:nw});
+  document.getElementById('curAdminPw').value='';
+  document.getElementById('newAdminPw').value='';
+  toast('관리자 비밀번호가 변경되었습니다. ✅');
+};
+
+// ─── Toast ────────────────────────────────────
+window.toast=(msg,type='success')=>{
+  const el=document.getElementById('toast');
+  el.textContent=msg;
+  el.style.borderColor=type==='warn'?'var(--warn)':type==='error'?'var(--danger)':'var(--accent3)';
+  el.style.color=type==='warn'?'var(--warn)':type==='error'?'var(--danger)':'var(--accent3)';
+  el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'),3500);
+};
+
+// ─── Init ─────────────────────────────────────
+document.getElementById('editModal').addEventListener('click', e=>{if(e.target===document.getElementById('editModal'))closeModal('editModal');});
+boot();
+</script>
+</body>
+</html>
