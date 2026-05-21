@@ -501,7 +501,7 @@ header{padding:0;border-bottom:3px solid var(--accent);margin-bottom:28px;backgr
     <!-- LEADERBOARD -->
     <div id="tab-leaderboard" class="panel active">
       <div class="formula-card">
-        <div class="formula-title">📐 종합점수 산정 공식</div>
+        <div class="formula-title" id="formulaTitleEl">📐 종합점수 산정 공식</div>
         <div class="formula-weights" id="formulaWeights"></div>
       </div>
       <div class="leaderboard-header">
@@ -526,7 +526,7 @@ header{padding:0;border-bottom:3px solid var(--accent);margin-bottom:28px;backgr
 
     <!-- ADMIN: ALL RECORDS -->
     <div id="tab-admin-records" class="panel">
-      <div class="admin-header"><span style="font-size:1.2rem">👑</span><div class="section-title">전체 기록 관리</div><span class="badge badge-admin">ADMIN</span></div>
+      <div class="admin-header"><span style="font-size:1.2rem">👑</span><div class="section-title" id="adminRecordsSectionTitle">전체 기록 관리</div><span class="badge badge-admin">ADMIN</span></div>
       <div class="member-select-bar">
         <select class="form-input" id="adminMemberSelect" style="max-width:220px" onchange="loadAdminRecords()">
           <option value="">-- 참여자 Members 선택 --</option>
@@ -537,9 +537,9 @@ header{padding:0;border-bottom:3px solid var(--accent);margin-bottom:28px;backgr
 
     <!-- ADMIN: MEMBERS -->
     <div id="tab-admin-members" class="panel">
-      <div class="admin-header"><span style="font-size:1.2rem">👑</span><div class="section-title">참여자 Members 관리</div><span class="badge badge-admin">ADMIN</span></div>
+      <div class="admin-header"><span style="font-size:1.2rem">👑</span><div class="section-title" id="adminMembersSectionTitle">참여자 관리</div><span class="badge badge-admin">ADMIN</span></div>
       <div class="form-card">
-        <div class="form-title">➕ 새 참여자 Members 등록 Add Member</div>
+        <div class="form-title" id="addMemberTitle">➕ 새 참여자 등록</div>
         <div class="form-grid">
           <div class="form-group"><label class="form-label">이름 Name</label><input type="text" class="form-input" id="newName" placeholder="이름"></div>
           <div class="form-group"><label class="form-label">비밀번호 Password (4자 이상)</label><input type="password" class="form-input" id="newPw" placeholder="참여자 Members 로그인 비밀번호 Password" maxlength="20"></div>
@@ -552,15 +552,15 @@ header{padding:0;border-bottom:3px solid var(--accent);margin-bottom:28px;backgr
         </div>
         <button class="btn btn-primary" style="width:auto;padding:12px 28px" onclick="addMember()">참여자 Members 등록</button>
       </div>
-      <div class="leaderboard-header"><div class="section-title">참여자 Members 목록 Member List</div></div>
+      <div class="leaderboard-header"><div class="section-title" id="memberListTitle">참여자 목록</div></div>
       <div id="memberList" style="display:flex;flex-direction:column;gap:10px"></div>
     </div>
 
     <!-- ADMIN: SETTINGS -->
     <div id="tab-admin-settings" class="panel">
-      <div class="admin-header"><span style="font-size:1.2rem">👑</span><div class="section-title">시스템 설정</div><span class="badge badge-admin">ADMIN</span></div>
+      <div class="admin-header"><span style="font-size:1.2rem">👑</span><div class="section-title" id="adminSettingsSectionTitle">시스템 설정</div><span class="badge badge-admin">ADMIN</span></div>
       <div class="form-card">
-        <div class="form-title">🏷️ 챌린지 이름 &amp; 기간 Challenge Info</div>
+        <div class="form-title" id="challengeInfoTitle">🏷️ 챌린지 이름 &amp; 기간</div>
         <div class="form-grid" style="grid-template-columns:1fr 1fr 1fr">
           <div class="form-group"><label class="form-label">챌린지 제목 Title</label><input type="text" class="form-input" id="challengeName" placeholder="예: 2026 상반기 헬스 챌린지"></div>
           <div class="form-group"><label class="form-label">챌린지 시작일 Start Date</label><input type="date" class="form-input" id="challengeStartDate"></div>
@@ -569,7 +569,7 @@ header{padding:0;border-bottom:3px solid var(--accent);margin-bottom:28px;backgr
         <button class="btn btn-outline" style="width:auto;padding:10px 22px" onclick="saveChallengeName()">저장 Save</button>
       </div>
       <div class="form-card">
-        <div class="form-title">🔑 관리자 비밀번호 Admin PW Password Admin Password</div>
+        <div class="form-title" id="adminPwTitle">🔑 관리자 비밀번호 변경</div>
         <div class="form-grid" style="grid-template-columns:1fr 1fr">
           <div class="form-group"><label class="form-label">현재 비밀번호 Password</label><input type="password" class="form-input" id="curAdminPw" placeholder="현재 비밀번호 Password"></div>
           <div class="form-group"><label class="form-label">새 비밀번호 Password</label><input type="password" class="form-input" id="newAdminPw" placeholder="새 비밀번호 Password (4자 이상)"></div>
@@ -577,7 +577,7 @@ header{padding:0;border-bottom:3px solid var(--accent);margin-bottom:28px;backgr
         <button class="btn btn-outline" style="width:auto;padding:10px 22px" onclick="changeAdminPw()">비밀번호 Password 변경</button>
       </div>
       <div class="form-card" id="subAdminCard">
-        <div class="form-title">👑 추가 관리자 Sub-Admin</div>
+        <div class="form-title" id="subAdminTitle">👑 추가 관리자 관리</div>
         <div style="font-size:.78rem;color:var(--muted);margin-bottom:16px;">부관리자는 모든 기록 조회·수정, 참여자 Members 관리가 가능합니다. 단, 관리자 비밀번호 Admin PW Password 변경 및 다른 관리자 추가는 <strong>최고 관리자만</strong> 가능합니다.</div>
         <div class="form-grid" style="grid-template-columns:1fr 1fr 1fr;">
           <div class="form-group"><label class="form-label">관리자 이름 Name</label><input type="text" class="form-input" id="newSubAdminName" placeholder="예: 홍길동"></div>
@@ -593,7 +593,7 @@ header{padding:0;border-bottom:3px solid var(--accent);margin-bottom:28px;backgr
         <div id="subAdminList" style="margin-top:20px;display:flex;flex-direction:column;gap:8px;"></div>
       </div>
       <div class="form-card">
-        <div class="form-title">💪 골격근량 단위 Muscle Unit</div>
+        <div class="form-title" id="muscleUnitTitle">💪 골격근량 입력 단위</div>
         <div style="font-size:.8rem;color:var(--muted);margin-bottom:16px;">참여자 Members들이 인바디 기기에서 골격근량을 <strong>kg</strong> 또는 <strong>%</strong> 중 어떤 단위로 보는지 선택하세요. 모든 참여자 Members에게 동일하게 적용됩니다.</div>
         <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;">
           <button id="unitBtnKg" class="btn btn-outline" style="padding:10px 24px;font-size:.85rem;" onclick="setMuscleUnit('kg')">⚖️ kg (킬로그램)</button>
@@ -606,7 +606,7 @@ header{padding:0;border-bottom:3px solid var(--accent);margin-bottom:28px;backgr
         </div>
       </div>
       <div class="form-card">
-        <div class="form-title">⚖️ 점수 가중치 Score Weights</div>
+        <div class="form-title" id="weightsTitle">⚖️ 점수 가중치 설정</div>
         <div class="form-grid" style="grid-template-columns:1fr 1fr 1fr">
           <div class="form-group"><label class="form-label">당뇨 HbA1c 가중치 Weight (%)</label><input type="number" class="form-input" id="wBlood" min="0" max="100" oninput="updateWeightSum()"></div>
           <div class="form-group"><label class="form-label">인바디 Body 가중치 Weight (%)</label><input type="number" class="form-input" id="wBody" min="0" max="100" oninput="updateWeightSum()"></div>
@@ -790,9 +790,33 @@ function applyLang() {
   const L = LABELS[currentLang];
   const ko = currentLang === 'ko';
 
+
+  // ── 정적 HTML 제목들 전체 언어 적용 ──────────────────
+  const staticTitles = {
+    formulaTitleEl:            ko ? '📐 종합점수 산정 공식'        : '📐 Score Formula',
+    rankSectionTitle:          ko ? '실시간 순위'                   : 'Live Ranking',
+    recordFormTitle:           ko ? '📅 오늘의 기록 입력'           : '📅 Daily Record Entry',
+    adminRecordsSectionTitle:  ko ? '전체 기록 관리'                : 'All Records',
+    adminMembersSectionTitle:  ko ? '참여자 관리'                   : 'Member Management',
+    adminSettingsSectionTitle: ko ? '시스템 설정'                   : 'System Settings',
+    addMemberTitle:            ko ? '➕ 새 참여자 등록'             : '➕ Register New Member',
+    memberListTitle:           ko ? '참여자 목록'                   : 'Member List',
+    adminPwTitle:              ko ? '🔑 관리자 비밀번호 변경'       : '🔑 Change Admin Password',
+    subAdminTitle:             ko ? '👑 추가 관리자 관리'           : '👑 Sub-Admin Management',
+    muscleUnitTitle:           ko ? '💪 골격근량 입력 단위 설정'    : '💪 Muscle Mass Unit',
+    weightsTitle:              ko ? '⚖️ 점수 가중치 설정'           : '⚖️ Score Weights',
+    challengeInfoTitle:        ko ? '🏷️ 챌린지 이름 & 기간'        : '🏷️ Challenge Info & Period',
+  };
+  Object.entries(staticTitles).forEach(([id, txt]) => {
+    const el = document.getElementById(id);
+    if(el) el.textContent = txt;
+  });
+  // 헤더 탑바
+  const topbarEl = document.getElementById('headerTopBar');
+  if(topbarEl) topbarEl.textContent = L.topbarText;
+
   // ── 헤더 탑바
-  const topbar = document.getElementById('headerTopBar');
-  if(topbar) topbar.textContent = L.topbarText;
+  // headerTopBar handled in staticTitles above
 
   // ── 메인 탭
   document.querySelectorAll('.tab').forEach(t=>{
@@ -860,9 +884,6 @@ function applyLang() {
   });
 
   // ── 점수 관련 동적 컨텐츠 재렌더 (세션 있을 때)
-  // 기록 폼 타이틀
-  const rft = document.getElementById('recordFormTitle');
-  if(rft) rft.innerHTML = '📅 ' + (currentLang==='en' ? 'Daily Record Entry' : '오늘의 기록 입력');
   if(session) {
     if(isMember()) { renderRecordForm(); loadMyRecords(); }
     renderLeaderboard();
