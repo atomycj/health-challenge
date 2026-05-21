@@ -273,6 +273,22 @@ header{padding:0;border-bottom:3px solid var(--accent);margin-bottom:28px;backgr
 .login-logo-wrap{display:flex;align-items:center;gap:14px;margin-bottom:10px}
 .login-logo-img{width:52px;height:auto;object-fit:contain;border-radius:6px;flex-shrink:0}
 .login-centre{font-size:.68rem;color:var(--muted);letter-spacing:.5px;margin-top:2px}
+/* Login guide buttons full-width */
+.login-guide-btns{display:flex;gap:8px;width:100%;margin-bottom:4px}
+.login-guide-btn{flex:1;display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:10px;border:2px solid var(--accent);background:linear-gradient(135deg,rgba(0,112,192,.09),rgba(0,112,192,.04));cursor:pointer;transition:all .2s;text-align:left;font-family:'Noto Sans KR',sans-serif}
+.login-guide-btn:hover{background:var(--accent);transform:translateY(-1px);box-shadow:0 4px 14px rgba(0,112,192,.3)}
+.login-guide-btn:hover .login-guide-title{color:#fff}
+.login-guide-btn:hover .login-guide-sub{color:rgba(255,255,255,.75)}
+.login-guide-btn:hover .login-guide-arrow{color:#fff;transform:translateX(3px)}
+.login-guide-btn-en{border-color:var(--teal);background:linear-gradient(135deg,rgba(0,168,204,.09),rgba(0,168,204,.04))}
+.login-guide-btn-en:hover{background:var(--teal);box-shadow:0 4px 14px rgba(0,168,204,.3)}
+.login-guide-icon{font-size:1.4rem;flex-shrink:0}
+.login-guide-text-wrap{flex:1;min-width:0}
+.login-guide-title{display:block;font-size:.85rem;font-weight:800;color:var(--accent);line-height:1.2;margin-bottom:1px;transition:color .2s}
+.login-guide-btn-en .login-guide-title{color:var(--teal)}
+.login-guide-sub{display:block;font-size:.68rem;color:var(--muted);transition:color .2s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.login-guide-arrow{font-size:1rem;color:var(--accent);transition:transform .2s, color .2s;font-weight:700;flex-shrink:0}
+.login-guide-btn-en .login-guide-arrow{color:var(--teal)}
 @media(max-width:420px){
   .login-logo-img{width:40px}
   .login-logo{font-size:1.4rem;letter-spacing:2px}
@@ -285,7 +301,7 @@ header{padding:0;border-bottom:3px solid var(--accent);margin-bottom:28px;backgr
 .btn-guide:hover{background:var(--accent);color:#fff}
 .btn-guide-en{border-color:var(--teal);background:#e0f7fb;color:var(--teal)}
 .btn-guide-en:hover{background:var(--teal);color:#fff}
-/* Guide button MAIN — prominent */
+/* Guide button MAIN — kept small for header icon use */
 .guide-btn-wrap{display:flex;gap:8px;align-items:center}
 .btn-guide-main{display:flex;align-items:center;gap:7px;padding:10px 18px;border-radius:10px;border:2px solid var(--accent);background:var(--accent);color:#fff;font-family:'Noto Sans KR',sans-serif;font-size:.88rem;font-weight:700;cursor:pointer;transition:all .2s;white-space:nowrap;box-shadow:0 3px 10px rgba(0,112,192,.25);letter-spacing:.3px}
 .btn-guide-main:hover{background:var(--accent2);border-color:var(--accent2);transform:translateY(-2px);box-shadow:0 6px 18px rgba(0,112,192,.35)}
@@ -294,6 +310,40 @@ header{padding:0;border-bottom:3px solid var(--accent);margin-bottom:28px;backgr
 .btn-guide-main-en:hover{background:var(--teal-d, #007d8c);border-color:var(--teal-d, #007d8c);box-shadow:0 6px 18px rgba(0,168,204,.35)}
 .guide-btn-icon{font-size:1rem;flex-shrink:0}
 .guide-btn-text{font-size:.88rem;font-weight:700}
+/* Header icon-only guide buttons */
+.guide-icon-btns{display:flex;gap:6px}
+.btn-guide-icon{width:36px;height:36px;border-radius:8px;border:2px solid var(--accent);background:var(--blue-l);color:var(--accent);font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0}
+.btn-guide-icon:hover{background:var(--accent);color:#fff;transform:translateY(-1px)}
+.btn-guide-icon-en{border-color:var(--teal);color:var(--teal)}
+.btn-guide-icon-en:hover{background:var(--teal);color:#fff}
+/* Full-width Guide Banner */
+.guide-banner{display:flex;width:100%;background:var(--card);border-bottom:2px solid var(--border);box-shadow:0 2px 12px rgba(0,112,192,.10);margin-bottom:24px;overflow:hidden}
+.guide-banner-btn{flex:1;display:flex;align-items:center;gap:14px;padding:16px 24px;background:linear-gradient(135deg,rgba(0,112,192,.07),rgba(0,112,192,.03));border:none;cursor:pointer;transition:all .2s;text-align:left;font-family:'Noto Sans KR',sans-serif;position:relative}
+.guide-banner-btn:hover{background:linear-gradient(135deg,rgba(0,112,192,.15),rgba(0,112,192,.08))}
+.guide-banner-btn:hover .guide-banner-arrow{transform:translateX(4px)}
+.guide-banner-btn-en{background:linear-gradient(135deg,rgba(0,168,204,.07),rgba(0,168,204,.03))}
+.guide-banner-btn-en:hover{background:linear-gradient(135deg,rgba(0,168,204,.15),rgba(0,168,204,.08))}
+.guide-banner-icon{font-size:1.8rem;flex-shrink:0}
+.guide-banner-texts{flex:1;min-width:0}
+.guide-banner-title{display:block;font-size:1rem;font-weight:800;color:var(--accent);line-height:1.2;margin-bottom:2px}
+.guide-banner-btn-en .guide-banner-title{color:var(--teal)}
+.guide-banner-sub{display:block;font-size:.75rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.guide-banner-arrow{font-size:1.2rem;color:var(--accent);transition:transform .2s;flex-shrink:0;font-weight:700}
+.guide-banner-btn-en .guide-banner-arrow{color:var(--teal)}
+.guide-banner-divider{width:1px;background:var(--border);flex-shrink:0}
+@media(max-width:480px){
+  .guide-banner-btn{padding:12px 14px;gap:10px}
+  .guide-banner-icon{font-size:1.4rem}
+  .guide-banner-title{font-size:.92rem}
+  .guide-banner-sub{font-size:.68rem}
+  .guide-banner-arrow{font-size:1rem}
+}
+@media(max-width:360px){
+  .guide-banner-btn{padding:10px 10px;gap:8px}
+  .guide-banner-icon{display:none}
+  .guide-banner-title{font-size:.88rem}
+  .guide-banner-sub{display:none}
+}
 /* Lang toggle */
 .lang-toggle{display:flex;background:var(--surface);border:1.5px solid var(--border);border-radius:8px;overflow:hidden}
 .lang-btn{padding:6px 12px;border:none;background:transparent;color:var(--muted);font-family:'Noto Sans KR',sans-serif;font-size:.78rem;font-weight:600;cursor:pointer;transition:all .2s}
@@ -355,10 +405,7 @@ header{padding:0;border-bottom:3px solid var(--accent);margin-bottom:28px;backgr
   .stats-grid{grid-template-columns:1fr 1fr}
   .progress-chart{padding:14px 12px 10px}
 
-  .btn-guide-main{padding:8px 12px;font-size:.78rem;gap:5px}
-  .guide-btn-text{display:none}
-  .guide-btn-icon{font-size:1.1rem}
-  .guide-btn-wrap{gap:5px}}
+  .btn-guide-icon{width:30px;height:30px;font-size:.9rem}}
 @media(max-width:360px){
   .tab{min-width:52px;font-size:.68rem;padding:6px 6px}
   .rank-card{grid-template-columns:28px 1fr auto;gap:5px}
@@ -412,13 +459,21 @@ header{padding:0;border-bottom:3px solid var(--accent);margin-bottom:28px;backgr
         </div>
       </div>
       <div class="login-guide-btns">
-        <button class="btn-guide-main" onclick="openGuide('ko')" id="loginGuideKo">
-          <span class="guide-btn-icon">📋</span>
-          <span class="guide-btn-text">챌린지 안내</span>
+        <button class="login-guide-btn" onclick="openGuide('ko')" id="loginGuideKo">
+          <span class="login-guide-icon">📋</span>
+          <span class="login-guide-text-wrap">
+            <span class="login-guide-title" id="loginGuideTitleKo">챌린지 안내</span>
+            <span class="login-guide-sub">참여 방법 보기</span>
+          </span>
+          <span class="login-guide-arrow">→</span>
         </button>
-        <button class="btn-guide-main btn-guide-main-en" onclick="openGuide('en')" id="loginGuideEn">
-          <span class="guide-btn-icon">📋</span>
-          <span class="guide-btn-text">Guide</span>
+        <button class="login-guide-btn login-guide-btn-en" onclick="openGuide('en')" id="loginGuideEn">
+          <span class="login-guide-icon">📋</span>
+          <span class="login-guide-text-wrap">
+            <span class="login-guide-title" id="loginGuideTitleEn">Challenge Guide</span>
+            <span class="login-guide-sub">How to join</span>
+          </span>
+          <span class="login-guide-arrow">→</span>
         </button>
       </div>
     </div>
@@ -488,15 +543,9 @@ header{padding:0;border-bottom:3px solid var(--accent);margin-bottom:28px;backgr
             <div class="hstat"><div class="hstat-val" id="challengeDays">0</div><div class="hstat-label">진행일 Days</div></div>
           </div>
           <span class="badge badge-live">● LIVE</span>
-          <div class="guide-btn-wrap">
-            <button class="btn-guide-main" onclick="openGuide('ko')" id="headerGuideKoBtn" title="챌린지 안내 (한국어)">
-              <span class="guide-btn-icon">📋</span>
-              <span class="guide-btn-text">챌린지 안내</span>
-            </button>
-            <button class="btn-guide-main btn-guide-main-en" onclick="openGuide('en')" id="headerGuideEnBtn" title="Challenge Guide (English)">
-              <span class="guide-btn-icon">📋</span>
-              <span class="guide-btn-text">Guide</span>
-            </button>
+          <div class="guide-icon-btns">
+            <button class="btn-guide-icon" onclick="openGuide('ko')" id="headerGuideKoBtn" title="챌린지 안내">📋</button>
+            <button class="btn-guide-icon btn-guide-icon-en" onclick="openGuide('en')" id="headerGuideEnBtn" title="Guide">🌐</button>
           </div>
           <div class="lang-toggle">
             <button id="langKo" class="lang-btn active" onclick="setLang('ko')">한국어</button>
@@ -507,6 +556,27 @@ header{padding:0;border-bottom:3px solid var(--accent);margin-bottom:28px;backgr
         </div>
       </div>
     </header>
+
+    <!-- GUIDE BANNER — full width, always visible -->
+    <div class="guide-banner" id="guideBanner">
+      <button class="guide-banner-btn" onclick="openGuide('ko')" id="guideBannerKo">
+        <span class="guide-banner-icon">📋</span>
+        <div class="guide-banner-texts">
+          <span class="guide-banner-title" id="guideBannerKoTitle">챌린지 안내</span>
+          <span class="guide-banner-sub">참여 방법 · 제품 · 패키지 보기</span>
+        </div>
+        <span class="guide-banner-arrow">→</span>
+      </button>
+      <div class="guide-banner-divider"></div>
+      <button class="guide-banner-btn guide-banner-btn-en" onclick="openGuide('en')" id="guideBannerEn">
+        <span class="guide-banner-icon">📋</span>
+        <div class="guide-banner-texts">
+          <span class="guide-banner-title" id="guideBannerEnTitle">Challenge Guide</span>
+          <span class="guide-banner-sub">How to join · Products · Packages</span>
+        </div>
+        <span class="guide-banner-arrow">→</span>
+      </button>
+    </div>
 
     <!-- MEMBER TABS -->
     <div class="tabs" id="memberTabs">
@@ -865,15 +935,23 @@ window.applyLang = function() {
   if(hstatLabels[0]) hstatLabels[0].textContent = L.members;
   if(hstatLabels[1]) hstatLabels[1].textContent = L.days;
 
-  // ── 헤더 안내 버튼 텍스트
-  const hGuideKoBtn = document.getElementById('headerGuideKoBtn');
-  const hGuideEnBtn = document.getElementById('headerGuideEnBtn');
-  if(hGuideKoBtn) { const t = hGuideKoBtn.querySelector('.guide-btn-text'); if(t) t.textContent = ko ? '챌린지 안내' : 'Guide 안내'; }
-  if(hGuideEnBtn) { const t = hGuideEnBtn.querySelector('.guide-btn-text'); if(t) t.textContent = ko ? 'Guide' : 'Guide'; }
-  const lgKoBtnTxt = document.getElementById('loginGuideKo');
-  const lgEnBtnTxt = document.getElementById('loginGuideEn');
-  if(lgKoBtnTxt) { const t = lgKoBtnTxt.querySelector('.guide-btn-text'); if(t) t.textContent = ko ? '챌린지 안내' : 'Guide'; }
-  if(lgEnBtnTxt) { const t = lgEnBtnTxt.querySelector('.guide-btn-text'); if(t) t.textContent = 'Guide'; }
+  // ── 안내 배너 텍스트 (헤더 아래 전체폭)
+  const bannerKoTitle = document.getElementById('guideBannerKoTitle');
+  const bannerEnTitle = document.getElementById('guideBannerEnTitle');
+  if(bannerKoTitle) bannerKoTitle.textContent = ko ? '챌린지 안내' : 'Challenge Guide';
+  if(bannerEnTitle) bannerEnTitle.textContent = ko ? 'Challenge Guide' : 'Challenge Guide';
+  // 배너 부제목도 언어 변경
+  const bannerBtns = document.querySelectorAll('.guide-banner-btn');
+  if(bannerBtns[0]) { const sub = bannerBtns[0].querySelector('.guide-banner-sub'); if(sub) sub.textContent = ko ? '참여 방법 · 제품 · 패키지 보기' : 'How to join · Products · Packages'; }
+  if(bannerBtns[1]) { const sub = bannerBtns[1].querySelector('.guide-banner-sub'); if(sub) sub.textContent = ko ? '영어 가이드 보기' : 'View in English'; }
+  // 로그인 화면 안내 버튼
+  const lgKoTitle = document.getElementById('loginGuideTitleKo');
+  const lgEnTitle = document.getElementById('loginGuideTitleEn');
+  if(lgKoTitle) lgKoTitle.textContent = ko ? '챌린지 안내' : 'Challenge Guide';
+  if(lgEnTitle) lgEnTitle.textContent = ko ? 'Challenge Guide' : 'Challenge Guide';
+  const lgBtns = document.querySelectorAll('.login-guide-btn');
+  if(lgBtns[0]) { const sub = lgBtns[0].querySelector('.login-guide-sub'); if(sub) sub.textContent = ko ? '참여 방법 보기' : 'How to join'; }
+  if(lgBtns[1]) { const sub = lgBtns[1].querySelector('.login-guide-sub'); if(sub) sub.textContent = ko ? '영어 가이드' : 'English Guide'; }
 
   // ── 로그인 화면
   const loginSub = document.getElementById('loginSubTitle');
