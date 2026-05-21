@@ -786,7 +786,7 @@ window.setLang = (lang) => {
   applyLang();
 };
 
-function applyLang() {
+window.applyLang = function() {
   const L = LABELS[currentLang];
   const ko = currentLang === 'ko';
 
@@ -1171,7 +1171,7 @@ function updateHeaderStats() {
   document.getElementById('challengeTitle').textContent = name;
   document.getElementById('loginSubTitle').textContent = name;
 }
-function renderFormulaWeights() {
+window.renderFormulaWeights = function() {
   const w = getWeights();
   const endDate = appData.settings.endDate;
   const today = new Date().toISOString().split('T')[0];
@@ -1190,7 +1190,7 @@ function renderFormulaWeights() {
 }
 
 // ─── Leaderboard ──────────────────────────────
-function renderLeaderboard() {
+window.renderLeaderboard = function() {
   const container = document.getElementById('rankList');
   const L = LABELS[currentLang];
   const timeStr = new Date().toLocaleTimeString(currentLang==='en'?'en-NZ':'ko-KR',{hour:'2-digit',minute:'2-digit'});
@@ -1232,7 +1232,7 @@ function renderLeaderboard() {
 window.showTabGlobal = (id) => { showTab(id); };
 
 // ─── Record Form ──────────────────────────────
-function renderRecordForm() {
+window.renderRecordForm = function() {
   if (!isMember()) return;
   const member = appData.members[myId()];
   if (!member) return;
@@ -1377,7 +1377,7 @@ window.submitFinalHba1c = async () => {
 };
 
 // ─── My Records ───────────────────────────────
-function loadMyRecords() {
+window.loadMyRecords = function() {
   if (!isMember()) return;
   const member = appData.members[myId()];
   renderRecordView(member, document.getElementById('myRecordContent'), false);
@@ -1653,13 +1653,13 @@ function renderRecordView(member, container, adminView) {
 }
 
 // ─── Admin: Records ───────────────────────────
-function refreshAdminSelects() {
+window.refreshAdminSelects = function() {
   const members=Object.values(appData.members);
   const opts=members.map(m=>`<option value="${m.id}">${m.name}</option>`).join('');
   const sel=document.getElementById('adminMemberSelect');
   if(sel) sel.innerHTML='<option value="">-- 참여자 Members 선택 --</option>'+opts;
 }
-function loadAdminRecords() {
+window.loadAdminRecords = function() {
   const memberId=document.getElementById('adminMemberSelect').value;
   const container=document.getElementById('adminRecordsContent');
   if(!memberId){container.innerHTML='<div class="empty"><div class="empty-icon">👤</div><div class="empty-text">참여자 Members를 선택하면 기록을 확인할 수 있습니다.</div></div>';return;}
@@ -1737,7 +1737,7 @@ window.adminDeleteRecord=async(key,memberId)=>{
 window.closeModal=(id)=>document.getElementById(id).classList.remove('show');
 
 // ─── Admin: Members ───────────────────────────
-function renderAdminMemberList() {
+window.renderAdminMemberList = function() {
   const container=document.getElementById('memberList');
   const members=Object.values(appData.members);
   if(!members.length){container.innerHTML='<div class="empty"><div class="empty-icon">👥</div><div class="empty-text">등록된 참여자 Members가 없습니다.</div></div>';return;}
@@ -1835,7 +1835,7 @@ window.setMuscleUnit=async(unit)=>{
   toast(`골격근량 단위가 ${unit==='%'?'퍼센트(%)':'킬로그램(kg)'}으로 변경되었습니다.`);
   updateMuscleUnitUI();
 };
-function updateMuscleUnitUI(){
+window.updateMuscleUnitUI = function(){
   const unit=getMuscleUnit();
   const kgBtn=document.getElementById('unitBtnKg');
   const pctBtn=document.getElementById('unitBtnPct');
@@ -1859,7 +1859,7 @@ function updateMuscleUnitUI(){
   const editLabel=document.getElementById('editMuscleLabel');
   if(editLabel) editLabel.textContent=`골격근량 (${unit})`;
 }
-function loadWeightInputs(){
+window.loadWeightInputs = function(){
   const w=getWeights();
   document.getElementById('wBlood').value=w.blood;
   document.getElementById('wBody').value=w.body;
@@ -1947,7 +1947,7 @@ window.addSubAdmin=async()=>{
 };
 
 // ── 부관리자 목록 렌더 ──
-function renderSubAdminList(){
+window.renderSubAdminList = function(){
   const container=document.getElementById('subAdminList');
   if(!container) return;
   const subs=appData.settings.subAdmins||{};
