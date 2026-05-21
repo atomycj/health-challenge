@@ -149,17 +149,87 @@ footer{background:var(--blue);color:rgba(255,255,255,.75);text-align:center;padd
 footer strong{color:var(--white);display:block;margin-bottom:6px;font-size:1rem;letter-spacing:2px}
 
 /* ── RESPONSIVE ── */
-@media(max-width:600px){
-  html{font-size:15px}
-  .header-main{padding:18px 16px}
-  .inbody-grid,.req-grid,.pkg-grid,.check-grid{grid-template-columns:1fr}
-  .hero{padding:40px 16px 36px}
+/* ═══ RESPONSIVE ═══ */
+@media(max-width:860px){
+  .pkg-grid{grid-template-columns:1fr}
+  .req-grid{grid-template-columns:1fr}
+}
+@media(max-width:700px){
+  html{font-size:16px}
+  .header-main{padding:16px 14px;gap:12px}
+  .logo-img{width:56px}
+  .logo-text h1{font-size:1.6rem;letter-spacing:2px}
+  .hero h2{font-size:clamp(1.8rem,7vw,3rem)}
+  .hero{padding:36px 16px 30px}
+  .hero-desc{font-size:.95rem}
+  .container{padding:0 14px}
   .section{padding:36px 0}
-  .container{padding:0 16px}
+  .inbody-grid{grid-template-columns:1fr}
+  .check-grid{grid-template-columns:1fr}
   .score-label{min-width:110px}
   .score-note{margin-left:0}
   .tl-item::after{left:37px}
+  .pkg-grid{grid-template-columns:1fr}
+  .req-grid{grid-template-columns:1fr}
+  .walking-grid{grid-template-columns:1fr}
 }
+@media(max-width:480px){
+  html{font-size:14px}
+  .header-top{padding:8px 14px}
+  .header-main{padding:12px 10px}
+  .logo-img{width:44px}
+  .logo-text h1{font-size:1.3rem;letter-spacing:1px}
+  .logo-text .subtitle{font-size:.7rem}
+  .header-badge{padding:8px 14px;font-size:.72rem}
+  .hero{padding:28px 12px 24px}
+  .hero-tag{font-size:.68rem;padding:4px 12px}
+  .hero h2{font-size:clamp(1.6rem,8vw,2.4rem);letter-spacing:1px}
+  .hero-desc{font-size:.88rem}
+  .container{padding:0 10px}
+  .section{padding:28px 0}
+  .section-title{font-size:1.3rem}
+  .step{grid-template-columns:44px 1fr;gap:12px;padding:14px 14px}
+  .step-num{width:36px;height:36px;font-size:1rem}
+  .step-body h3{font-size:.95rem}
+  .step-body p{font-size:.84rem}
+  .score-box{padding:18px 14px}
+  .score-row{gap:8px}
+  .score-label{font-size:.78rem;min-width:100px}
+  .score-pct{font-size:1.1rem}
+  .inbody-card{padding:16px}
+  .req-body .req-row{flex-direction:column;gap:2px}
+  .req-key{min-width:auto}
+  .pkg-header{padding:14px 16px 12px}
+  .pkg-body{padding:4px 14px 14px}
+  .pkg-item{gap:8px;padding:10px 0}
+  .tl-item{grid-template-columns:62px 1fr}
+  .tl-badge{width:36px;height:36px;font-size:.7rem;margin-left:12px}
+  .tl-item::after{left:30px}
+  .tl-content{padding:12px 14px}
+  .notice{padding:14px 14px}
+  .warning{padding:14px 14px}
+  .walking-highlight{flex-direction:column;gap:10px;text-align:center}
+  footer{padding:24px 14px;font-size:.74rem}
+}
+@media(max-width:360px){
+  html{font-size:13px}
+  .header-main{flex-direction:column;align-items:flex-start;gap:8px}
+  .hero h2{font-size:1.5rem}
+  .step{grid-template-columns:36px 1fr;gap:10px}
+}
+
+/* ── WALKING SECTION ── */
+.walking-card{background:var(--white);border:1.5px solid var(--blue-m);border-radius:14px;padding:22px 24px;box-shadow:var(--shadow)}
+.walking-highlight{background:linear-gradient(135deg,var(--blue),var(--teal));border-radius:12px;padding:20px 24px;color:var(--white);margin-bottom:20px;display:flex;align-items:center;gap:18px}
+.walking-icon{font-size:2.2rem;flex-shrink:0}
+.walking-title{font-size:1.05rem;font-weight:700;margin-bottom:4px}
+.walking-subtitle{font-size:.85rem;opacity:.85;line-height:1.6}
+.walking-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px}
+.walking-info-card{background:var(--blue-l);border:1px solid var(--blue-m);border-radius:10px;padding:16px;text-align:center}
+.walking-info-card .wi-icon{font-size:1.6rem;margin-bottom:6px}
+.walking-info-card .wi-label{font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;font-weight:600}
+.walking-info-card .wi-value{font-size:.95rem;font-weight:700;color:var(--ink);line-height:1.3}
+.walking-note{background:var(--paper);border-left:4px solid var(--teal);border-radius:0 8px 8px 0;padding:12px 16px;font-size:.86rem;color:var(--body);line-height:1.7}
 </style>
 
 <title>헬스 챌린지 참여 안내 — Atomy Auckland Absolute Centre</title>
@@ -406,7 +476,60 @@ footer strong{color:var(--white);display:block;margin-bottom:6px;font-size:1rem;
   </div>
 </div>
 
-<!-- SECTION 7: 일정 -->
+<!-- SECTION 7: 그룹 워킹 -->
+<div class="section">
+  <div class="section-label">Group Activity</div>
+  <div class="section-title">주 1회 그룹 워킹</div>
+  <div class="divider"></div>
+  <p class="section-sub">챌린지 참가자 전원이 <strong>일주일에 한 번</strong> 함께 모여 워킹(걷기 운동)을 합니다.<br>요일과 시간은 참가자들이 가장 모이기 좋은 날로 함께 정합니다.</p>
+
+  <div class="walking-card">
+    <div class="walking-highlight">
+      <div class="walking-icon">🚶</div>
+      <div>
+        <div class="walking-title">함께 걷는 그룹 워킹 프로그램</div>
+        <div class="walking-subtitle">혼자 하는 운동보다 함께할 때 더 오래, 더 즐겁게 지속됩니다.<br>참가자 전원이 요일과 시간을 합의하여 정기적으로 만납니다.</div>
+      </div>
+    </div>
+
+    <div class="walking-grid">
+      <div class="walking-info-card">
+        <div class="wi-icon">📅</div>
+        <div class="wi-label">빈도</div>
+        <div class="wi-value">주 1회<br><span style="font-size:.78rem;color:var(--muted)">참가자 합의로 결정</span></div>
+      </div>
+      <div class="walking-info-card">
+        <div class="wi-icon">⏱️</div>
+        <div class="wi-label">시간</div>
+        <div class="wi-value">30~60분<br><span style="font-size:.78rem;color:var(--muted)">걷기 + 스트레칭</span></div>
+      </div>
+      <div class="walking-info-card">
+        <div class="wi-icon">👥</div>
+        <div class="wi-label">방식</div>
+        <div class="wi-value">전체 그룹<br><span style="font-size:.78rem;color:var(--muted)">함께 모여 진행</span></div>
+      </div>
+    </div>
+
+    <div class="walking-note">
+      🗓️ <strong>요일 & 시간 결정 방법</strong><br>
+      챌린지 시작 전, 참가자 전원이 참여 가능한 요일과 시간대를 조율하여 정기 모임 일정을 확정합니다.
+      모든 참가자가 참석할 수 있는 요일과 시간을 우선으로 선택하며, 장소는 걷기에 적합한
+      공원이나 가까운 실외 공간으로 정합니다.
+    </div>
+  </div>
+
+  <div class="notice" style="margin-top:18px">
+    <h4>💡 그룹 워킹의 효과</h4>
+    <ul>
+      <li>규칙적인 유산소 운동으로 <strong>혈당 수치 개선</strong>에 직접 도움</li>
+      <li>체지방 감소 + 기초대사량 향상 → <strong>챌린지 점수 향상</strong>에 기여</li>
+      <li>서로 격려하며 <strong>동기부여 유지</strong> — 혼자보다 포기 확률 낮음</li>
+      <li>운동 후 함께하는 시간이 <strong>커뮤니티 형성</strong>에도 도움</li>
+    </ul>
+  </div>
+</div>
+
+<!-- SECTION 8: 일정 -->
 <div class="section">
   <div class="section-label">Timeline</div>
   <div class="section-title">챌린지 일정</div>

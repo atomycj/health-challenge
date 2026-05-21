@@ -280,11 +280,20 @@ header{padding:0;border-bottom:3px solid var(--accent);margin-bottom:28px;backgr
   .btn-guide{padding:4px 8px;font-size:.68rem}
   .lang-btn{padding:4px 8px;font-size:.68rem}
 }
-/* Guide button */
+/* Guide button (small — kept for compatibility) */
 .btn-guide{padding:7px 14px;border-radius:8px;border:1.5px solid var(--accent);background:var(--blue-l);color:var(--accent);font-family:'Noto Sans KR',sans-serif;font-size:.78rem;font-weight:700;cursor:pointer;transition:all .2s;white-space:nowrap}
 .btn-guide:hover{background:var(--accent);color:#fff}
 .btn-guide-en{border-color:var(--teal);background:#e0f7fb;color:var(--teal)}
 .btn-guide-en:hover{background:var(--teal);color:#fff}
+/* Guide button MAIN — prominent */
+.guide-btn-wrap{display:flex;gap:8px;align-items:center}
+.btn-guide-main{display:flex;align-items:center;gap:7px;padding:10px 18px;border-radius:10px;border:2px solid var(--accent);background:var(--accent);color:#fff;font-family:'Noto Sans KR',sans-serif;font-size:.88rem;font-weight:700;cursor:pointer;transition:all .2s;white-space:nowrap;box-shadow:0 3px 10px rgba(0,112,192,.25);letter-spacing:.3px}
+.btn-guide-main:hover{background:var(--accent2);border-color:var(--accent2);transform:translateY(-2px);box-shadow:0 6px 18px rgba(0,112,192,.35)}
+.btn-guide-main:active{transform:translateY(0)}
+.btn-guide-main-en{background:var(--teal);border-color:var(--teal);box-shadow:0 3px 10px rgba(0,168,204,.25)}
+.btn-guide-main-en:hover{background:var(--teal-d, #007d8c);border-color:var(--teal-d, #007d8c);box-shadow:0 6px 18px rgba(0,168,204,.35)}
+.guide-btn-icon{font-size:1rem;flex-shrink:0}
+.guide-btn-text{font-size:.88rem;font-weight:700}
 /* Lang toggle */
 .lang-toggle{display:flex;background:var(--surface);border:1.5px solid var(--border);border-radius:8px;overflow:hidden}
 .lang-btn{padding:6px 12px;border:none;background:transparent;color:var(--muted);font-family:'Noto Sans KR',sans-serif;font-size:.78rem;font-weight:600;cursor:pointer;transition:all .2s}
@@ -345,7 +354,11 @@ header{padding:0;border-bottom:3px solid var(--accent);margin-bottom:28px;backgr
   .form-card{padding:16px 14px}
   .stats-grid{grid-template-columns:1fr 1fr}
   .progress-chart{padding:14px 12px 10px}
-}
+
+  .btn-guide-main{padding:8px 12px;font-size:.78rem;gap:5px}
+  .guide-btn-text{display:none}
+  .guide-btn-icon{font-size:1.1rem}
+  .guide-btn-wrap{gap:5px}}
 @media(max-width:360px){
   .tab{min-width:52px;font-size:.68rem;padding:6px 6px}
   .rank-card{grid-template-columns:28px 1fr auto;gap:5px}
@@ -399,8 +412,14 @@ header{padding:0;border-bottom:3px solid var(--accent);margin-bottom:28px;backgr
         </div>
       </div>
       <div class="login-guide-btns">
-        <button class="btn-guide" onclick="openGuide('ko')" id="loginGuideKo">📋 안내</button>
-        <button class="btn-guide btn-guide-en" onclick="openGuide('en')" id="loginGuideEn">📋 Guide</button>
+        <button class="btn-guide-main" onclick="openGuide('ko')" id="loginGuideKo">
+          <span class="guide-btn-icon">📋</span>
+          <span class="guide-btn-text">챌린지 안내</span>
+        </button>
+        <button class="btn-guide-main btn-guide-main-en" onclick="openGuide('en')" id="loginGuideEn">
+          <span class="guide-btn-icon">📋</span>
+          <span class="guide-btn-text">Guide</span>
+        </button>
       </div>
     </div>
     <!-- 로고 + 타이틀 -->
@@ -469,9 +488,15 @@ header{padding:0;border-bottom:3px solid var(--accent);margin-bottom:28px;backgr
             <div class="hstat"><div class="hstat-val" id="challengeDays">0</div><div class="hstat-label">진행일 Days</div></div>
           </div>
           <span class="badge badge-live">● LIVE</span>
-          <div style="display:flex;gap:6px">
-            <button class="btn-guide" onclick="openGuide('ko')" title="챌린지 안내 (한국어)">📋 안내</button>
-            <button class="btn-guide btn-guide-en" onclick="openGuide('en')" title="Challenge Guide (English)">📋 Guide</button>
+          <div class="guide-btn-wrap">
+            <button class="btn-guide-main" onclick="openGuide('ko')" id="headerGuideKoBtn" title="챌린지 안내 (한국어)">
+              <span class="guide-btn-icon">📋</span>
+              <span class="guide-btn-text">챌린지 안내</span>
+            </button>
+            <button class="btn-guide-main btn-guide-main-en" onclick="openGuide('en')" id="headerGuideEnBtn" title="Challenge Guide (English)">
+              <span class="guide-btn-icon">📋</span>
+              <span class="guide-btn-text">Guide</span>
+            </button>
           </div>
           <div class="lang-toggle">
             <button id="langKo" class="lang-btn active" onclick="setLang('ko')">한국어</button>
@@ -841,10 +866,14 @@ window.applyLang = function() {
   if(hstatLabels[1]) hstatLabels[1].textContent = L.days;
 
   // ── 헤더 안내 버튼 텍스트
-  const hGuideKo = document.querySelector('.header-right .btn-guide:not(.btn-guide-en)');
-  const hGuideEn = document.querySelector('.header-right .btn-guide-en');
-  if(hGuideKo) hGuideKo.textContent = L.headerGuideKo;
-  if(hGuideEn) hGuideEn.textContent = L.headerGuideEn;
+  const hGuideKoBtn = document.getElementById('headerGuideKoBtn');
+  const hGuideEnBtn = document.getElementById('headerGuideEnBtn');
+  if(hGuideKoBtn) { const t = hGuideKoBtn.querySelector('.guide-btn-text'); if(t) t.textContent = ko ? '챌린지 안내' : 'Guide 안내'; }
+  if(hGuideEnBtn) { const t = hGuideEnBtn.querySelector('.guide-btn-text'); if(t) t.textContent = ko ? 'Guide' : 'Guide'; }
+  const lgKoBtnTxt = document.getElementById('loginGuideKo');
+  const lgEnBtnTxt = document.getElementById('loginGuideEn');
+  if(lgKoBtnTxt) { const t = lgKoBtnTxt.querySelector('.guide-btn-text'); if(t) t.textContent = ko ? '챌린지 안내' : 'Guide'; }
+  if(lgEnBtnTxt) { const t = lgEnBtnTxt.querySelector('.guide-btn-text'); if(t) t.textContent = 'Guide'; }
 
   // ── 로그인 화면
   const loginSub = document.getElementById('loginSubTitle');

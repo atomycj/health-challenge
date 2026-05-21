@@ -148,16 +148,81 @@ footer{background:var(--blue);color:rgba(255,255,255,.75);text-align:center;padd
 footer strong{color:var(--white);display:block;margin-bottom:6px;font-size:1rem;letter-spacing:2px}
 
 /* ── RESPONSIVE ── */
-@media(max-width:600px){
-  html{font-size:15px}
-  .header-main{padding:18px 16px}
-  .inbody-grid,.req-grid,.pkg-grid,.check-grid{grid-template-columns:1fr}
-  .hero{padding:40px 16px 36px}
+/* ── WALKING SECTION ── */
+.walking-card{background:var(--white);border:1.5px solid var(--blue-m);border-radius:14px;padding:22px 24px;box-shadow:var(--shadow)}
+.walking-highlight{background:linear-gradient(135deg,var(--blue),var(--teal));border-radius:12px;padding:20px 24px;color:var(--white);margin-bottom:20px;display:flex;align-items:center;gap:18px}
+.walking-icon{font-size:2.2rem;flex-shrink:0}
+.walking-title{font-size:1.05rem;font-weight:700;margin-bottom:4px}
+.walking-subtitle{font-size:.85rem;opacity:.85;line-height:1.6}
+.walking-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px}
+.walking-info-card{background:var(--blue-l);border:1px solid var(--blue-m);border-radius:10px;padding:16px;text-align:center}
+.walking-info-card .wi-icon{font-size:1.6rem;margin-bottom:6px}
+.walking-info-card .wi-label{font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;font-weight:600}
+.walking-info-card .wi-value{font-size:.95rem;font-weight:700;color:var(--ink);line-height:1.3}
+.walking-note{background:var(--paper);border-left:4px solid var(--teal);border-radius:0 8px 8px 0;padding:12px 16px;font-size:.86rem;color:var(--body);line-height:1.7}
+
+/* ═══ RESPONSIVE ═══ */
+@media(max-width:860px){
+  .pkg-grid{grid-template-columns:1fr}
+  .req-grid{grid-template-columns:1fr}
+}
+@media(max-width:700px){
+  html{font-size:16px}
+  .header-main{padding:16px 14px;gap:12px}
+  .logo-img{width:56px}
+  .logo-text h1{font-size:1.6rem;letter-spacing:2px}
+  .hero h2{font-size:clamp(1.8rem,7vw,3rem)}
+  .hero{padding:36px 16px 30px}
+  .container{padding:0 14px}
   .section{padding:36px 0}
-  .container{padding:0 16px}
+  .inbody-grid{grid-template-columns:1fr}
+  .check-grid{grid-template-columns:1fr}
   .score-label{min-width:110px}
   .score-note{margin-left:0}
   .tl-item::after{left:37px}
+  .walking-grid{grid-template-columns:1fr}
+}
+@media(max-width:480px){
+  html{font-size:14px}
+  .header-top{padding:8px 14px}
+  .header-main{padding:12px 10px}
+  .logo-img{width:44px}
+  .logo-text h1{font-size:1.3rem;letter-spacing:1px}
+  .logo-text .subtitle{font-size:.7rem}
+  .header-badge{padding:8px 14px;font-size:.72rem}
+  .hero{padding:28px 12px 24px}
+  .hero-tag{font-size:.68rem;padding:4px 12px}
+  .hero h2{font-size:clamp(1.6rem,8vw,2.4rem);letter-spacing:1px}
+  .hero-desc{font-size:.88rem}
+  .container{padding:0 10px}
+  .section{padding:28px 0}
+  .section-title{font-size:1.3rem}
+  .step{grid-template-columns:44px 1fr;gap:12px;padding:14px 14px}
+  .step-num{width:36px;height:36px;font-size:1rem}
+  .step-body h3{font-size:.95rem}
+  .step-body p{font-size:.84rem}
+  .score-box{padding:18px 14px}
+  .score-row{gap:8px}
+  .score-label{font-size:.78rem;min-width:100px}
+  .inbody-card{padding:16px}
+  .req-body .req-row{flex-direction:column;gap:2px}
+  .req-key{min-width:auto}
+  .pkg-header{padding:14px 16px 12px}
+  .pkg-body{padding:4px 14px 14px}
+  .walking-highlight{flex-direction:column;gap:10px;text-align:center}
+  .tl-item{grid-template-columns:62px 1fr}
+  .tl-badge{width:36px;height:36px;font-size:.7rem;margin-left:12px}
+  .tl-item::after{left:30px}
+  .tl-content{padding:12px 14px}
+  .notice{padding:14px 14px}
+  .warning{padding:14px 14px}
+  footer{padding:24px 14px;font-size:.74rem}
+}
+@media(max-width:360px){
+  html{font-size:13px}
+  .header-main{flex-direction:column;align-items:flex-start;gap:8px}
+  .hero h2{font-size:1.5rem}
+  .step{grid-template-columns:36px 1fr;gap:10px}
 }
 </style>
 <title>Health Challenge Guide — Atomy Auckland Absolute Centre</title>
@@ -405,7 +470,60 @@ footer strong{color:var(--white);display:block;margin-bottom:6px;font-size:1rem;
   </div>
 </div>
 
-<!-- SECTION 7: Timeline -->
+<!-- SECTION 7: Group Walking -->
+<div class="section">
+  <div class="section-label">Group Activity</div>
+  <div class="section-title">Weekly Group Walk</div>
+  <div class="divider"></div>
+  <p class="section-sub">All challenge participants meet <strong>once a week</strong> for a group walk together.<br>The day and time are decided together by the participants — whatever works best for everyone.</p>
+
+  <div class="walking-card">
+    <div class="walking-highlight">
+      <div class="walking-icon">🚶</div>
+      <div>
+        <div class="walking-title">Group Walking Programme</div>
+        <div class="walking-subtitle">Exercise is easier to keep up when you do it together.<br>Participants agree on the most convenient day and time to meet regularly.</div>
+      </div>
+    </div>
+
+    <div class="walking-grid">
+      <div class="walking-info-card">
+        <div class="wi-icon">📅</div>
+        <div class="wi-label">Frequency</div>
+        <div class="wi-value">Once a week<br><span style="font-size:.78rem;color:var(--muted)">Agreed by participants</span></div>
+      </div>
+      <div class="walking-info-card">
+        <div class="wi-icon">⏱️</div>
+        <div class="wi-label">Duration</div>
+        <div class="wi-value">30–60 minutes<br><span style="font-size:.78rem;color:var(--muted)">Walking + stretching</span></div>
+      </div>
+      <div class="walking-info-card">
+        <div class="wi-icon">👥</div>
+        <div class="wi-label">Format</div>
+        <div class="wi-value">Whole group<br><span style="font-size:.78rem;color:var(--muted)">Everyone together</span></div>
+      </div>
+    </div>
+
+    <div class="walking-note">
+      🗓️ <strong>How we choose the day &amp; time</strong><br>
+      Before the challenge begins, all participants discuss their availability and agree on a regular meeting time.
+      We choose the day and time that works for the most people, and pick a suitable outdoor location
+      such as a local park or walking path nearby.
+    </div>
+  </div>
+
+  <div class="notice" style="margin-top:18px">
+    <h4>💡 Benefits of Group Walking</h4>
+    <ul>
+      <li>Regular aerobic exercise directly helps <strong>improve blood sugar levels</strong></li>
+      <li>Burns body fat and boosts metabolism → contributes to a <strong>higher challenge score</strong></li>
+      <li>Mutual encouragement keeps <strong>motivation high</strong> — far less likely to quit</li>
+      <li>Shared time together also helps <strong>build community</strong> among participants</li>
+    </ul>
+  </div>
+</div>
+
+<!-- SECTION 8: Timeline -->
 <div class="section">
   <div class="section-label">Timeline</div>
   <div class="section-title">Challenge Schedule</div>
