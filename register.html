@@ -171,6 +171,20 @@ function dragOver(e,z)    { if(_fbReady) window._dragOver(e,z); }
 function dragLeave(z)     { if(_fbReady) window._dragLeave(z); }
 function dropFile(e,t)    { if(_fbReady) window._dropFile(e,t); }
 function removeFile(t,i)  { if(_fbReady) window._removeFile(t,i); }
+function formatPhone(el) {
+  // 0으로 시작 안 하면 경고 표시
+  const v = el.value.replace(/[^0-9\-\s]/g,'');
+  el.value = v;
+  const clean = v.replace(/[\s\-]/g,'');
+  const errEl = document.getElementById('errPhone');
+  if(errEl && clean.length > 0 && !clean.startsWith('0')) {
+    errEl.style.display='block';
+    el.classList.add('error');
+  } else if(errEl) {
+    errEl.style.display='none';
+    el.classList.remove('error');
+  }
+}
 </script>
 
 <body>
@@ -241,8 +255,10 @@ function removeFile(t,i)  { if(_fbReady) window._removeFile(t,i); }
         <span class="field-error" id="errName">이름을 입력해주세요.</span>
       </div>
       <div class="form-group">
-        <label class="form-label" id="lblPhone">연락처 (선택)</label>
-        <input type="text" class="form-input" id="regPhone" placeholder="+64 ...">
+        <label class="form-label" id="lblPhone">연락처 <span class="req">*</span></label>
+        <input type="text" class="form-input" id="regPhone" placeholder="예: 021-123-4567" oninput="formatPhone(this)">
+        <span class="form-hint" id="phoneHint">0으로 시작하는 전화번호</span>
+        <span class="field-error" id="errPhone">전화번호를 입력해주세요. (0으로 시작)</span>
       </div>
       <div class="form-group">
         <label class="form-label" id="lblPw">비밀번호 <span class="req">*</span></label>
@@ -426,7 +442,7 @@ const T = {
     lbl1:'계정 생성', lbl2:'제품 구매 확인', lbl3:'초기 건강 기록', lbl4:'신청 완료',
     s1title:'계정 생성', s1sub:'챌린지 사이트에서 사용할 이름과 비밀번호를 만들어주세요.',
     s1info:'💡 입력한 이름과 비밀번호로 챌린지 사이트에 로그인합니다. 비밀번호는 4자 이상으로 설정해주세요.',
-    lblName:'이름', lblPhone:'연락처 (선택)', lblPw:'비밀번호', lblPw2:'비밀번호 확인',
+    lblName:'이름', lblPhone:'연락처', phoneHint:'0으로 시작하는 전화번호를 입력해주세요.', errPhone:'전화번호를 입력해주세요. (0으로 시작)', lblPw:'비밀번호', lblPw2:'비밀번호 확인',
     pwHint:'4자 이상 입력해주세요.', btnNext1:'다음 →', btnBack1:'← 돌아가기',
     s2title:'제품 구매 확인', s2sub:'챌린지 참여를 위해 아래 제품 중 하나 이상을 구매해야 합니다.',
     s2warn:'⚠️ 구매 증빙 서류는 관리자가 확인 후 승인합니다. 영수증, 주문확인서, 제품 사진 중 하나면 됩니다.',
@@ -455,7 +471,7 @@ const T = {
     errHba1c:'HbA1c 수치를 입력해주세요.', errWeight:'체중을 입력해주세요.', errTarget:'목표 체중을 입력해주세요.',
     toastSubmitting:'신청서를 제출하는 중...', toastSuccess:'신청이 완료되었습니다! ✅',
     toastError:'오류가 발생했습니다. 다시 시도해주세요.',
-    nameDup:'이미 등록된 이름입니다. 다른 이름을 사용해주세요.',
+    nameDup:'이미 같은 이름과 전화번호로 등록된 내역이 있습니다.',
     nameChecking:'이름 확인 중...',
   },
   en: {
@@ -466,7 +482,7 @@ const T = {
     lbl1:'Create Account', lbl2:'Product Purchase', lbl3:'Health Baseline', lbl4:'Done',
     s1title:'Create Your Account', s1sub:'Set up the name and password you will use to log into the challenge site.',
     s1info:'💡 You will use this name and password to log in. Password must be at least 4 characters.',
-    lblName:'Full Name', lblPhone:'Contact (Optional)', lblPw:'Password', lblPw2:'Confirm Password',
+    lblName:'Full Name', lblPhone:'Phone Number', phoneHint:'Must start with 0 (e.g. 021-123-4567)', errPhone:'Please enter a valid phone number starting with 0.', lblPw:'Password', lblPw2:'Confirm Password',
     pwHint:'At least 4 characters.', btnNext1:'Next →', btnBack1:'← Back',
     s2title:'Product Purchase Confirmation', s2sub:'You must purchase at least one of the products below to participate.',
     s2warn:'⚠️ Your purchase proof will be verified by the admin before approval.',
@@ -496,7 +512,7 @@ const T = {
     errTarget:'Please enter your target weight.',
     toastSubmitting:'Submitting your application...', toastSuccess:'Application submitted! ✅',
     toastError:'An error occurred. Please try again.',
-    nameDup:'This name is already registered. Please use a different name.',
+    nameDup:'A member with this name and phone number already exists.',
     nameChecking:'Checking name...',
   }
 };
@@ -514,7 +530,7 @@ function applyLang() {
     'lblReceipt','uploadSub1','uploadTitle1',
     's3title','s3sub','s3info','lblHba1c','hba1cHint','lblWeight','lblFat','fatHint',
     'lblMuscle','muscleHint','lblTargetWeight','lblBlood','bloodHint',
-    'lblLabUpload','uploadTitle2','s3warn',
+    'lblLabUpload','uploadTitle2','s3warn','phoneHint','errPhone',
     'errName','errPw','errPw2','errProduct','errHba1c','errWeight','errTarget'];
   strIds.forEach(id => {
     const el = document.getElementById(id);
@@ -600,25 +616,50 @@ window._goStep = (n) => setStepUI(n);
 
 // ── STEP 1 → STEP 2: 이름 중복 확인 포함 ─────
 window._goStep2 = async () => {
-  const name = document.getElementById('regName').value.trim();
-  const pw   = document.getElementById('regPw').value;
-  const pw2  = document.getElementById('regPw2').value;
+  const name  = document.getElementById('regName').value.trim();
+  const phone = document.getElementById('regPhone').value.trim();
+  const pw    = document.getElementById('regPw').value;
+  const pw2   = document.getElementById('regPw2').value;
 
-  // 1. 기본 검증
+  // ── 1. 기본 검증
   let ok = true;
-  const setErr = (id, show) => {
-    document.getElementById(id).style.display = show ? 'block' : 'none';
-    document.getElementById(id.replace('err','reg').replace('Name','Name').replace('Pw2','Pw2').replace('Pw','Pw')).classList.toggle('error', show);
-  };
-  if(!name)          { document.getElementById('errName').style.display='block'; document.getElementById('regName').classList.add('error'); ok=false; }
-  else               { document.getElementById('errName').style.display='none';  document.getElementById('regName').classList.remove('error'); }
-  if(!pw||pw.length<4){ document.getElementById('errPw').style.display='block'; document.getElementById('regPw').classList.add('error'); ok=false; }
-  else               { document.getElementById('errPw').style.display='none';   document.getElementById('regPw').classList.remove('error'); }
-  if(pw!==pw2)       { document.getElementById('errPw2').style.display='block'; document.getElementById('regPw2').classList.add('error'); ok=false; }
-  else               { document.getElementById('errPw2').style.display='none';  document.getElementById('regPw2').classList.remove('error'); }
+  // 이름
+  if(!name) {
+    document.getElementById('errName').style.display='block';
+    document.getElementById('regName').classList.add('error'); ok=false;
+  } else {
+    document.getElementById('errName').style.display='none';
+    document.getElementById('regName').classList.remove('error');
+  }
+  // 전화번호: 필수 + 0으로 시작
+  const phoneClean = phone.replace(/[\s\-]/g,'');
+  const phoneValid = phoneClean.length >= 8 && phoneClean.startsWith('0') && /^[0-9]+$/.test(phoneClean);
+  if(!phone || !phoneValid) {
+    document.getElementById('errPhone').style.display='block';
+    document.getElementById('regPhone').classList.add('error'); ok=false;
+  } else {
+    document.getElementById('errPhone').style.display='none';
+    document.getElementById('regPhone').classList.remove('error');
+  }
+  // 비밀번호
+  if(!pw || pw.length < 4) {
+    document.getElementById('errPw').style.display='block';
+    document.getElementById('regPw').classList.add('error'); ok=false;
+  } else {
+    document.getElementById('errPw').style.display='none';
+    document.getElementById('regPw').classList.remove('error');
+  }
+  // 비밀번호 확인
+  if(pw !== pw2) {
+    document.getElementById('errPw2').style.display='block';
+    document.getElementById('regPw2').classList.add('error'); ok=false;
+  } else {
+    document.getElementById('errPw2').style.display='none';
+    document.getElementById('regPw2').classList.remove('error');
+  }
   if(!ok) return;
 
-  // 2. 이름 중복 확인 (Firebase)
+  // ── 2. 이름 + 전화번호 동시 중복 확인 (Firebase)
   const btn = document.getElementById('btnNext1');
   btn.disabled = true;
   btn.textContent = t('nameChecking');
@@ -627,18 +668,30 @@ window._goStep2 = async () => {
       get(ref(db,'members')),
       get(ref(db,'applications'))
     ]);
+    // 이름 + 전화번호 둘 다 같아야 중복
     if(mSnap.exists()) {
-      const dup = Object.values(mSnap.val()).find(m => m.name===name);
-      if(dup) { toast(t('nameDup'),'error'); document.getElementById('regName').classList.add('error'); btn.disabled=false; btn.textContent=t('btnNext1'); return; }
+      const dup = Object.values(mSnap.val()).find(m => m.name===name && m.phone===phone);
+      if(dup) {
+        toast(t('nameDup'), 'error');
+        document.getElementById('regName').classList.add('error');
+        document.getElementById('regPhone').classList.add('error');
+        btn.disabled=false; btn.textContent=t('btnNext1'); return;
+      }
     }
     if(aSnap.exists()) {
-      const dup2 = Object.values(aSnap.val()).find(a => a.name===name && a.status!=='rejected');
-      if(dup2) { toast(lang==='en'?'A pending application already exists for this name.':'이 이름으로 이미 신청된 내역이 있습니다.','error'); btn.disabled=false; btn.textContent=t('btnNext1'); return; }
+      const dup2 = Object.values(aSnap.val()).find(a =>
+        a.name===name && a.phone===phone && a.status!=='rejected'
+      );
+      if(dup2) {
+        toast(lang==='en'
+          ? 'An application with this name and phone number already exists.'
+          : '같은 이름과 전화번호로 이미 신청된 내역이 있습니다.', 'error');
+        btn.disabled=false; btn.textContent=t('btnNext1'); return;
+      }
     }
     setStepUI(2);
   } catch(e) {
-    // Firebase 오류 시 그냥 통과 (오프라인 등)
-    console.warn('Name check failed, proceeding:', e);
+    console.warn('Duplicate check failed, proceeding:', e);
     setStepUI(2);
   } finally {
     btn.disabled=false; btn.textContent=t('btnNext1');
