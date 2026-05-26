@@ -149,6 +149,30 @@ body{background:var(--off);color:var(--body);font-family:'Noto Sans KR',sans-ser
 }
 </style>
 </head>
+
+<!-- ═══════════════════════════════════════════════
+     일반 script (모듈 아님) — onclick에서 즉시 접근 가능
+     실제 로직은 Firebase 준비 후 module script에서 window.* 덮어씀
+════════════════════════════════════════════════ -->
+<script>
+var _fbReady = false;
+var _pendingCall = null;
+
+function goStep2()        { if(_fbReady) window._goStep2();        else _pendingCall = ['goStep2']; }
+function goStep3()        { if(_fbReady) window._goStep3();        else _pendingCall = ['goStep3']; }
+function goStep(n)        { if(_fbReady) window._goStep(n);        else _pendingCall = ['goStep',n]; }
+function submitApplication(){ if(_fbReady) window._submitApplication(); else _pendingCall = ['submitApplication']; }
+function setLang(l)       { if(_fbReady) window._setLang(l);       else { localStorage.setItem('hc_lang',l); location.reload(); } }
+function checkPw()        { if(_fbReady) window._checkPw(); }
+function checkPw2()       { if(_fbReady) window._checkPw2(); }
+function updateProductSelect(){ if(_fbReady) window._updateProductSelect(); }
+function handleFiles(i,t) { if(_fbReady) window._handleFiles(i,t); }
+function dragOver(e,z)    { if(_fbReady) window._dragOver(e,z); }
+function dragLeave(z)     { if(_fbReady) window._dragLeave(z); }
+function dropFile(e,t)    { if(_fbReady) window._dropFile(e,t); }
+function removeFile(t,i)  { if(_fbReady) window._removeFile(t,i); }
+</script>
+
 <body>
 
 <!-- LANG BAR -->
@@ -371,10 +395,11 @@ body{background:var(--off);color:var(--body);font-family:'Noto Sans KR',sans-ser
 <div class="toast" id="toast"></div>
 
 <!-- FIREBASE -->
+
+<!-- FIREBASE + APP LOGIC -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getDatabase, ref, push, get } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
-import { getStorage, ref as sRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
 
 const firebaseConfig = {
   apiKey:            "AIzaSyAwJyMMhtCJmDe0QGWHJMeAN-IrgO9UULo",
@@ -388,347 +413,337 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db  = getDatabase(app);
-const storage = getStorage(app);
-
-// ── 전역 함수 placeholder (모듈 로드 전 onclick 방지) ──
-window.goStep2 = window.goStep3 = window.goStep = window.submitApplication =
-window.handleFiles = window.dragOver = window.dragLeave = window.dropFile =
-window.removeFile = window.checkPw = window.checkPw2 = window.updateProductSelect =
-window.setLang = () => {};
 
 // ── 언어 ──────────────────────────────────────
 let lang = localStorage.getItem('hc_lang') || 'ko';
+
 const T = {
   ko: {
-    logoTitle:'헬스 챌린지', badge:'📝 참여 신청', topbar:'Atomy Auckland Absolute Education Centre — 헬스 챌린지 참여 신청',
-    heroTag:'챌린지 참여 신청', heroTitle:'챌린지 참여 신청', heroDesc:'아래 단계를 순서대로 완료하면 관리자 승인 후 챌린지에 참여할 수 있습니다.',
+    logoTitle:'헬스 챌린지', badge:'📝 참여 신청',
+    topbar:'Atomy Auckland Absolute Education Centre — 헬스 챌린지 참여 신청',
+    heroTag:'챌린지 참여 신청', heroTitle:'챌린지 참여 신청',
+    heroDesc:'아래 단계를 순서대로 완료하면 관리자 승인 후 챌린지에 참여할 수 있습니다.',
     lbl1:'계정 생성', lbl2:'제품 구매 확인', lbl3:'초기 건강 기록', lbl4:'신청 완료',
     s1title:'계정 생성', s1sub:'챌린지 사이트에서 사용할 이름과 비밀번호를 만들어주세요.',
     s1info:'💡 입력한 이름과 비밀번호로 챌린지 사이트에 로그인합니다. 비밀번호는 4자 이상으로 설정해주세요.',
     lblName:'이름', lblPhone:'연락처 (선택)', lblPw:'비밀번호', lblPw2:'비밀번호 확인',
-    pwHint:'4자 이상 입력해주세요.', btnBack1:'← 돌아가기', btnNext1:'다음 →',
-    s2title:'제품 구매 확인', s2sub:'챌린지 참여를 위해 아래 제품 중 하나 이상을 구매해야 합니다. 구매 영수증 또는 사진을 업로드해주세요.',
+    pwHint:'4자 이상 입력해주세요.', btnNext1:'다음 →', btnBack1:'← 돌아가기',
+    s2title:'제품 구매 확인', s2sub:'챌린지 참여를 위해 아래 제품 중 하나 이상을 구매해야 합니다.',
     s2warn:'⚠️ 구매 증빙 서류는 관리자가 확인 후 승인합니다. 영수증, 주문확인서, 제품 사진 중 하나면 됩니다.',
-    lblProduct:'구매 제품 선택', prod1title:'🩸 애터미 혈당케어 바나바 홍삼', prod1sub:'30포 / 1개월분 · 식후 혈당 억제 + 홍삼 면역',
+    lblProduct:'구매 제품 선택',
+    prod1title:'🩸 애터미 혈당케어 바나바 홍삼', prod1sub:'30포 / 1개월분 · 식후 혈당 억제 + 홍삼 면역',
     prod2title:'🌿 애터미 혈당컷 여주', prod2sub:'60포 / 1개월분 · 식약처 인정 혈당 관리',
-    lblReceipt:'구매 증빙 업로드', uploadTitle1:'파일을 여기에 끌어다 놓거나 클릭하여 선택', uploadSub1:'영수증, 주문확인서, 제품 사진 (JPG, PNG, PDF)',
+    lblReceipt:'구매 증빙 업로드', uploadTitle1:'파일을 클릭하여 선택 또는 끌어다 놓기',
+    uploadSub1:'영수증, 주문확인서, 제품 사진 (JPG, PNG, PDF)',
     btnBack2:'← 이전', btnNext2:'다음 →',
-    s3title:'초기 건강 기록', s3sub:'챌린지 시작 시점의 건강 수치를 입력해주세요. 이 수치가 개선도 산정의 기준이 됩니다.',
+    s3title:'초기 건강 기록', s3sub:'챌린지 시작 시점의 건강 수치를 입력해주세요.',
     s3info:'💡 <strong>당화혈색소(HbA1c)</strong>는 병원 혈액검사 결과지에서 확인할 수 있습니다.<br>인바디 수치는 집에서 스마트 체중계로 측정하거나 센터에서 측정할 수 있습니다.',
-    lblHba1c:'초기 HbA1c (%)', hba1cHint:'혈액검사 당화혈색소 수치', lblWeight:'체중 (kg)', lblFat:'체지방률 (%)', fatHint:'인바디 체중계 측정값',
-    lblMuscle:'골격근량 (kg 또는 %)', muscleHint:'인바디 체중계 측정값', lblTargetWeight:'목표 체중 (kg)', lblBlood:'공복혈당 (mg/dL)', bloodHint:'아침 식전 측정 (선택)',
+    lblHba1c:'초기 HbA1c (%)', hba1cHint:'혈액검사 당화혈색소 수치',
+    lblWeight:'체중 (kg)', lblFat:'체지방률 (%)', fatHint:'인바디 체중계 측정값',
+    lblMuscle:'골격근량 (kg 또는 %)', muscleHint:'인바디 체중계 측정값',
+    lblTargetWeight:'목표 체중 (kg)', lblBlood:'공복혈당 (mg/dL)', bloodHint:'아침 식전 측정 (선택)',
     lblLabUpload:'혈액검사 결과지 업로드 (선택)', uploadTitle2:'혈액검사 결과지 업로드 (선택)',
-    s3warn:'⚠️ 입력한 초기 건강 기록은 관리자 검토 후 챌린지 시작일부터 유효합니다. 승인 전까지는 대기 상태로 유지됩니다.',
+    s3warn:'⚠️ 입력한 초기 건강 기록은 관리자 검토 후 챌린지 시작일부터 유효합니다.',
     btnBack3:'← 이전', btnSubmit:'신청 제출 →',
-    doneTitle:'신청이 완료되었습니다! 🎉', doneSub:'관리자가 제출 내용을 검토한 후 승인하면 챌린지를 시작할 수 있습니다.<br>승인 전까지 초기 기록은 대기 상태로 저장됩니다.',
+    doneTitle:'신청이 완료되었습니다! 🎉',
+    doneSub:'관리자가 제출 내용을 검토한 후 승인하면 챌린지를 시작할 수 있습니다.',
     doneInfo:'📱 <strong>다음 단계</strong><br>1. 관리자 승인 대기 (보통 1~2 영업일)<br>2. 승인 완료 후 챌린지 사이트에서 로그인<br>3. 챌린지 시작일부터 매일 기록 입력',
     btnGoSite:'챌린지 사이트로 이동',
-    errName:'이름을 입력해주세요.', errPw:'비밀번호를 4자 이상 입력해주세요.', errPw2:'비밀번호가 일치하지 않습니다.',
+    errName:'이름을 입력해주세요.', errPw:'비밀번호를 4자 이상 입력해주세요.',
+    errPw2:'비밀번호가 일치하지 않습니다.',
     errProduct:'제품을 하나 이상 선택해주세요.', errReceipt:'구매 증빙을 업로드해주세요.',
     errHba1c:'HbA1c 수치를 입력해주세요.', errWeight:'체중을 입력해주세요.', errTarget:'목표 체중을 입력해주세요.',
-    toastSubmitting:'신청서를 제출하는 중...', toastSuccess:'신청이 완료되었습니다! ✅', toastError:'오류가 발생했습니다. 다시 시도해주세요.',
+    toastSubmitting:'신청서를 제출하는 중...', toastSuccess:'신청이 완료되었습니다! ✅',
+    toastError:'오류가 발생했습니다. 다시 시도해주세요.',
     nameDup:'이미 등록된 이름입니다. 다른 이름을 사용해주세요.',
+    nameChecking:'이름 확인 중...',
   },
   en: {
-    logoTitle:'HEALTH CHALLENGE', badge:'📝 Register', topbar:'Atomy Auckland Absolute Education Centre — Health Challenge Registration',
-    heroTag:'Challenge Registration', heroTitle:'Register for the Challenge', heroDesc:'Complete the steps below. Once the admin reviews and approves your application, you can start the challenge.',
+    logoTitle:'HEALTH CHALLENGE', badge:'📝 Register',
+    topbar:'Atomy Auckland Absolute Education Centre — Health Challenge Registration',
+    heroTag:'Challenge Registration', heroTitle:'Register for the Challenge',
+    heroDesc:'Complete the steps below. Once approved by the admin, you can start the challenge.',
     lbl1:'Create Account', lbl2:'Product Purchase', lbl3:'Health Baseline', lbl4:'Done',
     s1title:'Create Your Account', s1sub:'Set up the name and password you will use to log into the challenge site.',
     s1info:'💡 You will use this name and password to log in. Password must be at least 4 characters.',
     lblName:'Full Name', lblPhone:'Contact (Optional)', lblPw:'Password', lblPw2:'Confirm Password',
-    pwHint:'At least 4 characters.', btnBack1:'← Back', btnNext1:'Next →',
-    s2title:'Product Purchase Confirmation', s2sub:'You must purchase at least one of the products below to participate. Please upload proof of purchase.',
-    s2warn:'⚠️ Your purchase proof will be verified by the admin before approval. A receipt, order confirmation, or product photo is fine.',
-    lblProduct:'Select Product(s) Purchased', prod1title:'🩸 Atomy Blood Sugar Care Banaba Red Ginseng', prod1sub:'30 sachets / 1 month · Post-meal blood sugar control',
-    prod2title:'🌿 Atomy Blood Sugar Cut Bitter Melon', prod2sub:'60 sachets / 1 month · MFDS-approved blood sugar management',
-    lblReceipt:'Upload Proof of Purchase', uploadTitle1:'Drag & drop files here or click to select', uploadSub1:'Receipt, order confirmation, or product photo (JPG, PNG, PDF)',
+    pwHint:'At least 4 characters.', btnNext1:'Next →', btnBack1:'← Back',
+    s2title:'Product Purchase Confirmation', s2sub:'You must purchase at least one of the products below to participate.',
+    s2warn:'⚠️ Your purchase proof will be verified by the admin before approval.',
+    lblProduct:'Select Product(s) Purchased',
+    prod1title:'🩸 Atomy Blood Sugar Care Banaba Red Ginseng', prod1sub:'30 sachets / 1 month',
+    prod2title:'🌿 Atomy Blood Sugar Cut Bitter Melon', prod2sub:'60 sachets / 1 month',
+    lblReceipt:'Upload Proof of Purchase', uploadTitle1:'Click to select or drag & drop files',
+    uploadSub1:'Receipt, order confirmation, or product photo (JPG, PNG, PDF)',
     btnBack2:'← Back', btnNext2:'Next →',
-    s3title:'Initial Health Baseline', s3sub:'Enter your health measurements at the start of the challenge. These will be used to measure your improvement.',
-    s3info:'💡 <strong>HbA1c (Glycated Haemoglobin)</strong> can be found on your blood test results.<br>InBody measurements can be taken at home with a smart scale or at the centre.',
-    lblHba1c:'Initial HbA1c (%)', hba1cHint:'From blood test results', lblWeight:'Body Weight (kg)', lblFat:'Body Fat (%)', fatHint:'From body composition scale',
-    lblMuscle:'Muscle Mass (kg or %)', muscleHint:'From body composition scale', lblTargetWeight:'Target Weight (kg)', lblBlood:'Fasting Blood Sugar (mg/dL)', bloodHint:'Before breakfast (optional)',
+    s3title:'Initial Health Baseline', s3sub:'Enter your health measurements at the start of the challenge.',
+    s3info:'💡 <strong>HbA1c</strong> can be found on your blood test results.<br>InBody measurements can be taken at home with a smart scale or at the centre.',
+    lblHba1c:'Initial HbA1c (%)', hba1cHint:'From blood test results',
+    lblWeight:'Body Weight (kg)', lblFat:'Body Fat (%)', fatHint:'From body composition scale',
+    lblMuscle:'Muscle Mass (kg or %)', muscleHint:'From body composition scale',
+    lblTargetWeight:'Target Weight (kg)', lblBlood:'Fasting Blood Sugar (mg/dL)', bloodHint:'Before breakfast (optional)',
     lblLabUpload:'Upload Blood Test Results (Optional)', uploadTitle2:'Upload blood test results (optional)',
-    s3warn:'⚠️ Your initial health records will be held as pending until the admin reviews and approves your application.',
+    s3warn:'⚠️ Your initial health records will be held as pending until admin approval.',
     btnBack3:'← Back', btnSubmit:'Submit Application →',
-    doneTitle:'Application Submitted! 🎉', doneSub:'The admin will review your application and approve it shortly.<br>Your initial health records will be activated on your challenge start date.',
-    doneInfo:'📱 <strong>Next Steps</strong><br>1. Wait for admin approval (usually 1–2 business days)<br>2. Once approved, log in to the challenge site<br>3. Start recording daily from your challenge start date',
+    doneTitle:'Application Submitted! 🎉',
+    doneSub:'The admin will review your application and approve it. Your records will be activated on your start date.',
+    doneInfo:'📱 <strong>Next Steps</strong><br>1. Wait for admin approval (usually 1–2 business days)<br>2. Log in to the challenge site once approved<br>3. Start recording daily from your challenge start date',
     btnGoSite:'Go to Challenge Site',
-    errName:'Please enter your name.', errPw:'Password must be at least 4 characters.', errPw2:'Passwords do not match.',
+    errName:'Please enter your name.', errPw:'Password must be at least 4 characters.',
+    errPw2:'Passwords do not match.',
     errProduct:'Please select at least one product.', errReceipt:'Please upload proof of purchase.',
-    errHba1c:'Please enter your HbA1c level.', errWeight:'Please enter your body weight.', errTarget:'Please enter your target weight.',
-    toastSubmitting:'Submitting your application...', toastSuccess:'Application submitted! ✅', toastError:'An error occurred. Please try again.',
+    errHba1c:'Please enter your HbA1c level.', errWeight:'Please enter your body weight.',
+    errTarget:'Please enter your target weight.',
+    toastSubmitting:'Submitting your application...', toastSuccess:'Application submitted! ✅',
+    toastError:'An error occurred. Please try again.',
     nameDup:'This name is already registered. Please use a different name.',
+    nameChecking:'Checking name...',
   }
 };
 
 function t(key) { return T[lang][key] || key; }
 
-window.setLang = (l) => {
-  lang = l;
-  localStorage.setItem('hc_lang', l);
-  document.getElementById('langKo').classList.toggle('active', l==='ko');
-  document.getElementById('langEn').classList.toggle('active', l==='en');
-  applyLang();
-};
-
+// ── applyLang ──────────────────────────────────
 function applyLang() {
-  const ids = ['logoTitle','badge','topbar','heroTag','heroTitle','heroDesc',
+  document.getElementById('langKo').classList.toggle('active', lang==='ko');
+  document.getElementById('langEn').classList.toggle('active', lang==='en');
+  const strIds = ['logoTitle','badge','topbar','heroTag','heroTitle','heroDesc',
     'lbl1','lbl2','lbl3','lbl4',
-    's1title','s1sub','s1info','lblName','lblPhone','lblPw','lblPw2','pwHint','btnNext1',
+    's1title','s1sub','s1info','lblName','lblPhone','lblPw','lblPw2','pwHint',
     's2title','s2sub','s2warn','lblProduct','prod1title','prod1sub','prod2title','prod2sub',
-    'lblReceipt','uploadTitle1','uploadSub1','btnNext2',
+    'lblReceipt','uploadSub1','uploadTitle1',
     's3title','s3sub','s3info','lblHba1c','hba1cHint','lblWeight','lblFat','fatHint',
-    'lblMuscle','muscleHint','lblTargetWeight','lblBlood','bloodHint','lblLabUpload','uploadTitle2','s3warn','btnSubmit',
-    'doneTitle','doneSub','doneInfo','btnGoSite',
-    'errName','errPw','errPw2','errProduct','errHba1c','errWeight','errTarget',
-  ];
-  ids.forEach(id => {
+    'lblMuscle','muscleHint','lblTargetWeight','lblBlood','bloodHint',
+    'lblLabUpload','uploadTitle2','s3warn',
+    'errName','errPw','errPw2','errProduct','errHba1c','errWeight','errTarget'];
+  strIds.forEach(id => {
     const el = document.getElementById(id);
-    if(el) {
-      if(el.tagName === 'A' || el.tagName === 'BUTTON') el.textContent = t(id);
-      else el.innerHTML = t(id);
-    }
+    if(el) el.innerHTML = t(id);
   });
-  document.getElementById('btnBack1').textContent = t('btnBack1');
-  document.getElementById('btnBack2').textContent = t('btnBack2');
-  document.getElementById('btnBack3').textContent = t('btnBack3');
-  document.getElementById('heroTag').textContent = t('heroTag');
+  ['btnNext1','btnBack1','btnNext2','btnBack2','btnBack3','btnSubmit','btnGoSite'].forEach(id => {
+    const el = document.getElementById(id);
+    if(el) el.textContent = t(id);
+  });
 }
 
-// ── 파일 업로드 상태 ──────────────────────────
-const uploadedFiles = { receipt: [], lab: [] };
-window.handleFiles = (input, type) => {
-  const files = Array.from(input.files);
-  uploadedFiles[type] = [...uploadedFiles[type], ...files];
+// ── 파일 업로드 ──────────────────────────────────
+const uploadedFiles = { receipt:[], lab:[] };
+
+window._handleFiles = (input, type) => {
+  uploadedFiles[type] = [...uploadedFiles[type], ...Array.from(input.files)];
   renderPreviews(type);
 };
-window.dragOver = (e, zoneId) => { e.preventDefault(); document.getElementById(zoneId).classList.add('dragover'); };
-window.dragLeave = (zoneId) => document.getElementById(zoneId).classList.remove('dragover');
-window.dropFile = (e, type) => {
+window._dragOver  = (e,zoneId) => { e.preventDefault(); document.getElementById(zoneId).classList.add('dragover'); };
+window._dragLeave = (zoneId)   => document.getElementById(zoneId).classList.remove('dragover');
+window._dropFile  = (e, type)  => {
   e.preventDefault();
-  const zoneId = type === 'receipt' ? 'uploadZone1' : 'uploadZone2';
+  const zoneId = type==='receipt' ? 'uploadZone1' : 'uploadZone2';
   document.getElementById(zoneId).classList.remove('dragover');
-  const files = Array.from(e.dataTransfer.files);
-  uploadedFiles[type] = [...uploadedFiles[type], ...files];
+  uploadedFiles[type] = [...uploadedFiles[type], ...Array.from(e.dataTransfer.files)];
   renderPreviews(type);
 };
+window._removeFile = (type, i) => { uploadedFiles[type].splice(i,1); renderPreviews(type); };
+
 function renderPreviews(type) {
-  const container = document.getElementById(type === 'receipt' ? 'receiptPreview' : 'labPreview');
+  const container = document.getElementById(type==='receipt' ? 'receiptPreview' : 'labPreview');
   container.innerHTML = uploadedFiles[type].map((f,i) => {
-    const isImg = f.type.startsWith('image/');
-    if(isImg) {
+    if(f.type.startsWith('image/')) {
       const url = URL.createObjectURL(f);
       return `<div class="upload-thumb"><img src="${url}" alt="${f.name}"><button class="upload-thumb-remove" onclick="removeFile('${type}',${i})">✕</button></div>`;
-    } else {
-      return `<div class="upload-file-item">📄 ${f.name}<button class="upload-file-remove" onclick="removeFile('${type}',${i})">✕</button></div>`;
     }
+    return `<div class="upload-file-item">📄 ${f.name}<button class="upload-file-remove" onclick="removeFile('${type}',${i})">✕</button></div>`;
   }).join('');
 }
-window.removeFile = (type, i) => {
-  uploadedFiles[type].splice(i,1);
-  renderPreviews(type);
-};
 
 // ── 비밀번호 강도 ──────────────────────────────
-window.checkPw = () => {
+window._checkPw = () => {
   const pw = document.getElementById('regPw').value;
   const bar = document.getElementById('pwStrengthBar');
   const hint = document.getElementById('pwHint');
-  let strength = 0;
-  if(pw.length >= 4) strength++;
-  if(pw.length >= 8) strength++;
-  if(/[A-Z]/.test(pw) || /[0-9]/.test(pw)) strength++;
-  const colors = ['#ef4444','#f59e0b','#10b981','#0070c0'];
-  const labels_ko = ['너무 짧음','보통','좋음','매우 강함'];
-  const labels_en = ['Too short','Fair','Good','Strong'];
-  bar.style.width = (strength * 25) + '%';
-  bar.style.background = colors[strength-1] || '#e5e7eb';
-  if(pw.length > 0) hint.textContent = (lang==='en'?labels_en:labels_ko)[strength-1] || '';
-  else hint.textContent = lang==='en'?'At least 4 characters.':'4자 이상 입력해주세요.';
+  let s = 0;
+  if(pw.length>=4) s++; if(pw.length>=8) s++; if(/[A-Z0-9]/.test(pw)) s++;
+  const colors=['#ef4444','#f59e0b','#10b981','#0070c0'];
+  const ko_lbl=['너무 짧음','보통','좋음','매우 강함'];
+  const en_lbl=['Too short','Fair','Good','Strong'];
+  bar.style.width=(s*25)+'%'; bar.style.background=colors[s-1]||'#e5e7eb';
+  hint.textContent = pw.length>0 ? (lang==='en'?en_lbl:ko_lbl)[s-1]||'' : t('pwHint');
 };
-window.checkPw2 = () => {
-  const pw = document.getElementById('regPw').value;
-  const pw2 = document.getElementById('regPw2').value;
-  const err = document.getElementById('errPw2');
-  if(pw2 && pw !== pw2) { err.style.display='block'; document.getElementById('regPw2').classList.add('error'); }
-  else { err.style.display='none'; document.getElementById('regPw2').classList.remove('error'); }
+window._checkPw2 = () => {
+  const match = document.getElementById('regPw').value === document.getElementById('regPw2').value;
+  document.getElementById('errPw2').style.display = (!match && document.getElementById('regPw2').value) ? 'block' : 'none';
+  document.getElementById('regPw2').classList.toggle('error', !match && !!document.getElementById('regPw2').value);
 };
 
-// ── 제품 선택 UI ───────────────────────────────
-window.updateProductSelect = () => {
+// ── 제품 선택 ──────────────────────────────────
+window._updateProductSelect = () => {
   ['prod1','prod2'].forEach(id => {
-    const item = document.getElementById(id+'item');
-    item.classList.toggle('selected', document.getElementById(id).checked);
+    document.getElementById(id+'item').classList.toggle('selected', document.getElementById(id).checked);
   });
 };
 
-// ── Step 이동 ──────────────────────────────────
+// ── Step UI ────────────────────────────────────
 function setStepUI(n) {
   [1,2,3,4].forEach(i => {
     document.getElementById('step'+i).classList.toggle('active', i===n);
     const dot = document.getElementById('dot'+i);
     const lbl = document.getElementById('lbl'+i);
-    if(i < n) { dot.classList.add('done'); dot.classList.remove('active'); dot.textContent='✓'; }
-    else if(i === n) { dot.classList.add('active'); dot.classList.remove('done'); dot.textContent=i; }
-    else { dot.classList.remove('active','done'); dot.textContent=i; }
+    if(i<n)      { dot.className='step-dot done'; dot.textContent='✓'; }
+    else if(i===n){ dot.className='step-dot active'; dot.textContent=i; }
+    else          { dot.className='step-dot'; dot.textContent=i; }
     lbl.classList.toggle('active', i===n);
-    if(i < n) document.getElementById('line'+i)?.classList.add('done');
-    else document.getElementById('line'+i)?.classList.remove('done');
+    const line = document.getElementById('line'+i);
+    if(line) line.classList.toggle('done', i<n);
   });
-  window.scrollTo({top:0, behavior:'smooth'});
+  window.scrollTo({top:0,behavior:'smooth'});
 }
-window.goStep = (n) => setStepUI(n);
+window._goStep = (n) => setStepUI(n);
 
-window.goStep2 = () => {
-  // 순수 검증만 — Firebase 의존 없음 (중복 확인은 최종 제출 시 처리)
+// ── STEP 1 → STEP 2: 이름 중복 확인 포함 ─────
+window._goStep2 = async () => {
   const name = document.getElementById('regName').value.trim();
   const pw   = document.getElementById('regPw').value;
   const pw2  = document.getElementById('regPw2').value;
+
+  // 1. 기본 검증
   let ok = true;
-  if(!name) {
-    document.getElementById('errName').style.display='block';
-    document.getElementById('regName').classList.add('error');
-    ok = false;
-  } else {
-    document.getElementById('errName').style.display='none';
-    document.getElementById('regName').classList.remove('error');
-  }
-  if(!pw || pw.length < 4) {
-    document.getElementById('errPw').style.display='block';
-    document.getElementById('regPw').classList.add('error');
-    ok = false;
-  } else {
-    document.getElementById('errPw').style.display='none';
-    document.getElementById('regPw').classList.remove('error');
-  }
-  if(pw !== pw2) {
-    document.getElementById('errPw2').style.display='block';
-    document.getElementById('regPw2').classList.add('error');
-    ok = false;
-  } else {
-    document.getElementById('errPw2').style.display='none';
-    document.getElementById('regPw2').classList.remove('error');
-  }
+  const setErr = (id, show) => {
+    document.getElementById(id).style.display = show ? 'block' : 'none';
+    document.getElementById(id.replace('err','reg').replace('Name','Name').replace('Pw2','Pw2').replace('Pw','Pw')).classList.toggle('error', show);
+  };
+  if(!name)          { document.getElementById('errName').style.display='block'; document.getElementById('regName').classList.add('error'); ok=false; }
+  else               { document.getElementById('errName').style.display='none';  document.getElementById('regName').classList.remove('error'); }
+  if(!pw||pw.length<4){ document.getElementById('errPw').style.display='block'; document.getElementById('regPw').classList.add('error'); ok=false; }
+  else               { document.getElementById('errPw').style.display='none';   document.getElementById('regPw').classList.remove('error'); }
+  if(pw!==pw2)       { document.getElementById('errPw2').style.display='block'; document.getElementById('regPw2').classList.add('error'); ok=false; }
+  else               { document.getElementById('errPw2').style.display='none';  document.getElementById('regPw2').classList.remove('error'); }
   if(!ok) return;
-  setStepUI(2);
+
+  // 2. 이름 중복 확인 (Firebase)
+  const btn = document.getElementById('btnNext1');
+  btn.disabled = true;
+  btn.textContent = t('nameChecking');
+  try {
+    const [mSnap, aSnap] = await Promise.all([
+      get(ref(db,'members')),
+      get(ref(db,'applications'))
+    ]);
+    if(mSnap.exists()) {
+      const dup = Object.values(mSnap.val()).find(m => m.name===name);
+      if(dup) { toast(t('nameDup'),'error'); document.getElementById('regName').classList.add('error'); btn.disabled=false; btn.textContent=t('btnNext1'); return; }
+    }
+    if(aSnap.exists()) {
+      const dup2 = Object.values(aSnap.val()).find(a => a.name===name && a.status!=='rejected');
+      if(dup2) { toast(lang==='en'?'A pending application already exists for this name.':'이 이름으로 이미 신청된 내역이 있습니다.','error'); btn.disabled=false; btn.textContent=t('btnNext1'); return; }
+    }
+    setStepUI(2);
+  } catch(e) {
+    // Firebase 오류 시 그냥 통과 (오프라인 등)
+    console.warn('Name check failed, proceeding:', e);
+    setStepUI(2);
+  } finally {
+    btn.disabled=false; btn.textContent=t('btnNext1');
+  }
 };
 
-window.goStep3 = () => {
+// ── STEP 2 → STEP 3 ────────────────────────────
+window._goStep3 = () => {
   const prod1 = document.getElementById('prod1').checked;
   const prod2 = document.getElementById('prod2').checked;
-  const errProd = document.getElementById('errProduct');
-  const errRec  = document.getElementById('errReceipt');
   let ok = true;
-  if(!prod1 && !prod2) { errProd.style.visibility='visible'; ok=false; } else { errProd.style.visibility='hidden'; }
-  if(uploadedFiles.receipt.length === 0) { errRec.style.display='block'; ok=false; } else { errRec.style.display='none'; }
+  if(!prod1&&!prod2) { document.getElementById('errProduct').style.visibility='visible'; ok=false; }
+  else               { document.getElementById('errProduct').style.visibility='hidden'; }
+  if(uploadedFiles.receipt.length===0) { document.getElementById('errReceipt').style.display='block'; ok=false; }
+  else                                  { document.getElementById('errReceipt').style.display='none'; }
   if(!ok) return;
   setStepUI(3);
 };
 
 // ── 최종 제출 ──────────────────────────────────
-window.submitApplication = async () => {
-  const name     = document.getElementById('regName').value.trim();
-  const pw       = document.getElementById('regPw').value;
-  const phone    = document.getElementById('regPhone').value.trim();
-  const hba1c    = parseFloat(document.getElementById('regHba1c').value) || null;
-  const weight   = parseFloat(document.getElementById('regWeight').value) || null;
-  const fat      = parseFloat(document.getElementById('regFat').value) || null;
-  const muscle   = parseFloat(document.getElementById('regMuscle').value) || null;
-  const target   = parseFloat(document.getElementById('regTarget').value) || null;
-  const blood    = parseFloat(document.getElementById('regBlood').value) || null;
-  const prod1    = document.getElementById('prod1').checked;
-  const prod2    = document.getElementById('prod2').checked;
-  let ok = true;
-  // 이름 중복 확인 (제출 시점에 체크)
-  try {
-    const membersSnap = await get(ref(db, 'members'));
-    if(membersSnap.exists()) {
-      const dup = Object.values(membersSnap.val()).find(m => m.name === name);
-      if(dup) { toast(t('nameDup'), 'error'); document.getElementById('regName').classList.add('error'); setStepUI(1); return; }
-    }
-    const appSnap = await get(ref(db, 'applications'));
-    if(appSnap.exists()) {
-      const dup2 = Object.values(appSnap.val()).find(a => a.name === name && a.status !== 'rejected');
-      if(dup2) { toast(lang==='en'?'A pending application with this name already exists.':'이미 같은 이름으로 신청된 내역이 있습니다.', 'error'); setStepUI(1); return; }
-    }
-  } catch(e) { /* DB 조회 실패 시 계속 진행 */ }
-  if(!hba1c) { document.getElementById('errHba1c').style.display='block'; document.getElementById('regHba1c').classList.add('error'); ok=false; }
-  else { document.getElementById('errHba1c').style.display='none'; document.getElementById('regHba1c').classList.remove('error'); }
-  if(!weight) { document.getElementById('errWeight').style.display='block'; document.getElementById('regWeight').classList.add('error'); ok=false; }
-  else { document.getElementById('errWeight').style.display='none'; document.getElementById('regWeight').classList.remove('error'); }
-  if(!target) { document.getElementById('errTarget').style.display='block'; document.getElementById('regTarget').classList.add('error'); ok=false; }
-  else { document.getElementById('errTarget').style.display='none'; document.getElementById('regTarget').classList.remove('error'); }
+window._submitApplication = async () => {
+  const name   = document.getElementById('regName').value.trim();
+  const pw     = document.getElementById('regPw').value;
+  const phone  = document.getElementById('regPhone').value.trim();
+  const hba1c  = parseFloat(document.getElementById('regHba1c').value)||null;
+  const weight = parseFloat(document.getElementById('regWeight').value)||null;
+  const fat    = parseFloat(document.getElementById('regFat').value)||null;
+  const muscle = parseFloat(document.getElementById('regMuscle').value)||null;
+  const target = parseFloat(document.getElementById('regTarget').value)||null;
+  const blood  = parseFloat(document.getElementById('regBlood').value)||null;
+  const prod1  = document.getElementById('prod1').checked;
+  const prod2  = document.getElementById('prod2').checked;
+  let ok=true;
+  if(!hba1c)  { document.getElementById('errHba1c').style.display='block';  document.getElementById('regHba1c').classList.add('error');  ok=false; } else { document.getElementById('errHba1c').style.display='none'; document.getElementById('regHba1c').classList.remove('error'); }
+  if(!weight) { document.getElementById('errWeight').style.display='block'; document.getElementById('regWeight').classList.add('error'); ok=false; } else { document.getElementById('errWeight').style.display='none'; document.getElementById('regWeight').classList.remove('error'); }
+  if(!target) { document.getElementById('errTarget').style.display='block'; document.getElementById('regTarget').classList.add('error'); ok=false; } else { document.getElementById('errTarget').style.display='none'; document.getElementById('regTarget').classList.remove('error'); }
   if(!ok) return;
+
   const btn = document.getElementById('btnSubmit');
-  btn.disabled = true;
-  btn.textContent = t('toastSubmitting');
+  btn.disabled=true; btn.textContent=t('toastSubmitting');
   toast(t('toastSubmitting'));
+
   try {
-    // 영수증 파일 base64 변환 (Storage 없이 DB에 저장)
-    const toBase64 = file => new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=rej;r.readAsDataURL(file);});
+    const toBase64 = f => new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=rej;r.readAsDataURL(f);});
     const receiptData = await Promise.all(uploadedFiles.receipt.slice(0,3).map(async f=>{
-      const b64 = await toBase64(f); return {name:f.name, type:f.type, data:b64.substring(0,50000)};
+      const b64=await toBase64(f); return {name:f.name,type:f.type,data:b64.substring(0,60000)};
     })));
     const labData = await Promise.all(uploadedFiles.lab.slice(0,2).map(async f=>{
-      const b64 = await toBase64(f); return {name:f.name, type:f.type, data:b64.substring(0,50000)};
+      const b64=await toBase64(f); return {name:f.name,type:f.type,data:b64.substring(0,60000)};
     })));
-    const products = [];
-    if(prod1) products.push('바나바 홍삼');
-    if(prod2) products.push('혈당컷 여주');
-    const appData = {
-      name, password:pw, phone: phone||'',
-      initHba1c: hba1c, initWeight: weight, initFat: fat, initMuscle: muscle,
-      targetWeight: target, initBlood: blood,
-      products,
-      receiptFiles: receiptData,
-      labFiles: labData,
-      status: 'pending',
-      appliedAt: new Date().toISOString(),
-      startDate: '',
-    };
-    const newRef = await push(ref(db, 'applications'), appData);
-    // 완료 화면
-    const L = lang==='en';
-    document.getElementById('doneDetails').innerHTML = `
+    const products=[];
+    if(prod1) products.push(lang==='en'?'Banaba Red Ginseng':'바나바 홍삼');
+    if(prod2) products.push(lang==='en'?'Blood Sugar Cut Bitter Melon':'혈당컷 여주');
+    const newRef = await push(ref(db,'applications'), {
+      name, password:pw, phone:phone||'',
+      initHba1c:hba1c, initWeight:weight, initFat:fat||null, initMuscle:muscle||null,
+      targetWeight:target, initBlood:blood||null,
+      products, receiptFiles:receiptData, labFiles:labData,
+      status:'pending', appliedAt:new Date().toISOString(), startDate:'',
+    });
+    const L=lang==='en';
+    document.getElementById('doneDetails').innerHTML=`
       <dt>${L?'Name':'이름'}</dt><dd>${name}</dd>
-      <dt>${L?'Products Purchased':'구매 제품'}</dt><dd>${products.join(', ')}</dd>
+      <dt>${L?'Products':'구매 제품'}</dt><dd>${products.join(', ')}</dd>
       <dt>${L?'Initial HbA1c':'초기 HbA1c'}</dt><dd>${hba1c}%</dd>
-      <dt>${L?'Body Weight':'체중'}</dt><dd>${weight} kg</dd>
-      <dt>${L?'Target Weight':'목표 체중'}</dt><dd>${target} kg</dd>
-      <dt>${L?'Application ID':'신청 ID'}</dt><dd style="font-size:.7rem;color:var(--muted)">${newRef.key}</dd>
+      <dt>${L?'Weight':'체중'}</dt><dd>${weight} kg → 목표 ${target} kg</dd>
       <dt>${L?'Status':'상태'}</dt><dd style="color:var(--gold)">⏳ ${L?'Pending Admin Approval':'관리자 승인 대기 중'}</dd>
+      <dt>ID</dt><dd style="font-size:.7rem;color:var(--muted)">${newRef.key}</dd>
     `;
     applyLang();
     setStepUI(4);
     toast(t('toastSuccess'));
   } catch(e) {
-    toast(t('toastError'), 'error');
-    btn.disabled = false;
-    btn.textContent = t('btnSubmit');
-    console.error(e);
+    toast(t('toastError'),'error');
+    console.error('Submit error:',e);
+    btn.disabled=false; btn.textContent=t('btnSubmit');
   }
 };
 
 // ── Toast ──────────────────────────────────────
 function toast(msg, type='success') {
-  const el = document.getElementById('toast');
-  el.textContent = msg;
-  el.className = 'toast show' + (type==='error'?' error':'');
-  setTimeout(() => el.classList.remove('show'), 3500);
+  const el=document.getElementById('toast');
+  el.textContent=msg;
+  el.className='toast show'+(type==='error'?' error':'');
+  setTimeout(()=>el.classList.remove('show'),3500);
 }
 
-// ── Init ──────────────────────────────────────
-document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('langKo').classList.toggle('active', lang==='ko');
-  document.getElementById('langEn').classList.toggle('active', lang==='en');
-  applyLang();
-});
-// 이미 로드됐으면 즉시 실행
-if(document.readyState !== 'loading') {
-  document.getElementById('langKo').classList.toggle('active', lang==='ko');
-  document.getElementById('langEn').classList.toggle('active', lang==='en');
-  applyLang();
+// ── setLang ────────────────────────────────────
+window._setLang = (l) => {
+  lang=l; localStorage.setItem('hc_lang',l); applyLang();
+};
+
+// ── Firebase 준비 완료 → 대기 중인 호출 실행 ──
+_fbReady = true;
+if(_pendingCall) {
+  const [fn,...args] = _pendingCall;
+  _pendingCall = null;
+  if(fn==='goStep2')         window._goStep2();
+  else if(fn==='goStep3')    window._goStep3();
+  else if(fn==='goStep')     window._goStep(...args);
+  else if(fn==='submitApplication') window._submitApplication();
 }
+
+// ── 초기화 ────────────────────────────────────
+applyLang();
 </script>
 </body>
 </html>
