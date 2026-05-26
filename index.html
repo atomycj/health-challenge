@@ -87,7 +87,7 @@ body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(
 
 /* ── LOGIN ── */
 #loginScreen{position:fixed;inset:0;background:linear-gradient(135deg,#003d70 0%,#0070c0 60%,#00a8cc 100%);display:none;align-items:center;justify-content:center;z-index:200;padding:20px}
-.login-box{background:var(--card);border:2px solid var(--border);border-radius:20px;padding:40px 36px;width:100%;max-width:400px;box-shadow:0 8px 40px rgba(0,112,192,.15)}
+.login-box{background:var(--card);border:2px solid var(--border);border-radius:20px;padding:36px 32px;width:100%;max-width:440px;box-shadow:0 8px 40px rgba(0,112,192,.15)}
 .login-logo{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:4px;color:var(--accent);margin-bottom:4px}
 .login-sub{font-size:.75rem;color:var(--muted);letter-spacing:2px;margin-bottom:28px}
 .login-tabs{display:flex;gap:4px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:3px;margin-bottom:22px}
@@ -273,28 +273,45 @@ header{padding:0;border-bottom:3px solid var(--accent);margin-bottom:28px;backgr
 .login-logo-wrap{display:flex;align-items:center;gap:14px;margin-bottom:10px}
 .login-logo-img{width:52px;height:auto;object-fit:contain;border-radius:6px;flex-shrink:0}
 .login-centre{font-size:.68rem;color:var(--muted);letter-spacing:.5px;margin-top:2px}
-/* Login guide buttons full-width */
-.login-guide-btns{display:flex;gap:8px;width:100%;margin-bottom:4px}
-.login-guide-btn{flex:1;display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:10px;border:2px solid var(--accent);background:linear-gradient(135deg,rgba(0,112,192,.09),rgba(0,112,192,.04));cursor:pointer;transition:all .2s;text-align:left;font-family:'Noto Sans KR',sans-serif}
+/* Login guide buttons — 세로 배치 + 전체폭 */
+.login-guide-btns{display:flex;flex-direction:column;gap:7px;width:100%;margin-bottom:6px}
+.login-guide-row{display:flex;gap:7px;width:100%}
+.login-guide-btn{flex:1;display:flex;align-items:center;gap:10px;padding:11px 13px;border-radius:10px;border:2px solid var(--accent);background:linear-gradient(135deg,rgba(0,112,192,.08),rgba(0,112,192,.03));cursor:pointer;transition:all .2s;text-align:left;font-family:'Noto Sans KR',sans-serif;min-width:0}
 .login-guide-btn:hover{background:var(--accent);transform:translateY(-1px);box-shadow:0 4px 14px rgba(0,112,192,.3)}
 .login-guide-btn:hover .login-guide-title{color:#fff}
 .login-guide-btn:hover .login-guide-sub{color:rgba(255,255,255,.75)}
 .login-guide-btn:hover .login-guide-arrow{color:#fff;transform:translateX(3px)}
-.login-guide-btn-en{border-color:var(--teal);background:linear-gradient(135deg,rgba(0,168,204,.09),rgba(0,168,204,.04))}
+.login-guide-btn-en{border-color:var(--teal);background:linear-gradient(135deg,rgba(0,168,204,.08),rgba(0,168,204,.03))}
 .login-guide-btn-en:hover{background:var(--teal);box-shadow:0 4px 14px rgba(0,168,204,.3)}
-.login-guide-icon{font-size:1.4rem;flex-shrink:0}
+.login-guide-btn-success{border-color:var(--gold);background:linear-gradient(135deg,rgba(212,160,23,.08),rgba(212,160,23,.03));flex:none;width:100%}
+.login-guide-btn-success:hover{background:var(--gold);box-shadow:0 4px 14px rgba(212,160,23,.3)}
+.login-guide-btn-success .login-guide-title{color:var(--gold)}
+.login-guide-btn-success .login-guide-arrow{color:var(--gold)}
+.login-guide-btn-success:hover .login-guide-title,.login-guide-btn-success:hover .login-guide-arrow{color:#fff}
+.login-guide-icon{font-size:1.3rem;flex-shrink:0}
 .login-guide-text-wrap{flex:1;min-width:0}
-.login-guide-title{display:block;font-size:.85rem;font-weight:800;color:var(--accent);line-height:1.2;margin-bottom:1px;transition:color .2s}
+.login-guide-title{display:block;font-size:.83rem;font-weight:800;color:var(--accent);line-height:1.2;margin-bottom:1px;transition:color .2s}
 .login-guide-btn-en .login-guide-title{color:var(--teal)}
-.login-guide-sub{display:block;font-size:.68rem;color:var(--muted);transition:color .2s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.login-guide-arrow{font-size:1rem;color:var(--accent);transition:transform .2s, color .2s;font-weight:700;flex-shrink:0}
+.login-guide-sub{display:block;font-size:.67rem;color:var(--muted);transition:color .2s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.login-guide-arrow{font-size:.95rem;color:var(--accent);transition:transform .2s, color .2s;font-weight:700;flex-shrink:0}
 .login-guide-btn-en .login-guide-arrow{color:var(--teal)}
 @media(max-width:420px){
-  .login-logo-img{width:40px}
-  .login-logo{font-size:1.4rem;letter-spacing:2px}
-  .login-topbar{gap:6px}
+  .login-box{padding:18px 14px}
+  .login-logo-img{width:38px}
+  .login-logo{font-size:1.3rem;letter-spacing:2px}
+  .login-topbar{gap:6px;flex-wrap:wrap}
+  .login-lang-wrap,.login-guide-btns-top{flex:1}
   .btn-guide{padding:4px 8px;font-size:.68rem}
   .lang-btn{padding:4px 8px;font-size:.68rem}
+  .login-guide-row{gap:5px}
+  .login-guide-btn{padding:9px 10px;gap:7px}
+  .login-guide-icon{font-size:1.1rem}
+  .login-guide-title{font-size:.78rem}
+  .login-guide-sub{font-size:.62rem}
+}
+@media(max-width:340px){
+  .login-guide-row{flex-direction:column}
+  .login-guide-btn{width:100%}
 }
 /* Guide button (small — kept for compatibility) */
 .btn-guide{padding:7px 14px;border-radius:8px;border:1.5px solid var(--accent);background:var(--blue-l);color:var(--accent);font-family:'Noto Sans KR',sans-serif;font-size:.78rem;font-weight:700;cursor:pointer;transition:all .2s;white-space:nowrap}
@@ -463,19 +480,29 @@ header{padding:0;border-bottom:3px solid var(--accent);margin-bottom:28px;backgr
         </div>
       </div>
       <div class="login-guide-btns">
-        <button class="login-guide-btn" onclick="openGuide('ko')" id="loginGuideKo">
-          <span class="login-guide-icon">📋</span>
+        <div class="login-guide-row">
+          <button class="login-guide-btn" onclick="openGuide('ko')" id="loginGuideKo">
+            <span class="login-guide-icon">📋</span>
+            <span class="login-guide-text-wrap">
+              <span class="login-guide-title" id="loginGuideTitleKo">챌린지 안내</span>
+              <span class="login-guide-sub" id="loginGuideSubKo">참여 방법 보기</span>
+            </span>
+            <span class="login-guide-arrow">→</span>
+          </button>
+          <button class="login-guide-btn login-guide-btn-en" onclick="openGuide('en')" id="loginGuideEn">
+            <span class="login-guide-icon">📋</span>
+            <span class="login-guide-text-wrap">
+              <span class="login-guide-title" id="loginGuideTitleEn">Challenge Guide</span>
+              <span class="login-guide-sub" id="loginGuideSubEn">How to join</span>
+            </span>
+            <span class="login-guide-arrow">→</span>
+          </button>
+        </div>
+        <button class="login-guide-btn login-guide-btn-success" onclick="openSuccessStories()" id="loginGuideSuccess">
+          <span class="login-guide-icon">✨</span>
           <span class="login-guide-text-wrap">
-            <span class="login-guide-title" id="loginGuideTitleKo">챌린지 안내</span>
-            <span class="login-guide-sub">참여 방법 보기</span>
-          </span>
-          <span class="login-guide-arrow">→</span>
-        </button>
-        <button class="login-guide-btn login-guide-btn-en" onclick="openGuide('en')" id="loginGuideEn">
-          <span class="login-guide-icon">📋</span>
-          <span class="login-guide-text-wrap">
-            <span class="login-guide-title" id="loginGuideTitleEn">Challenge Guide</span>
-            <span class="login-guide-sub">How to join</span>
+            <span class="login-guide-title" id="loginGuideTitleSuccess">성공 사례 보기</span>
+            <span class="login-guide-sub" id="loginGuideSubSuccess">실제 참가자 결과 확인</span>
           </span>
           <span class="login-guide-arrow">→</span>
         </button>
@@ -966,6 +993,10 @@ window.applyLang = function() {
   const lgBtns = document.querySelectorAll('.login-guide-btn');
   if(lgBtns[0]) { const sub = lgBtns[0].querySelector('.login-guide-sub'); if(sub) sub.textContent = ko ? '참여 방법 보기' : 'How to join'; }
   if(lgBtns[1]) { const sub = lgBtns[1].querySelector('.login-guide-sub'); if(sub) sub.textContent = ko ? '영어 가이드' : 'English Guide'; }
+  const lgSuccessTitle = document.getElementById('loginGuideTitleSuccess');
+  const lgSuccessSub   = document.getElementById('loginGuideSubSuccess');
+  if(lgSuccessTitle) lgSuccessTitle.textContent = ko ? '성공 사례 보기' : 'View Success Stories';
+  if(lgSuccessSub)   lgSuccessSub.textContent   = ko ? '실제 참가자 결과 확인' : 'Real participant results';
 
   // ── 로그인 화면
   const loginSub = document.getElementById('loginSubTitle');
