@@ -390,6 +390,12 @@ const app = initializeApp(firebaseConfig);
 const db  = getDatabase(app);
 const storage = getStorage(app);
 
+// ── 전역 함수 placeholder (모듈 로드 전 onclick 방지) ──
+window.goStep2 = window.goStep3 = window.goStep = window.submitApplication =
+window.handleFiles = window.dragOver = window.dragLeave = window.dropFile =
+window.removeFile = window.checkPw = window.checkPw2 = window.updateProductSelect =
+window.setLang = () => {};
+
 // ── 언어 ──────────────────────────────────────
 let lang = localStorage.getItem('hc_lang') || 'ko';
 const T = {
@@ -573,24 +579,37 @@ function setStepUI(n) {
 }
 window.goStep = (n) => setStepUI(n);
 
-window.goStep2 = async () => {
+window.goStep2 = () => {
+  // 순수 검증만 — Firebase 의존 없음 (중복 확인은 최종 제출 시 처리)
   const name = document.getElementById('regName').value.trim();
   const pw   = document.getElementById('regPw').value;
   const pw2  = document.getElementById('regPw2').value;
   let ok = true;
-  if(!name) { document.getElementById('errName').style.display='block'; document.getElementById('regName').classList.add('error'); ok=false; }
-  else { document.getElementById('errName').style.display='none'; document.getElementById('regName').classList.remove('error'); }
-  if(!pw || pw.length < 4) { document.getElementById('errPw').style.display='block'; document.getElementById('regPw').classList.add('error'); ok=false; }
-  else { document.getElementById('errPw').style.display='none'; document.getElementById('regPw').classList.remove('error'); }
-  if(pw !== pw2) { document.getElementById('errPw2').style.display='block'; ok=false; }
-  else { document.getElementById('errPw2').style.display='none'; }
-  if(!ok) return;
-  // 이름 중복 확인
-  const membersSnap = await get(ref(db, 'members'));
-  if(membersSnap.exists()) {
-    const dup = Object.values(membersSnap.val()).find(m => m.name === name);
-    if(dup) { toast(t('nameDup'), 'error'); document.getElementById('regName').classList.add('error'); return; }
+  if(!name) {
+    document.getElementById('errName').style.display='block';
+    document.getElementById('regName').classList.add('error');
+    ok = false;
+  } else {
+    document.getElementById('errName').style.display='none';
+    document.getElementById('regName').classList.remove('error');
   }
+  if(!pw || pw.length < 4) {
+    document.getElementById('errPw').style.display='block';
+    document.getElementById('regPw').classList.add('error');
+    ok = false;
+  } else {
+    document.getElementById('errPw').style.display='none';
+    document.getElementById('regPw').classList.remove('error');
+  }
+  if(pw !== pw2) {
+    document.getElementById('errPw2').style.display='block';
+    document.getElementById('regPw2').classList.add('error');
+    ok = false;
+  } else {
+    document.getElementById('errPw2').style.display='none';
+    document.getElementById('regPw2').classList.remove('error');
+  }
+  if(!ok) return;
   setStepUI(2);
 };
 
@@ -620,6 +639,19 @@ window.submitApplication = async () => {
   const prod1    = document.getElementById('prod1').checked;
   const prod2    = document.getElementById('prod2').checked;
   let ok = true;
+  // 이름 중복 확인 (제출 시점에 체크)
+  try {
+    const membersSnap = await get(ref(db, 'members'));
+    if(membersSnap.exists()) {
+      const dup = Object.values(membersSnap.val()).find(m => m.name === name);
+      if(dup) { toast(t('nameDup'), 'error'); document.getElementById('regName').classList.add('error'); setStepUI(1); return; }
+    }
+    const appSnap = await get(ref(db, 'applications'));
+    if(appSnap.exists()) {
+      const dup2 = Object.values(appSnap.val()).find(a => a.name === name && a.status !== 'rejected');
+      if(dup2) { toast(lang==='en'?'A pending application with this name already exists.':'이미 같은 이름으로 신청된 내역이 있습니다.', 'error'); setStepUI(1); return; }
+    }
+  } catch(e) { /* DB 조회 실패 시 계속 진행 */ }
   if(!hba1c) { document.getElementById('errHba1c').style.display='block'; document.getElementById('regHba1c').classList.add('error'); ok=false; }
   else { document.getElementById('errHba1c').style.display='none'; document.getElementById('regHba1c').classList.remove('error'); }
   if(!weight) { document.getElementById('errWeight').style.display='block'; document.getElementById('regWeight').classList.add('error'); ok=false; }
@@ -686,9 +718,17 @@ function toast(msg, type='success') {
 }
 
 // ── Init ──────────────────────────────────────
-document.getElementById('langKo').classList.toggle('active', lang==='ko');
-document.getElementById('langEn').classList.toggle('active', lang==='en');
-applyLang();
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('langKo').classList.toggle('active', lang==='ko');
+  document.getElementById('langEn').classList.toggle('active', lang==='en');
+  applyLang();
+});
+// 이미 로드됐으면 즉시 실행
+if(document.readyState !== 'loading') {
+  document.getElementById('langKo').classList.toggle('active', lang==='ko');
+  document.getElementById('langEn').classList.toggle('active', lang==='en');
+  applyLang();
+}
 </script>
 </body>
 </html>
