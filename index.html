@@ -284,6 +284,7 @@ header{padding:0;border-bottom:3px solid var(--accent);margin-bottom:28px;backgr
 .login-guide-btn-en{border-color:var(--teal);background:linear-gradient(135deg,rgba(0,168,204,.08),rgba(0,168,204,.03))}
 .login-guide-btn-en:hover{background:var(--teal);box-shadow:0 4px 14px rgba(0,168,204,.3)}
 .login-guide-btn-success{border-color:var(--gold);background:linear-gradient(135deg,rgba(212,160,23,.08),rgba(212,160,23,.03));flex:none;width:100%}
+.login-guide-btn-single{width:100%;flex:none}
 .login-guide-btn-success:hover{background:var(--gold);box-shadow:0 4px 14px rgba(212,160,23,.3)}
 .login-guide-btn-success .login-guide-title{color:var(--gold)}
 .login-guide-btn-success .login-guide-arrow{color:var(--gold)}
@@ -480,24 +481,14 @@ header{padding:0;border-bottom:3px solid var(--accent);margin-bottom:28px;backgr
         </div>
       </div>
       <div class="login-guide-btns">
-        <div class="login-guide-row">
-          <button class="login-guide-btn" onclick="openGuide('ko')" id="loginGuideKo">
-            <span class="login-guide-icon">📋</span>
-            <span class="login-guide-text-wrap">
-              <span class="login-guide-title" id="loginGuideTitleKo">챌린지 안내</span>
-              <span class="login-guide-sub" id="loginGuideSubKo">참여 방법 보기</span>
-            </span>
-            <span class="login-guide-arrow">→</span>
-          </button>
-          <button class="login-guide-btn login-guide-btn-en" onclick="openGuide('en')" id="loginGuideEn">
-            <span class="login-guide-icon">📋</span>
-            <span class="login-guide-text-wrap">
-              <span class="login-guide-title" id="loginGuideTitleEn">Challenge Guide</span>
-              <span class="login-guide-sub" id="loginGuideSubEn">How to join</span>
-            </span>
-            <span class="login-guide-arrow">→</span>
-          </button>
-        </div>
+        <button class="login-guide-btn login-guide-btn-single" onclick="openGuide(currentLang)" id="loginGuideBtn">
+          <span class="login-guide-icon">📋</span>
+          <span class="login-guide-text-wrap">
+            <span class="login-guide-title" id="loginGuideTitleSingle">챌린지 안내</span>
+            <span class="login-guide-sub" id="loginGuideSubSingle">참여 방법 보기</span>
+          </span>
+          <span class="login-guide-arrow">→</span>
+        </button>
         <button class="login-guide-btn login-guide-btn-success" onclick="openSuccessStories()" id="loginGuideSuccess">
           <span class="login-guide-icon">✨</span>
           <span class="login-guide-text-wrap">
@@ -575,8 +566,7 @@ header{padding:0;border-bottom:3px solid var(--accent);margin-bottom:28px;backgr
           </div>
           <span class="badge badge-live">● LIVE</span>
           <div class="guide-icon-btns">
-            <button class="btn-guide-icon" onclick="openGuide('ko')" id="headerGuideKoBtn" title="챌린지 안내">📋</button>
-            <button class="btn-guide-icon btn-guide-icon-en" onclick="openGuide('en')" id="headerGuideEnBtn" title="Guide">🌐</button>
+            <button class="btn-guide-icon" onclick="openGuide(currentLang)" id="headerGuideBtn" title="챌린지 안내 / Guide">📋</button>
           </div>
           <div class="lang-toggle">
             <button id="langKo" class="lang-btn active" onclick="setLang('ko')">한국어</button>
@@ -590,20 +580,11 @@ header{padding:0;border-bottom:3px solid var(--accent);margin-bottom:28px;backgr
 
     <!-- GUIDE BANNER — full width, always visible -->
     <div class="guide-banner" id="guideBanner">
-      <button class="guide-banner-btn" onclick="openGuide('ko')" id="guideBannerKo">
+      <button class="guide-banner-btn" onclick="openGuide(currentLang)" id="guideBannerGuide">
         <span class="guide-banner-icon">📋</span>
         <div class="guide-banner-texts">
-          <span class="guide-banner-title" id="guideBannerKoTitle">챌린지 안내</span>
-          <span class="guide-banner-sub">참여 방법 · 제품 · 패키지 보기</span>
-        </div>
-        <span class="guide-banner-arrow">→</span>
-      </button>
-      <div class="guide-banner-divider"></div>
-      <button class="guide-banner-btn guide-banner-btn-en" onclick="openGuide('en')" id="guideBannerEn">
-        <span class="guide-banner-icon">📋</span>
-        <div class="guide-banner-texts">
-          <span class="guide-banner-title" id="guideBannerEnTitle">Challenge Guide</span>
-          <span class="guide-banner-sub">How to join · Products · Packages</span>
+          <span class="guide-banner-title" id="guideBannerGuideTitle">챌린지 안내</span>
+          <span class="guide-banner-sub" id="guideBannerGuideSub">참여 방법 · 제품 · 패키지 보기</span>
         </div>
         <span class="guide-banner-arrow">→</span>
       </button>
@@ -976,23 +957,23 @@ window.applyLang = function() {
   if(hstatLabels[1]) hstatLabels[1].textContent = L.days;
 
   // ── 안내 배너 텍스트 (헤더 아래 전체폭)
-  const bannerKoTitle = document.getElementById('guideBannerKoTitle');
-  const bannerEnTitle = document.getElementById('guideBannerEnTitle');
-  if(bannerKoTitle) bannerKoTitle.textContent = ko ? '챌린지 안내' : 'Challenge Guide';
-  if(bannerEnTitle) bannerEnTitle.textContent = ko ? 'Challenge Guide' : 'Challenge Guide';
-  // 배너 부제목도 언어 변경
-  const bannerBtns = document.querySelectorAll('.guide-banner-btn');
-  if(bannerBtns[0]) { const sub = bannerBtns[0].querySelector('.guide-banner-sub'); if(sub) sub.textContent = ko ? '참여 방법 · 제품 · 패키지 보기' : 'How to join · Products · Packages'; }
-  if(bannerBtns[1]) { const sub = bannerBtns[1].querySelector('.guide-banner-sub'); if(sub) sub.textContent = ko ? '영어 가이드 보기' : 'View in English'; }
-  if(bannerBtns[2]) { const sub = bannerBtns[2].querySelector('.guide-banner-sub'); if(sub) sub.textContent = ko ? '실제 참가자 결과 보기' : 'View real participant results'; }
+  // 배너 단일 안내 버튼
+  const bannerGuideTitle = document.getElementById('guideBannerGuideTitle');
+  const bannerGuideSub   = document.getElementById('guideBannerGuideSub');
+  if(bannerGuideTitle) bannerGuideTitle.textContent = ko ? '챌린지 안내' : 'Challenge Guide';
+  if(bannerGuideSub)   bannerGuideSub.textContent   = ko ? '참여 방법 · 제품 · 패키지 보기' : 'How to join · Products · Packages';
+  // 배너 성공사례 버튼
+  const bannerSuccessTitle = document.getElementById('guideBannerSuccessTitle');
+  const bannerSuccessSub   = document.getElementById('guideBannerSuccessSub');
+  if(bannerSuccessTitle) bannerSuccessTitle.textContent = ko ? '성공 사례' : 'Success Stories';
+  if(bannerSuccessSub)   bannerSuccessSub.textContent   = ko ? '실제 참가자 결과 보기' : 'View real participant results';
   // 로그인 화면 안내 버튼
-  const lgKoTitle = document.getElementById('loginGuideTitleKo');
-  const lgEnTitle = document.getElementById('loginGuideTitleEn');
-  if(lgKoTitle) lgKoTitle.textContent = ko ? '챌린지 안내' : 'Challenge Guide';
-  if(lgEnTitle) lgEnTitle.textContent = ko ? 'Challenge Guide' : 'Challenge Guide';
-  const lgBtns = document.querySelectorAll('.login-guide-btn');
-  if(lgBtns[0]) { const sub = lgBtns[0].querySelector('.login-guide-sub'); if(sub) sub.textContent = ko ? '참여 방법 보기' : 'How to join'; }
-  if(lgBtns[1]) { const sub = lgBtns[1].querySelector('.login-guide-sub'); if(sub) sub.textContent = ko ? '영어 가이드' : 'English Guide'; }
+  // 로그인 단일 안내 버튼
+  const lgSingleTitle = document.getElementById('loginGuideTitleSingle');
+  const lgSingleSub   = document.getElementById('loginGuideSubSingle');
+  if(lgSingleTitle) lgSingleTitle.textContent = ko ? '챌린지 안내' : 'Challenge Guide';
+  if(lgSingleSub)   lgSingleSub.textContent   = ko ? '참여 방법 보기' : 'How to join';
+  // 로그인 성공사례 버튼
   const lgSuccessTitle = document.getElementById('loginGuideTitleSuccess');
   const lgSuccessSub   = document.getElementById('loginGuideSubSuccess');
   if(lgSuccessTitle) lgSuccessTitle.textContent = ko ? '성공 사례 보기' : 'View Success Stories';
