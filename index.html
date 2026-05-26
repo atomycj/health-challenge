@@ -331,6 +331,10 @@ header{padding:0;border-bottom:3px solid var(--accent);margin-bottom:28px;backgr
 .guide-banner-arrow{font-size:1.2rem;color:var(--accent);transition:transform .2s;flex-shrink:0;font-weight:700}
 .guide-banner-btn-en .guide-banner-arrow{color:var(--teal)}
 .guide-banner-divider{width:1px;background:var(--border);flex-shrink:0}
+.guide-banner-btn-success{background:linear-gradient(135deg,rgba(212,160,23,.08),rgba(212,160,23,.03))}
+.guide-banner-btn-success:hover{background:linear-gradient(135deg,rgba(212,160,23,.18),rgba(212,160,23,.10))}
+.guide-banner-btn-success .guide-banner-title{color:var(--gold)}
+.guide-banner-btn-success .guide-banner-arrow{color:var(--gold)}
 @media(max-width:480px){
   .guide-banner-btn{padding:12px 14px;gap:10px}
   .guide-banner-icon{font-size:1.4rem}
@@ -573,6 +577,15 @@ header{padding:0;border-bottom:3px solid var(--accent);margin-bottom:28px;backgr
         <div class="guide-banner-texts">
           <span class="guide-banner-title" id="guideBannerEnTitle">Challenge Guide</span>
           <span class="guide-banner-sub">How to join · Products · Packages</span>
+        </div>
+        <span class="guide-banner-arrow">→</span>
+      </button>
+      <div class="guide-banner-divider"></div>
+      <button class="guide-banner-btn guide-banner-btn-success" onclick="openSuccessStories()" id="guideBannerSuccess">
+        <span class="guide-banner-icon">✨</span>
+        <div class="guide-banner-texts">
+          <span class="guide-banner-title" id="guideBannerSuccessTitle">성공 사례</span>
+          <span class="guide-banner-sub" id="guideBannerSuccessSub">실제 참가자 결과 보기</span>
         </div>
         <span class="guide-banner-arrow">→</span>
       </button>
@@ -944,6 +957,7 @@ window.applyLang = function() {
   const bannerBtns = document.querySelectorAll('.guide-banner-btn');
   if(bannerBtns[0]) { const sub = bannerBtns[0].querySelector('.guide-banner-sub'); if(sub) sub.textContent = ko ? '참여 방법 · 제품 · 패키지 보기' : 'How to join · Products · Packages'; }
   if(bannerBtns[1]) { const sub = bannerBtns[1].querySelector('.guide-banner-sub'); if(sub) sub.textContent = ko ? '영어 가이드 보기' : 'View in English'; }
+  if(bannerBtns[2]) { const sub = bannerBtns[2].querySelector('.guide-banner-sub'); if(sub) sub.textContent = ko ? '실제 참가자 결과 보기' : 'View real participant results'; }
   // 로그인 화면 안내 버튼
   const lgKoTitle = document.getElementById('loginGuideTitleKo');
   const lgEnTitle = document.getElementById('loginGuideTitleEn');
@@ -1010,6 +1024,16 @@ window.openGuide = (lang) => {
   const file = lang === 'en' ? 'challenge-guide-en.html' : 'challenge-guide-ko.html';
   iframe.src = file;
   title.textContent = lang==='en' ? '📋 Challenge Guide' : '📋 챌린지 안내 가이드';
+  modal.classList.add('show');
+  document.body.style.overflow = 'hidden';
+};
+window.openSuccessStories = () => {
+  const lang = currentLang === 'en' ? 'success-stories-en.html' : 'success-stories-ko.html';
+  const modal = document.getElementById('guideModal');
+  const iframe = document.getElementById('guideIframe');
+  const title = document.getElementById('guideModalTitle');
+  iframe.src = lang;
+  title.textContent = currentLang === 'en' ? '✨ Success Stories' : '✨ 성공 사례';
   modal.classList.add('show');
   document.body.style.overflow = 'hidden';
 };
