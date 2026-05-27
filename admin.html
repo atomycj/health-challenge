@@ -34,7 +34,7 @@ body{font-family:'Noto Sans KR',sans-serif;background:#f0f4f8;color:#1a2a3a;min-
 .stat-card.draft-card .num{color:#d4a017}
 .stat-card.done-card .num{color:#1a8a4a}
 .stat-card .label{font-size:.78rem;color:#5a7090;margin-top:2px}
-.tabs{display:flex;gap:6px;margin-bottom:16px;border-bottom:2px solid #c8dff5;padding-bottom:0}
+.tabs{display:flex;gap:6px;margin-bottom:16px;border-bottom:2px solid #c8dff5}
 .tab{padding:9px 20px;cursor:pointer;font-size:.88rem;font-weight:600;color:#5a7090;border-radius:8px 8px 0 0;border:none;background:none;border-bottom:3px solid transparent;margin-bottom:-2px}
 .tab.active{color:#0070c0;border-bottom:3px solid #0070c0;background:#eef5fc}
 .tab:hover:not(.active){background:#f0f4f8}
@@ -78,25 +78,23 @@ tbody td{padding:11px 14px;color:#2c3e5a;vertical-align:top}
   <span id="hSubtitle">로딩 중...</span>
 </div>
 
-<!-- Login -->
 <div class="login-wrap" id="loginWrap">
   <div class="login-box">
     <h2>🔐 관리자 로그인</h2>
     <p>관리자 비밀번호를 입력하세요</p>
-    <input type="password" id="adminPw" placeholder="비밀번호" onkeydown="if(event.key==='Enter')doAdminLogin()">
-    <button onclick="doAdminLogin()">로그인</button>
+    <input type="password" id="adminPw" placeholder="비밀번호">
+    <button id="loginBtn">로그인</button>
     <div class="login-err" id="loginErr"></div>
   </div>
 </div>
 
-<!-- Admin Panel -->
 <div class="admin-wrap" id="adminWrap" style="display:none">
   <div class="top-bar">
     <h2>📋 신청자 현황</h2>
     <div class="actions">
-      <input class="search-bar" type="text" id="searchInput" placeholder="이름 또는 전화번호 검색" oninput="renderTables()">
-      <button class="btn-refresh" onclick="loadAll()">🔄 새로고침</button>
-      <button class="btn-logout" onclick="doLogout()">로그아웃</button>
+      <input class="search-bar" type="text" id="searchInput" placeholder="이름 또는 전화번호 검색">
+      <button class="btn-refresh" id="refreshBtn">🔄 새로고침</button>
+      <button class="btn-logout" id="logoutBtn">로그아웃</button>
     </div>
   </div>
 
@@ -109,7 +107,7 @@ tbody td{padding:11px 14px;color:#2c3e5a;vertical-align:top}
       <div class="num" id="statDraft">-</div>
       <div class="label">임시저장 (Step 1)</div>
     </div>
-    <div class="stat-card" style="border-top-color:#0070c0">
+    <div class="stat-card">
       <div class="num" id="statStep2" style="color:#0070c0">-</div>
       <div class="label">진행중 (Step 2+)</div>
     </div>
@@ -120,38 +118,40 @@ tbody td{padding:11px 14px;color:#2c3e5a;vertical-align:top}
   </div>
 
   <div class="tabs">
-    <button class="tab active" id="tabAll" onclick="setTab('all')">전체</button>
-    <button class="tab" id="tabDraft" onclick="setTab('draft')">임시저장</button>
-    <button class="tab" id="tabApps" onclick="setTab('apps')">최종 제출</button>
+    <button class="tab active" id="tabAll">전체</button>
+    <button class="tab" id="tabDraft">임시저장</button>
+    <button class="tab" id="tabApps">최종 제출</button>
   </div>
 
   <div class="table-wrap" id="tableWrap">
-    <div class="loading" id="loadingMsg">데이터 로딩 중...</div>
+    <div class="loading">데이터 로딩 중...</div>
   </div>
 </div>
 
-<!-- Detail Modal -->
-<div class="modal-bg" id="detailModal" onclick="if(event.target===this)closeModal()">
+<div class="modal-bg" id="detailModal">
   <div class="modal" id="modalInner">
-    <button class="close-btn" onclick="closeModal()">✕</button>
+    <button class="close-btn" id="modalClose">✕</button>
     <h3 id="modalTitle">상세 정보</h3>
     <div id="modalBody"></div>
   </div>
 </div>
 
-<!-- Image Preview -->
-<div class="img-preview-bg" id="imgPreview" onclick="closeImgPreview()">
+<div class="img-preview-bg" id="imgPreview">
   <img id="imgPreviewEl" src="" alt="미리보기">
 </div>
 
 <script>
 var DB_URL = 'https://health-challenge-990fd-default-rtdb.firebaseio.com';
-var ADMIN_PW = 'admin1234';  // 관리자 비밀번호 (필요시 변경)
+var ADMIN_PW = 'admin1234';
 var allDrafts = {};
 var allApps = {};
 var currentTab = 'all';
 
-// ── Auth ──────────────────────────────────────────────
+function escHtml(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+/* ---- Auth ---- */
 function doAdminLogin() {
   var pw = document.getElementById('adminPw').value;
   if (pw === ADMIN_PW) {
@@ -172,9 +172,8 @@ function doLogout() {
   document.getElementById('loginErr').textContent = '';
 }
 
-// ── Data Loading ──────────────────────────────────────
+/* ---- Data ---- */
 function loadAll() {
-  document.getElementById('loadingMsg') && (document.getElementById('loadingMsg').textContent = '데이터 로딩 중...');
   document.getElementById('tableWrap').innerHTML = '<div class="loading">데이터 로딩 중...</div>';
   Promise.all([
     fetch(DB_URL + '/draft.json').then(function(r){ return r.json(); }),
@@ -186,159 +185,173 @@ function loadAll() {
     renderTables();
     document.getElementById('hSubtitle').textContent = '마지막 업데이트: ' + new Date().toLocaleString('ko-KR');
   }).catch(function(e) {
-    document.getElementById('tableWrap').innerHTML = '<div class="empty">❌ 데이터를 불러오지 못했습니다: ' + e.message + '</div>';
+    document.getElementById('tableWrap').innerHTML = '<div class="empty">❌ 데이터를 불러오지 못했습니다.</div>';
   });
 }
 
 function updateStats() {
   var draftArr = Object.values(allDrafts);
   var appArr = Object.values(allApps);
-  var step2 = draftArr.filter(function(d){ return d.step && d.step > 1; }).length;
   document.getElementById('statTotal').textContent = draftArr.length + appArr.length;
   document.getElementById('statDraft').textContent = draftArr.filter(function(d){ return !d.step || d.step <= 1; }).length;
-  document.getElementById('statStep2').textContent = step2;
+  document.getElementById('statStep2').textContent = draftArr.filter(function(d){ return d.step && d.step > 1; }).length;
   document.getElementById('statDone').textContent = appArr.length;
 }
 
-// ── Tabs ──────────────────────────────────────────────
+/* ---- Tabs ---- */
 function setTab(tab) {
   currentTab = tab;
-  ['all','draft','apps'].forEach(function(t){
-    document.getElementById('tab' + (t==='all'?'All':t==='draft'?'Draft':'Apps')).classList.toggle('active', t===tab);
-  });
+  document.getElementById('tabAll').classList.toggle('active', tab === 'all');
+  document.getElementById('tabDraft').classList.toggle('active', tab === 'draft');
+  document.getElementById('tabApps').classList.toggle('active', tab === 'apps');
   renderTables();
 }
 
-// ── Render ────────────────────────────────────────────
+/* ---- Render ---- */
 function renderTables() {
   var q = (document.getElementById('searchInput').value || '').toLowerCase();
   var rows = [];
 
   if (currentTab !== 'apps') {
-    Object.entries(allDrafts).forEach(function(entry) {
-      var phone = entry[0];
-      var d = entry[1];
+    Object.keys(allDrafts).forEach(function(phone) {
+      var d = allDrafts[phone];
       var name = d.name || '-';
       var step = d.step || 1;
       if (q && name.toLowerCase().indexOf(q) === -1 && phone.indexOf(q) === -1) return;
       rows.push({
-        src: 'draft',
-        phone: phone,
-        name: name,
-        step: step,
-        stepLabel: step <= 1 ? '<span class="badge badge-draft">Step 1 임시저장</span>' : '<span class="badge badge-step2">Step ' + step + ' 진행중</span>',
-        ts: '-',
-        status: '-',
-        raw: d
+        src: 'draft', phone: phone, name: name, step: step, raw: d,
+        stepLabel: step <= 1
+          ? '<span class="badge badge-draft">Step 1 임시저장</span>'
+          : '<span class="badge badge-step2">Step ' + step + ' 진행중</span>',
+        ts: '-', key: null
       });
     });
   }
 
   if (currentTab !== 'draft') {
-    Object.entries(allApps).forEach(function(entry) {
-      var key = entry[0];
-      var d = entry[1];
+    Object.keys(allApps).forEach(function(key) {
+      var d = allApps[key];
       var name = d.name || '-';
       var phone = d.phone || '-';
       if (q && name.toLowerCase().indexOf(q) === -1 && phone.indexOf(q) === -1) return;
       rows.push({
-        src: 'app',
-        key: key,
-        phone: phone,
-        name: name,
-        step: 'done',
+        src: 'app', phone: phone, name: name, step: 'done', raw: d, key: key,
         stepLabel: '<span class="badge badge-done">✅ 최종제출</span>',
-        ts: d.ts ? new Date(d.ts).toLocaleString('ko-KR') : '-',
-        status: d.status || 'pending',
-        raw: d
+        ts: d.ts ? new Date(d.ts).toLocaleString('ko-KR') : '-'
       });
     });
   }
 
   if (rows.length === 0) {
     document.getElementById('tableWrap').innerHTML = '<div class="empty">신청 데이터가 없습니다.</div>';
+    window._rows = [];
     return;
   }
 
-  // Sort: done first, then by step desc
   rows.sort(function(a,b){
     if (a.src==='app' && b.src!=='app') return -1;
     if (b.src==='app' && a.src!=='app') return 1;
-    return (b.step||0) - (a.step||0);
+    var as = typeof a.step === 'number' ? a.step : 99;
+    var bs = typeof b.step === 'number' ? b.step : 99;
+    return bs - as;
   });
 
-  var html = '<table><thead><tr>' +
-    '<th>#</th><th>이름</th><th>전화번호</th><th>진행 단계</th><th>제출 시각</th><th>상태</th><th>상세</th>' +
-    '</tr></thead><tbody>';
-
+  var html = '<table><thead><tr><th>#</th><th>이름</th><th>전화번호</th><th>진행 단계</th><th>제출 시각</th><th>상태</th><th>상세</th></tr></thead><tbody>';
   rows.forEach(function(row, i) {
     var statusBadge = '';
     if (row.src === 'app') {
-      var st = row.status;
+      var st = row.raw.status || 'pending';
       if (st === 'approved') statusBadge = '<span class="badge badge-approved">✅ 승인</span>';
       else if (st === 'rejected') statusBadge = '<span class="badge" style="background:#fdecea;color:#c0392b">❌ 거절</span>';
       else statusBadge = '<span class="badge badge-pending">⏳ 검토중</span>';
     } else {
       statusBadge = '<span style="color:#aaa;font-size:.8rem">-</span>';
     }
-    html += '<tr>' +
-      '<td>' + (i+1) + '</td>' +
-      '<td><strong>' + escHtml(row.name) + '</strong></td>' +
-      '<td>' + escHtml(row.phone) + '</td>' +
-      '<td>' + row.stepLabel + '</td>' +
-      '<td style="font-size:.8rem;color:#5a7090">' + escHtml(row.ts) + '</td>' +
-      '<td>' + statusBadge + '</td>' +
-      '<td><button class="detail-btn" onclick="showDetail(' + i + ')">상세</button></td>' +
-      '</tr>';
+    html += '<tr>'
+      + '<td>' + (i+1) + '</td>'
+      + '<td><strong>' + escHtml(row.name) + '</strong></td>'
+      + '<td>' + escHtml(row.phone) + '</td>'
+      + '<td>' + row.stepLabel + '</td>'
+      + '<td style="font-size:.8rem;color:#5a7090">' + escHtml(row.ts) + '</td>'
+      + '<td>' + statusBadge + '</td>'
+      + '<td><button class="detail-btn" data-idx="' + i + '">상세</button></td>'
+      + '</tr>';
   });
-
   html += '</tbody></table>';
   document.getElementById('tableWrap').innerHTML = html;
   window._rows = rows;
+
+  /* bind detail buttons */
+  document.querySelectorAll('.detail-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      showDetail(parseInt(btn.getAttribute('data-idx')));
+    });
+  });
 }
 
-function escHtml(s) {
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-
-// ── Detail Modal ──────────────────────────────────────
+/* ---- Detail ---- */
 function showDetail(idx) {
   var row = window._rows[idx];
   if (!row) return;
   var d = row.raw;
-  document.getElementById('modalTitle').textContent = (row.src==='app'?'최종 제출':'임시저장') + ' 상세 — ' + row.name;
+  document.getElementById('modalTitle').textContent = (row.src==='app' ? '최종 제출' : '임시저장') + ' 상세 — ' + escHtml(row.name);
   var html = '<dl>';
 
   if (row.src === 'draft') {
-    html += '<dt>이름</dt><dd>' + escHtml(d.name||'-') + '</dd>';
+    html += '<dt>이름</dt><dd>' + escHtml(d.name) + '</dd>';
     html += '<dt>전화번호</dt><dd>' + escHtml(row.phone) + '</dd>';
     html += '<dt>진행 단계</dt><dd>Step ' + (d.step||1) + '</dd>';
   } else {
-    html += '<dt>이름</dt><dd>' + escHtml(d.name||'-') + '</dd>';
-    html += '<dt>전화번호</dt><dd>' + escHtml(d.phone||'-') + '</dd>';
-    if (d.wt) html += '<dt>체중 (kg)</dt><dd>' + escHtml(d.wt) + '</dd>';
+    html += '<dt>이름</dt><dd>' + escHtml(d.name) + '</dd>';
+    html += '<dt>전화번호</dt><dd>' + escHtml(d.phone) + '</dd>';
+    if (d.wt)  html += '<dt>체중 (kg)</dt><dd>' + escHtml(d.wt) + '</dd>';
     if (d.mus) html += '<dt>근육량 (kg)</dt><dd>' + escHtml(d.mus) + '</dd>';
     if (d.fat) html += '<dt>체지방률 (%)</dt><dd>' + escHtml(d.fat) + '</dd>';
-    if (d.products) html += '<dt>선택 제품</dt><dd>' + escHtml(d.products.join ? d.products.join(', ') : d.products) + '</dd>';
+    if (d.products) {
+      var prods = Array.isArray(d.products) ? d.products.join(', ') : String(d.products);
+      html += '<dt>선택 제품</dt><dd>' + escHtml(prods) + '</dd>';
+    }
     if (d.ts) html += '<dt>제출 시각</dt><dd>' + new Date(d.ts).toLocaleString('ko-KR') + '</dd>';
-    var st = d.status || 'pending';
-    html += '<dt>승인 상태</dt><dd><select class="status-select" onchange="updateStatus('' + escHtml(row.key) + '',this.value)">' +
-      '<option value="pending"' + (st==='pending'?' selected':'') + '>⏳ 검토중</option>' +
-      '<option value="approved"' + (st==='approved'?' selected':'') + '>✅ 승인</option>' +
-      '<option value="rejected"' + (st==='rejected'?' selected':'') + '>❌ 거절</option>' +
-      '</select></dd>';
+
+    /* status selector - use data-key attribute, no inline quotes around key */
+    var curSt = d.status || 'pending';
+    html += '<dt>승인 상태</dt><dd>'
+      + '<select class="status-select" data-key="' + escHtml(row.key) + '">'
+      + '<option value="pending"'  + (curSt==='pending'  ? ' selected' : '') + '>⏳ 검토중</option>'
+      + '<option value="approved"' + (curSt==='approved' ? ' selected' : '') + '>✅ 승인</option>'
+      + '<option value="rejected"' + (curSt==='rejected' ? ' selected' : '') + '>❌ 거절</option>'
+      + '</select></dd>';
+
+    /* receipt images */
     if (d.receiptFiles) {
       var rfs = Array.isArray(d.receiptFiles) ? d.receiptFiles : Object.values(d.receiptFiles);
-      html += '<dt>영수증</dt><dd>' + rfs.map(function(f){ return '<img class="img-thumb" src="' + f + '" onclick="previewImg('' + f + '')" title="클릭하여 확대">'; }).join(' ') + '</dd>';
+      html += '<dt>영수증</dt><dd>';
+      rfs.forEach(function(f){ html += '<img class="img-thumb" src="' + escHtml(f) + '" title="클릭하여 확대" data-preview="' + escHtml(f) + '">'; });
+      html += '</dd>';
     }
+    /* inbody images */
     if (d.labFiles) {
       var lfs = Array.isArray(d.labFiles) ? d.labFiles : Object.values(d.labFiles);
-      html += '<dt>인바디</dt><dd>' + lfs.map(function(f){ return '<img class="img-thumb" src="' + f + '" onclick="previewImg('' + f + '')" title="클릭하여 확대">'; }).join(' ') + '</dd>';
+      html += '<dt>인바디</dt><dd>';
+      lfs.forEach(function(f){ html += '<img class="img-thumb" src="' + escHtml(f) + '" title="클릭하여 확대" data-preview="' + escHtml(f) + '">'; });
+      html += '</dd>';
     }
   }
-
   html += '</dl>';
   document.getElementById('modalBody').innerHTML = html;
+
+  /* bind events on dynamically created elements */
+  document.querySelectorAll('#modalBody .status-select').forEach(function(sel) {
+    sel.addEventListener('change', function() {
+      updateStatus(sel.getAttribute('data-key'), sel.value);
+    });
+  });
+  document.querySelectorAll('#modalBody .img-thumb').forEach(function(img) {
+    img.addEventListener('click', function() {
+      previewImg(img.getAttribute('data-preview'));
+    });
+  });
+
   document.getElementById('detailModal').classList.add('show');
 }
 
@@ -355,30 +368,38 @@ function closeImgPreview() {
   document.getElementById('imgPreview').classList.remove('show');
 }
 
-// ── Status Update ─────────────────────────────────────
+/* ---- Status Update ---- */
 function updateStatus(key, status) {
   fetch(DB_URL + '/applications/' + key + '/status.json', {
     method: 'PUT',
-    headers:{'Content-Type':'application/json'},
+    headers: {'Content-Type': 'application/json'},
     body: JSON.stringify(status)
-  }).then(function(){
-    // Update local data
+  }).then(function() {
     if (allApps[key]) allApps[key].status = status;
     renderTables();
-  }).catch(function(e){ alert('상태 업데이트 실패: ' + e.message); });
+  }).catch(function(e) {
+    alert('상태 업데이트 실패: ' + e.message);
+  });
 }
 
-// ── Init ──────────────────────────────────────────────
-(function init() {
-  if (sessionStorage.getItem('adminAuth') === '1') {
-    document.getElementById('loginWrap').style.display = 'none';
-    document.getElementById('adminWrap').style.display = 'block';
-    loadAll();
-  }
-  document.getElementById('adminPw').addEventListener('keydown', function(e) {
-    if (e.key === 'Enter') doAdminLogin();
-  });
-})();
+/* ---- Init ---- */
+document.getElementById('loginBtn').addEventListener('click', doAdminLogin);
+document.getElementById('adminPw').addEventListener('keydown', function(e) { if (e.key === 'Enter') doAdminLogin(); });
+document.getElementById('refreshBtn').addEventListener('click', loadAll);
+document.getElementById('logoutBtn').addEventListener('click', doLogout);
+document.getElementById('searchInput').addEventListener('input', renderTables);
+document.getElementById('tabAll').addEventListener('click', function(){ setTab('all'); });
+document.getElementById('tabDraft').addEventListener('click', function(){ setTab('draft'); });
+document.getElementById('tabApps').addEventListener('click', function(){ setTab('apps'); });
+document.getElementById('detailModal').addEventListener('click', function(e){ if(e.target===this) closeModal(); });
+document.getElementById('modalClose').addEventListener('click', closeModal);
+document.getElementById('imgPreview').addEventListener('click', closeImgPreview);
+
+if (sessionStorage.getItem('adminAuth') === '1') {
+  document.getElementById('loginWrap').style.display = 'none';
+  document.getElementById('adminWrap').style.display = 'block';
+  loadAll();
+}
 </script>
 </body>
 </html>
