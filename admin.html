@@ -69,6 +69,8 @@ tbody td{padding:11px 14px;color:#2c3e5a;vertical-align:top}
 .status-select{padding:4px 8px;border:1.5px solid #c8dff5;border-radius:6px;font-size:.82rem;cursor:pointer}
 .search-bar{padding:8px 14px;border:1.5px solid #c8dff5;border-radius:8px;font-size:.88rem;width:220px;outline:none}
 .search-bar:focus{border-color:#0070c0}
+.hint{font-size:.78rem;color:#5a7090;margin-top:10px}
+.hint a{color:#0070c0;text-decoration:none}
 </style>
 </head>
 <body>
@@ -81,10 +83,11 @@ tbody td{padding:11px 14px;color:#2c3e5a;vertical-align:top}
 <div class="login-wrap" id="loginWrap">
   <div class="login-box">
     <h2>🔐 관리자 로그인</h2>
-    <p>관리자 비밀번호를 입력하세요</p>
+    <p>관리자 비밀번호를 입력하세요<br><small style="color:#aaa">(index 페이지와 동일한 비밀번호)</small></p>
     <input type="password" id="adminPw" placeholder="비밀번호">
     <button id="loginBtn">로그인</button>
     <div class="login-err" id="loginErr"></div>
+    <p class="hint">비밀번호를 잊으셨나요? <a href="index.html">index 페이지</a>에서 설정 가능합니다.</p>
   </div>
 </div>
 
@@ -142,7 +145,6 @@ tbody td{padding:11px 14px;color:#2c3e5a;vertical-align:top}
 
 <script>
 var DB_URL = 'https://health-challenge-990fd-default-rtdb.firebaseio.com';
-var ADMIN_PW = 'admin1234';
 var allDrafts = {};
 var allApps = {};
 var currentTab = 'all';
@@ -151,17 +153,56 @@ function escHtml(s) {
   return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
+/* ---- Admin Password: read from Firebase settings (same as index.html) ---- */
+function getAdminPw() {
+  return fetch(DB_URL + '/settings/adminPw.json')
+    .then(function(r){ return r.json(); })
+    .then(function(v){ return v || 'admin1234'; })
+    .catch(function(){ return 'admin1234'; });
+}
+
+function getSubAdmins() {
+  return fetch(DB_URL + '/settings/subAdmins.json')
+    .then(function(r){ return r.json(); })
+    .then(function(v){ return v || {}; })
+    .catch(function(){ return {}; });
+}
+
 /* ---- Auth ---- */
 function doAdminLogin() {
   var pw = document.getElementById('adminPw').value;
-  if (pw === ADMIN_PW) {
-    document.getElementById('loginWrap').style.display = 'none';
-    document.getElementById('adminWrap').style.display = 'block';
-    sessionStorage.setItem('adminAuth', '1');
-    loadAll();
-  } else {
-    document.getElementById('loginErr').textContent = '비밀번호가 올바르지 않습니다.';
-  }
+  var errEl = document.getElementById('loginErr');
+  errEl.textContent = '확인 중...';
+
+  Promise.all([getAdminPw(), getSubAdmins()]).then(function(results) {
+    var adminPw = results[0];
+    var subAdmins = results[1];
+
+    // Check super admin password
+    if (pw === adminPw) {
+      loginSuccess();
+      return;
+    }
+    // Check sub-admin passwords
+    var subFound = Object.values(subAdmins).find(function(sa) {
+      return sa && sa.password === pw && sa.active !== false;
+    });
+    if (subFound) {
+      loginSuccess();
+      return;
+    }
+    errEl.textContent = '비밀번호가 올바르지 않습니다.';
+  }).catch(function() {
+    errEl.textContent = '오류가 발생했습니다. 다시 시도해주세요.';
+  });
+}
+
+function loginSuccess() {
+  document.getElementById('loginWrap').style.display = 'none';
+  document.getElementById('adminWrap').style.display = 'block';
+  document.getElementById('loginErr').textContent = '';
+  sessionStorage.setItem('adminAuth', '1');
+  loadAll();
 }
 
 function doLogout() {
@@ -281,7 +322,6 @@ function renderTables() {
   document.getElementById('tableWrap').innerHTML = html;
   window._rows = rows;
 
-  /* bind detail buttons */
   document.querySelectorAll('.detail-btn').forEach(function(btn) {
     btn.addEventListener('click', function() {
       showDetail(parseInt(btn.getAttribute('data-idx')));
@@ -313,7 +353,6 @@ function showDetail(idx) {
     }
     if (d.ts) html += '<dt>제출 시각</dt><dd>' + new Date(d.ts).toLocaleString('ko-KR') + '</dd>';
 
-    /* status selector - use data-key attribute, no inline quotes around key */
     var curSt = d.status || 'pending';
     html += '<dt>승인 상태</dt><dd>'
       + '<select class="status-select" data-key="' + escHtml(row.key) + '">'
@@ -322,14 +361,12 @@ function showDetail(idx) {
       + '<option value="rejected"' + (curSt==='rejected' ? ' selected' : '') + '>❌ 거절</option>'
       + '</select></dd>';
 
-    /* receipt images */
     if (d.receiptFiles) {
       var rfs = Array.isArray(d.receiptFiles) ? d.receiptFiles : Object.values(d.receiptFiles);
       html += '<dt>영수증</dt><dd>';
       rfs.forEach(function(f){ html += '<img class="img-thumb" src="' + escHtml(f) + '" title="클릭하여 확대" data-preview="' + escHtml(f) + '">'; });
       html += '</dd>';
     }
-    /* inbody images */
     if (d.labFiles) {
       var lfs = Array.isArray(d.labFiles) ? d.labFiles : Object.values(d.labFiles);
       html += '<dt>인바디</dt><dd>';
@@ -340,7 +377,6 @@ function showDetail(idx) {
   html += '</dl>';
   document.getElementById('modalBody').innerHTML = html;
 
-  /* bind events on dynamically created elements */
   document.querySelectorAll('#modalBody .status-select').forEach(function(sel) {
     sel.addEventListener('change', function() {
       updateStatus(sel.getAttribute('data-key'), sel.value);
@@ -355,18 +391,9 @@ function showDetail(idx) {
   document.getElementById('detailModal').classList.add('show');
 }
 
-function closeModal() {
-  document.getElementById('detailModal').classList.remove('show');
-}
-
-function previewImg(src) {
-  document.getElementById('imgPreviewEl').src = src;
-  document.getElementById('imgPreview').classList.add('show');
-}
-
-function closeImgPreview() {
-  document.getElementById('imgPreview').classList.remove('show');
-}
+function closeModal() { document.getElementById('detailModal').classList.remove('show'); }
+function previewImg(src) { document.getElementById('imgPreviewEl').src = src; document.getElementById('imgPreview').classList.add('show'); }
+function closeImgPreview() { document.getElementById('imgPreview').classList.remove('show'); }
 
 /* ---- Status Update ---- */
 function updateStatus(key, status) {
@@ -384,7 +411,7 @@ function updateStatus(key, status) {
 
 /* ---- Init ---- */
 document.getElementById('loginBtn').addEventListener('click', doAdminLogin);
-document.getElementById('adminPw').addEventListener('keydown', function(e) { if (e.key === 'Enter') doAdminLogin(); });
+document.getElementById('adminPw').addEventListener('keydown', function(e){ if(e.key==='Enter') doAdminLogin(); });
 document.getElementById('refreshBtn').addEventListener('click', loadAll);
 document.getElementById('logoutBtn').addEventListener('click', doLogout);
 document.getElementById('searchInput').addEventListener('input', renderTables);
