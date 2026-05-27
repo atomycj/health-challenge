@@ -1248,6 +1248,7 @@ window.doAdminLogin = async () => {
   if (pw === adminPw) {
     session = { role:'admin', isSuper:true, name:'최고 관리자' };
     startApp();
+    localStorage.setItem('hc_adminAuth','1');
     return;
   }
   // 부관리자 확인
@@ -1257,6 +1258,7 @@ window.doAdminLogin = async () => {
     const [saId, sa] = found;
     session = { role:'admin', isSuper:false, subAdminId:saId, name:sa.name, level:sa.level||'sub' };
     startApp();
+    localStorage.setItem('hc_adminAuth','1');
     return;
   }
   err.textContent='비밀번호 Password가 올바르지 않습니다.';
@@ -1264,6 +1266,7 @@ window.doAdminLogin = async () => {
 
 window.doLogout = () => {
   session = null;
+  localStorage.removeItem('hc_adminAuth');
   document.getElementById('mainApp').style.display = 'none';
   document.getElementById('loginScreen').style.display = 'flex';
   document.getElementById('loginMemberPw').value = '';
