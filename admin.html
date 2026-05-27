@@ -63,6 +63,7 @@ tbody td{padding:11px 14px;color:#2c3e5a;vertical-align:top}
 .modal dt{font-weight:700;color:#5a7090;font-size:.82rem;padding-top:2px}
 .modal dd{font-size:.88rem;color:#1a2a3a;word-break:break-all}
 .modal .img-thumb{width:80px;height:80px;object-fit:cover;border-radius:6px;border:1px solid #c8dff5;cursor:pointer}
+.file-link{display:inline-block;padding:4px 10px;margin:3px;background:#f0f6ff;color:#0070c0;border-radius:5px;text-decoration:none;font-size:.84rem;border:1px solid #c8dff5;word-break:break-all}
 .img-preview-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;align-items:center;justify-content:center}
 .img-preview-bg.show{display:flex}
 .img-preview-bg img{max-width:92vw;max-height:88vh;border-radius:8px}
@@ -315,7 +316,7 @@ function renderTables() {
       + '<td>' + row.stepLabel + '</td>'
       + '<td style="font-size:.8rem;color:#5a7090">' + escHtml(row.ts) + '</td>'
       + '<td>' + statusBadge + '</td>'
-      + '<td><button class="detail-btn" data-idx="' + i + '">상세</button></td>'
+      + '<td><button class="detail-btn" data-idx="' + i + '">상세</button> <button class="del-btn" data-src="' + escHtml(row.src) + '" data-key="' + escHtml(row.src==='draft'?row.phone:row.key) + '" style="background:#e74c3c;color:#fff;border:none;border-radius:5px;padding:3px 8px;font-size:.78rem;cursor:pointer;margin-left:4px;">삭제</button></td>'
       + '</tr>';
   });
   html += '</tbody></table>';
@@ -327,6 +328,27 @@ function renderTables() {
       showDetail(parseInt(btn.getAttribute('data-idx')));
     });
   });
+
+  document.querySelectorAll('.del-btn').forEach(function(btn) {
+    btn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      var src = btn.getAttribute('data-src');
+      var key = btn.getAttribute('data-key');
+      deleteRow(src, key);
+    });
+  });
+}
+
+function deleteRow(src, key) {
+  var label = src === 'draft' ? '임시저장 기록' : '미완료 신청 기록';
+  if (!confirm('이 ' + label + '을(를) 삭제하겠습니까?')) return;
+  var url = src === 'draft'
+    ? DB_URL + '/draft/' + encodeURIComponent(key) + '.json'
+    : DB_URL + '/applications/' + key + '.json';
+  fetch(url, { method: 'DELETE' })
+    .then(function(r){ if(!r.ok) throw new Error(r.status); return r.json(); })
+    .then(function(){ alert('삭제되었습니다.'); loadData(); })
+    .catch(function(e){ alert('삭제 실패: ' + e.message); });
 }
 
 /* ---- Detail ---- */
@@ -364,13 +386,13 @@ function showDetail(idx) {
     if (d.receiptFiles) {
       var rfs = Array.isArray(d.receiptFiles) ? d.receiptFiles : Object.values(d.receiptFiles);
       html += '<dt>영수증</dt><dd>';
-      rfs.forEach(function(f){ html += '<img class="img-thumb" src="' + escHtml(f) + '" title="클릭하여 확대" data-preview="' + escHtml(f) + '">'; });
+      rfs.forEach(function(f){ var fd=(f&&f.data)?f.data:String(f); var fn=(f&&f.name)?f.name:'영수증'; var ft=(f&&f.type)?f.type:''; if(ft.indexOf('pdf')>=0||fn.toLowerCase().endsWith('.pdf')){ html+='<a class="file-link" href="'+fd+'" target="_blank">&#128196; '+escHtml(fn)+'</a>'; }else{ html+='<img class="img-thumb" src="'+fd+'" title="'+escHtml(fn)+'" data-preview="'+fd+'">'; } });
       html += '</dd>';
     }
     if (d.labFiles) {
       var lfs = Array.isArray(d.labFiles) ? d.labFiles : Object.values(d.labFiles);
       html += '<dt>인바디</dt><dd>';
-      lfs.forEach(function(f){ html += '<img class="img-thumb" src="' + escHtml(f) + '" title="클릭하여 확대" data-preview="' + escHtml(f) + '">'; });
+      lfs.forEach(function(f){ var fd=(f&&f.data)?f.data:String(f); var fn=(f&&f.name)?f.name:'파일'; var ft=(f&&f.type)?f.type:''; if(ft.indexOf('pdf')>=0||fn.toLowerCase().endsWith('.pdf')){ html+='<a class="file-link" href="'+fd+'" target="_blank">&#128196; '+escHtml(fn)+'</a>'; }else{ html+='<img class="img-thumb" src="'+fd+'" title="'+escHtml(fn)+'" data-preview="'+fd+'">'; } });
       html += '</dd>';
     }
   }
