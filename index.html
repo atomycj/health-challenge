@@ -1008,6 +1008,8 @@ window.applyLang = function() {
   // ── 로그인 화면
   const loginSub = document.getElementById('loginSubTitle');
   if(loginSub) loginSub.textContent = L.loginSubTitle;
+  const loginRegisterEl = document.getElementById('loginRegisterText');
+  if(loginRegisterEl) loginRegisterEl.textContent = ko ? '첫음 참여하시나요? 참여 신청하기' : 'New here? Register now';
 
   const ltMember = document.getElementById('ltMember');
   const ltAdmin  = document.getElementById('ltAdmin');
