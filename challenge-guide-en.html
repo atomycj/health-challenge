@@ -224,6 +224,41 @@ footer strong{color:var(--white);display:block;margin-bottom:6px;font-size:1rem;
   .hero h2{font-size:1.5rem}
   .step{grid-template-columns:36px 1fr;gap:10px}
 }
+
+/* === Mandatory Products Box === */
+.pkg-mandatory{background:linear-gradient(135deg,#fff5f5,#f0fdf4);border:2px solid #e53e3e;border-radius:16px;padding:22px;margin-bottom:28px}
+.pkg-mandatory-title{font-weight:800;color:#c53030;font-size:1rem;margin-bottom:16px;text-align:center;letter-spacing:.5px}
+.pkg-mandatory-body{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.pkg-mand-item{flex:1;background:var(--white);border-radius:10px;padding:14px;box-shadow:0 2px 8px rgba(0,0,0,.08);display:flex;align-items:flex-start;gap:10px}
+.pkg-mand-icon{font-size:1.6rem;flex-shrink:0}
+.pkg-mand-text{font-size:.83rem;line-height:1.5;color:var(--text)}
+.pkg-mand-text strong{color:var(--green);font-size:.9rem}
+.pkg-mand-plus{font-size:2rem;font-weight:900;color:#e53e3e;flex-shrink:0}
+.pkg-mand-note{font-size:.78rem;color:#666;background:#fff;border-left:3px solid #e53e3e;padding:8px 12px;border-radius:0 6px 6px 0;line-height:1.5}
+/* === Package cards redesign === */
+.pkg-header.blood{background:linear-gradient(135deg,#7b1d1d,#c53030);color:var(--white)}
+.pkg-header.body{background:linear-gradient(135deg,#1a3a1a,#276749);color:var(--white)}
+.pkg-label{font-size:.72rem;opacity:.75;letter-spacing:2px;font-weight:700;margin-bottom:2px}
+.pkg-name{font-size:1.1rem;font-weight:800;letter-spacing:1px;line-height:1.2}
+.pkg-name-en{font-size:.72rem;opacity:.7;margin-top:2px;letter-spacing:.5px}
+.pkg-who{background:#fffbeb;border:1px solid #f6e05e;border-radius:6px;padding:8px 10px;font-size:.77rem;color:#744210;margin-bottom:12px;line-height:1.4}
+.pkg-list{list-style:none;padding:0;margin:0}
+.pkg-list li{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)}
+.pkg-list li:last-child{border-bottom:none}
+.pkg-item-icon{font-size:1.3rem;flex-shrink:0;margin-top:2px}
+.pkg-item-body{flex:1}
+.pkg-item-body strong{font-size:.88rem;color:var(--green);display:block;margin-bottom:2px}
+.pkg-item-body p{font-size:.78rem;color:#555;margin:0;line-height:1.5}
+.pkg-tip{background:#f0f9ff;border:1px solid #bae6fd;border-radius:12px;padding:18px 20px}
+.pkg-tip-title{font-weight:800;color:#0369a1;margin-bottom:10px;font-size:.92rem}
+.pkg-tip ul{list-style:none;padding:0;margin:0}
+.pkg-tip li{font-size:.82rem;color:var(--text);padding:4px 0;padding-left:14px;position:relative;line-height:1.5}
+.pkg-tip li::before{content:"›";position:absolute;left:0;color:#0369a1;font-weight:700}
+.section-sub{color:#555;font-size:.9rem;text-align:center;margin-bottom:24px;line-height:1.6}
+@media(max-width:600px){
+  .pkg-mandatory-body{flex-direction:column}
+  .pkg-mand-plus{align-self:center;transform:rotate(90deg)}
+}
 </style>
 <title>Health Challenge Guide — Atomy Auckland Absolute Centre</title>
 </head>
@@ -288,8 +323,8 @@ footer strong{color:var(--white);display:block;margin-bottom:6px;font-size:1rem;
       <div class="step-num" style="background:var(--blue)">3</div>
       <div class="step-body">
         <h3>Purchase Atomy Products</h3>
-        <p>You must purchase <strong>at least one</strong> of the designated products to qualify for the challenge. Take the product consistently throughout the challenge period.</p>
-        <span class="tag red">Required Purchase</span><span class="tag">Banaba Red Ginseng or Blood Sugar Cut Bitter Melon</span>
+        <p>You must purchase <strong>both products (3-month supply)</strong> to qualify for the challenge. Take both products consistently throughout the 3-month challenge period.</p>
+        <span class="tag red">Required Purchase</span><span class="tag">Banaba Red Ginseng + Blood Sugar Cut Bitter Melon (3 months)</span>
       </div>
     </div>
     <div class="step">
@@ -390,14 +425,14 @@ footer strong{color:var(--white);display:block;margin-bottom:6px;font-size:1rem;
 <!-- SECTION 5: Required Products -->
 <div class="section">
   <div class="section-label">Required Products</div>
-  <div class="section-title">Required Products (Choose 1)</div>
+  <div class="section-title">Required Products (Both Required)</div>
   <div class="divider"></div>
-  <p class="section-sub">Purchasing at least one of the two products below is required to join the challenge. Both are certified functional health foods for blood sugar management.</p>
+  <p class="section-sub">Both products below are required for the challenge. Together, they target blood sugar suppression through complementary mechanisms. Both are MFDS/KFDA-certified functional health foods.</p>
   <div class="req-grid">
     <div class="req-card">
       <div class="req-header blood">🩸 Atomy Blood Sugar Care Banaba &amp; Red Ginseng</div>
       <div class="req-body">
-        <div class="req-row"><span class="req-key">Volume</span><span class="req-val">30 sachets (1 month)</span></div>
+        <div class="req-row"><span class="req-key">Volume</span><span class="req-val">90 sachets (3 months)</span></div>
         <div class="req-row"><span class="req-key">Key Ingredients</span><span class="req-val">Banaba leaf extract (Corosolic acid 1.2mg)<br>Red ginseng concentrate (Ginsenosides 3mg)</span></div>
         <div class="req-row"><span class="req-key">Function</span><span class="req-val">Post-meal blood sugar rise suppression<br>Immunity · fatigue relief · antioxidant</span></div>
         <div class="req-row"><span class="req-key">Usage</span><span class="req-val">1 sachet per day, dissolved in water</span></div>
@@ -406,7 +441,7 @@ footer strong{color:var(--white);display:block;margin-bottom:6px;font-size:1rem;
     <div class="req-card">
       <div class="req-header green">🌿 Atomy Blood Sugar Cut Bitter Melon (Yeo-ju)</div>
       <div class="req-body">
-        <div class="req-row"><span class="req-key">Volume</span><span class="req-val">60 sachets (1 month)</span></div>
+        <div class="req-row"><span class="req-key">Volume</span><span class="req-val">180 sachets (3 months)</span></div>
         <div class="req-row"><span class="req-key">Key Ingredients</span><span class="req-val">Unripe bitter melon extract (GABA)<br>Magnesium · Zinc · Vitamin B6 · B12</span></div>
         <div class="req-row"><span class="req-key">Function</span><span class="req-val">Post-meal blood sugar suppression (MFDS approved)<br>Immune support · energy metabolism</span></div>
         <div class="req-row"><span class="req-key">Features</span><span class="req-val">3mm micro tablet · 2025 Food Tech Award<br>100% Korean-grown bitter melon</span></div>
@@ -423,49 +458,119 @@ footer strong{color:var(--white);display:block;margin-bottom:6px;font-size:1rem;
   </div>
 </div>
 
-<!-- SECTION 6: Packages -->
+<!-- SECTION 6: Recommended Packages -->
 <div class="section">
-  <div class="section-label">Recommended Packages</div>
-  <div class="section-title">Recommended Supplement Packages</div>
-  <div class="divider"></div>
-  <p class="section-sub">We've designed two packages based on your primary health goal. Adding supplements alongside the required product can enhance your results.</p>
-  <div class="pkg-grid">
-    <div class="pkg-card">
-      <div class="pkg-header blue">
-        <div class="pkg-icon">🩸</div>
-        <div><div class="pkg-name">Package A<br>Blood Sugar Focus</div><div class="pkg-tagline">혈당 집중 케어</div></div>
+  <div class="section-label">RECOMMENDED PACKAGES</div>
+  <h2>Recommended Supplement Packages</h2>
+  <p class="section-sub">Taking both Banaba Red Ginseng and Blood Sugar Cut Bitter Melon together enhances blood sugar control. Choose additional supplements based on your primary goal.</p>
+
+  <div class="pkg-mandatory">
+    <div class="pkg-mandatory-title">🔴 Both Products Required — 3-Month Supply</div>
+    <div class="pkg-mandatory-body">
+      <div class="pkg-mand-item">
+        <div class="pkg-mand-icon">🩸</div>
+        <div class="pkg-mand-text">
+          <strong>Banaba Red Ginseng</strong><br>
+          Banaba leaf corosolic acid + Red ginseng ginsenosides<br>
+          Post-meal blood sugar suppression · Immunity · Fatigue relief
+        </div>
       </div>
-      <div class="pkg-must">🔴 Includes required product (choose 1)</div>
-      <div class="pkg-body">
-        <div class="pkg-item"><div class="pkg-item-icon">🩸</div><div><h4>Banaba Red Ginseng <span style="color:var(--red);font-size:.75rem">Required</span></h4><p>Post-meal blood sugar control + ginseng immunity & fatigue relief. Directly supports HbA1c improvement.</p></div></div>
-        <div class="pkg-item"><div class="pkg-item-icon">🌿</div><div><h4>Blood Sugar Cut Bitter Melon <span style="color:var(--red);font-size:.75rem">Or Required</span></h4><p>MFDS-approved ingredient · includes Mg, Zn, B6, B12 for 5-in-1 benefits</p></div></div>
-        <div class="pkg-item"><div class="pkg-item-icon">🔬</div><div><h4>Alaska E-Omega3</h4><p>EPA & DHA help improve insulin resistance and reduce triglycerides — supports blood sugar control</p></div></div>
-        <div class="pkg-item"><div class="pkg-item-icon">🦠</div><div><h4>Chinsaeng Probiotics</h4><p>Gut health is linked to blood sugar regulation and weight management</p></div></div>
-        <div class="pkg-item"><div class="pkg-item-icon">⚡</div><div><h4>Vital Mega Vitamin B Complex</h4><p>Essential for glucose metabolism & energy production. Especially recommended for those managing diabetes</p></div></div>
+      <div class="pkg-mand-plus">+</div>
+      <div class="pkg-mand-item">
+        <div class="pkg-mand-icon">🌿</div>
+        <div class="pkg-mand-text">
+          <strong>Blood Sugar Cut Bitter Melon</strong><br>
+          100% Korean bitter melon GABA + Magnesium · Zinc · B6 · B12<br>
+          MFDS-approved blood sugar control · Energy metabolism · Muscle function
+        </div>
       </div>
     </div>
+    <div class="pkg-mand-note">When taken together, corosolic acid from Banaba leaf and GABA from bitter melon work through different pathways to regulate blood sugar, creating a complementary synergistic effect.</div>
+  </div>
+
+  <div class="pkg-grid">
     <div class="pkg-card">
-      <div class="pkg-header teal">
-        <div class="pkg-icon">💪</div>
-        <div><div class="pkg-name">Package B<br>Body Composition</div><div class="pkg-tagline">체성분 개선 케어</div></div>
+      <div class="pkg-header blood">
+        <span class="pkg-icon">🩸</span>
+        <div>
+          <div class="pkg-label">Package A</div>
+          <div class="pkg-name">Blood Sugar Focus</div>
+          <div class="pkg-name-en">혈당 집중 케어</div>
+        </div>
       </div>
-      <div class="pkg-must">🔴 Includes required product (choose 1)</div>
       <div class="pkg-body">
-        <div class="pkg-item"><div class="pkg-item-icon">🩸</div><div><h4>Banaba Red Ginseng <span style="color:var(--red);font-size:.75rem">Required</span></h4><p>Blood sugar control prevents fat storage + ginseng fatigue relief supports consistent exercise</p></div></div>
-        <div class="pkg-item"><div class="pkg-item-icon">🌿</div><div><h4>Blood Sugar Cut Bitter Melon <span style="color:var(--red);font-size:.75rem">Or Required</span></h4><p>Reduces blood sugar spikes to prevent fat synthesis. Magnesium supports muscle function</p></div></div>
-        <div class="pkg-item"><div class="pkg-item-icon">💊</div><div><h4>HemoHIM</h4><p>Immune boost + antioxidant. Prevents fatigue during the challenge and improves exercise performance</p></div></div>
-        <div class="pkg-item"><div class="pkg-item-icon">🦴</div><div><h4>Turmasin MSM</h4><p>Joint health support. Reduces joint strain as exercise intensity increases</p></div></div>
-        <div class="pkg-item"><div class="pkg-item-icon">☀️</div><div><h4>Vital Mega Vitamin C 2000</h4><p>Antioxidant & immune support. Counters oxidative stress during fat loss</p></div></div>
+        <div class="pkg-who">📌 For those with high HbA1c or whose primary goal is blood sugar improvement</div>
+        <ul class="pkg-list">
+          <li>
+            <span class="pkg-item-icon">🔬</span>
+            <div class="pkg-item-body">
+              <strong>Alaska E-Omega3</strong>
+              <p>EPA &amp; DHA improve insulin resistance and lower triglycerides, supporting blood sugar control from multiple angles</p>
+            </div>
+          </li>
+          <li>
+            <span class="pkg-item-icon">🦠</span>
+            <div class="pkg-item-body">
+              <strong>Chinsaeng Probiotics</strong>
+              <p>Gut microbiome balance is directly linked to blood sugar regulation and insulin sensitivity — supports the gut-glucose axis</p>
+            </div>
+          </li>
+          <li>
+            <span class="pkg-item-icon">⚡</span>
+            <div class="pkg-item-body">
+              <strong>Vital Mega Vitamin B Complex</strong>
+              <p>Essential coenzymes for glucose metabolism and energy production. B1·B2·B6·B12 protect nerves and reduce fatigue associated with diabetes</p>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="pkg-card">
+      <div class="pkg-header body">
+        <span class="pkg-icon">💪</span>
+        <div>
+          <div class="pkg-label">Package B</div>
+          <div class="pkg-name">Body Composition</div>
+          <div class="pkg-name-en">체성분 개선 케어</div>
+        </div>
+      </div>
+      <div class="pkg-body">
+        <div class="pkg-who">📌 For those with high body fat or low muscle mass whose primary goal is body composition improvement</div>
+        <ul class="pkg-list">
+          <li>
+            <span class="pkg-item-icon">💊</span>
+            <div class="pkg-item-body">
+              <strong>HemoHIM</strong>
+              <p>Powerful immune boost and antioxidant support. Prevents energy crashes during the challenge and enhances exercise performance</p>
+            </div>
+          </li>
+          <li>
+            <span class="pkg-item-icon">🦴</span>
+            <div class="pkg-item-body">
+              <strong>Turmasin MSM</strong>
+              <p>Supports joint health. Reduces joint strain as exercise intensity increases — essential for maintaining consistent activity levels</p>
+            </div>
+          </li>
+          <li>
+            <span class="pkg-item-icon">☀️</span>
+            <div class="pkg-item-body">
+              <strong>Vital Mega Vitamin C 2000</strong>
+              <p>Strong antioxidant and immune support. Counters oxidative stress during fat loss and supports collagen synthesis for muscle recovery</p>
+            </div>
+          </li>
+        </ul>
       </div>
     </div>
   </div>
-  <div class="notice">
-    <h4>💡 Package Selection Guide</h4>
+
+  <div class="pkg-tip">
+    <div class="pkg-tip-title">💡 Package Selection Guide</div>
     <ul>
-      <li><strong>High HbA1c level</strong> → Package A: Blood Sugar Focus recommended</li>
-      <li><strong>High body fat, low muscle</strong> → Package B: Body Composition recommended</li>
-      <li>If both apply, take the required product + choose 1–2 extras from each package.</li>
-      <li>All products available through the Atomy website or centre coordinator.</li>
+      <li>High HbA1c level → <strong>Package A: Blood Sugar Focus</strong> recommended</li>
+      <li>High body fat, low muscle mass → <strong>Package B: Body Composition</strong> recommended</li>
+      <li>If both apply, choose 1–2 extras from each package alongside the required products.</li>
+      <li>All products are available through the Atomy website or centre coordinator.</li>
     </ul>
   </div>
 </div>
