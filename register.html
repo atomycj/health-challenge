@@ -137,6 +137,28 @@ body{background:var(--off);color:var(--body);font-family:'Noto Sans KR',sans-ser
     <div class="si"><div class="sd" id="d4">4</div><span class="sl" id="lb4">완료</span></div>
   </div>
 
+  <!-- LOGIN CARD -->
+  <div class="card" id="loginCard" style="display:none">
+    <div class="ctitle">🔐 <span id="loginTitleEl">Login</span></div>
+    <p class="csub" id="loginSubEl">Continue where you left off.</p>
+    <div class="hr"></div>
+    <div class="g2">
+      <div class="fg full">
+        <label class="fl" id="loginPhoneLbl">Phone Number <span class="req">*</span></label>
+        <input class="fi" type="tel" id="iLoginPhone" placeholder="021-123-4567" autocomplete="tel">
+      </div>
+      <div class="fg full">
+        <label class="fl" id="loginPwLbl">Password <span class="req">*</span></label>
+        <input class="fi" type="password" id="iLoginPw" placeholder="••••" autocomplete="current-password">
+        <span class="fe" id="eLogin"></span>
+      </div>
+    </div>
+    <div class="brow" style="margin-top:16px;justify-content:space-between">
+      <button class="btn bs" id="bStartNew" type="button" onclick="showStep1()">← <span id="startNewEl">Start a new application</span></button>
+      <button class="btn bp" id="bLogin" type="button" onclick="doLogin()"><span id="loginBtnEl">Login to continue</span></button>
+    </div>
+  </div>
+
   <!-- STEP 1 -->
   <div class="card act" id="step1">
     <div class="ctitle">👤 <span id="s1Title">계정 생성</span></div>
@@ -185,11 +207,11 @@ body{background:var(--off);color:var(--body);font-family:'Noto Sans KR',sans-ser
     <div class="pl">
       <label class="pi" id="pi1">
         <input type="checkbox" id="iP1" onchange="this.closest('.pi').classList.toggle('on',this.checked)">
-        <div><div class="pt" id="pt1">🩸 애터미 혈당케어 바나바 홍삼</div><div class="ps" id="ps1">30포/1개월분</div></div>
+        <div><div class="pt" id="pt1">🩸 애터미 혈당케어 바나바 홍삼</div><div class="ps" id="ps1">90포/3개월분</div></div>
       </label>
       <label class="pi" id="pi2">
         <input type="checkbox" id="iP2" onchange="this.closest('.pi').classList.toggle('on',this.checked)">
-        <div><div class="pt" id="pt2">🌿 애터미 혈당컷 여주</div><div class="ps" id="ps2">60포/1개월분</div></div>
+        <div><div class="pt" id="pt2">🌿 애터미 혈당컷 여주</div><div class="ps" id="ps2">180포/3개월분</div></div>
       </label>
     </div>
     <span class="fe" id="eProd" style="margin-bottom:10px"></span>
@@ -318,8 +340,8 @@ var TX = {
     s1Info:'💡 입력한 이름과 비밀번호로 챌린지 사이트에 로그인합니다.',
     s2Title:'제품 구매 확인', s2Sub:'챌린지 참여를 위해 아래 제품 중 하나 이상을 구매해야 합니다.',
     s2Warn:'⚠️ 구매 증빙 서류는 관리자가 확인 후 승인합니다. 영수증, 주문확인서, 제품 사진 중 하나면 됩니다.',
-    pt1:'🩸 애터미 혈당케어 바나바 홍삼', ps1:'30포 / 1개월분 · 식후 혈당 억제 + 홍삼 면역',
-    pt2:'🌿 애터미 혈당컷 여주', ps2:'60포 / 1개월분 · 혈당 관리',
+    pt1:'🩸 애터미 혈당케어 바나바 홍삼', ps1:'90포 / 3개월분 · 식후 혈당 억제 + 홍삼 면역',
+    pt2:'🌿 애터미 혈당컷 여주', ps2:'180포 / 3개월분 · 혈당 관리',
     ut1:'클릭하여 파일 선택', us1:'영수증, 주문확인서, 제품 사진 (JPG, PNG, PDF)',
     s3Title:'초기 건강 기록', s3Sub:'챌린지 시작 시점의 건강 수치를 입력해주세요.',
     s3Info:'💡 HbA1c는 병원 혈액검사 결과지에서 확인할 수 있습니다. 인바디 수치는 스마트 체중계 또는 센터에서 측정 가능합니다.',
@@ -341,7 +363,12 @@ var TX = {
     submitted:'신청이 완료되었습니다! ✅', errNet:'오류가 발생했습니다. 다시 시도해주세요.',
     pwStrength:['너무 짧음','보통','좋음','매우 강함'],
     hPhone:'0으로 시작하는 전화번호', hPw:'4자 이상 입력해주세요.',
-    nameLabel:'이름', phoneLabel:'전화번호', pwLabel:'비밀번호', pw2Label:'비밀번호 확인'
+    nameLabel:'이름', phoneLabel:'전화번호', pwLabel:'비밀번호', pw2Label:'비밀번호 확인',
+    loginTitle:'로그인',
+    loginSub:'이전에 저장한 내용으로 이어서 진행합니다.',
+    loginBtn:'로그인하여 이어서 진행', startNew:'새로 신청하기',
+    errLogin:'전화번호 또는 비밀번호가 올바르지 않습니다.',
+    savedDraft:'임시 저장되었습니다.'
   },
   en: {
     hLogo:'HEALTH CHALLENGE', hBadge:'📝 Register',
@@ -353,8 +380,8 @@ var TX = {
     s1Info:'💡 You will use this name and password to log in to the challenge site.',
     s2Title:'Product Purchase', s2Sub:'You must purchase at least one product below to participate.',
     s2Warn:'⚠️ Your purchase proof will be verified by the admin before approval.',
-    pt1:'🩸 Atomy Blood Sugar Care Banaba Red Ginseng', ps1:'30 sachets / 1 month',
-    pt2:'🌿 Atomy Blood Sugar Cut Bitter Melon', ps2:'60 sachets / 1 month',
+    pt1:'🩸 Atomy Blood Sugar Care Banaba Red Ginseng', ps1:'90 sachets / 3 months',
+    pt2:'🌿 Atomy Blood Sugar Cut Bitter Melon', ps2:'180 sachets / 3 months',
     ut1:'Click to select files', us1:'Receipt, order confirmation, or product photo (JPG, PNG, PDF)',
     s3Title:'Initial Health Baseline', s3Sub:'Enter your health measurements at the start of the challenge.',
     s3Info:'💡 HbA1c can be found on your blood test results. InBody can be measured at home or at the centre.',
@@ -376,7 +403,12 @@ var TX = {
     submitted:'Application submitted! ✅', errNet:'An error occurred. Please try again.',
     pwStrength:['Too short','Fair','Good','Strong'],
     hPhone:'Must start with 0', hPw:'At least 4 characters.',
-    nameLabel:'Full Name', phoneLabel:'Phone Number', pwLabel:'Password', pw2Label:'Confirm Password'
+    nameLabel:'Full Name', phoneLabel:'Phone Number', pwLabel:'Password', pw2Label:'Confirm Password',
+    loginTitle:'Login',
+    loginSub:'Continue where you left off.',
+    loginBtn:'Login to continue', startNew:'Start a new application',
+    errLogin:'Phone number or password is incorrect.',
+    savedDraft:'Progress saved.'
   }
 };
 
@@ -408,10 +440,12 @@ function applyLang() {
   });
   document.getElementById('lbKo').classList.toggle('on', lang==='ko');
   document.getElementById('lbEn').classList.toggle('on', lang==='en');
+  applyLangToLogin();
 }
 
 /* ── Step 이동 ─────────────────────────────── */
 function goStep(n) {
+  var lc=document.getElementById('loginCard'); if(lc) lc.style.display='none';
   for(var i=1;i<=4;i++){
     document.getElementById('step'+i).classList.toggle('act', i===n);
     var d = document.getElementById('d'+i);
@@ -534,6 +568,8 @@ document.getElementById('bNext1').addEventListener('click', function() {
         }
       }
       btn.disabled=false; btn.textContent=tx('bNext1');
+      dbSet('draft/' + phone, {name:name, pw:pw, step:2}).catch(function(){});
+      showToast(tx('savedDraft'));
       goStep(2);
     })
     .catch(function(){
@@ -627,6 +663,66 @@ function showToast(msg, type) {
 
 /* ── 초기화 ───────────────────────────────── */
 setLang(lang);
+
+/* ── 임시저장 / 로그인 기능 ──────────────────────────────── */
+function dbSet(path, data) {
+  return fetch(DB_URL + '/' + path + '.json', {
+    method: 'PUT',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify(data)
+  }).then(function(r){ return r.json(); });
+}
+
+function showStep1() {
+  document.getElementById('loginCard').style.display = 'none';
+  document.getElementById('step1').style.display = 'block';
+}
+
+function doLogin() {
+  var phone = document.getElementById('iLoginPhone').value.trim().replace(/-/g,'');
+  var pw    = document.getElementById('iLoginPw').value;
+  var eEl   = document.getElementById('eLogin');
+  var btn   = document.getElementById('bLogin');
+  if (!phone || !pw) { eEl.textContent = tx('errLogin'); eEl.style.display='block'; return; }
+  btn.disabled = true;
+  dbGet('draft/' + phone).then(function(data) {
+    btn.disabled = false;
+    if (!data || data.pw !== pw) {
+      eEl.textContent = tx('errLogin'); eEl.style.display='block'; return;
+    }
+    eEl.style.display = 'none';
+    // 저장된 데이터를 step1 필드에 복원
+    document.getElementById('iName').value  = data.name  || '';
+    document.getElementById('iPhone').value = phone.replace(/^(\d{2,3})(\d{3,4})(\d{4})$/, '$1-$2-$3');
+    document.getElementById('iPw').value    = data.pw;
+    document.getElementById('iPw2').value   = data.pw;
+    // 로그인 카드 숨기고 step 2부터 시작
+    document.getElementById('loginCard').style.display = 'none';
+    document.getElementById('step1').style.display = 'block';
+    goStep(data.step || 2);
+  }).catch(function() {
+    btn.disabled = false;
+    eEl.textContent = tx('errLogin'); eEl.style.display='block';
+  });
+}
+
+function applyLangToLogin() {
+  var el = function(id) { return document.getElementById(id); };
+  if(el('loginTitleEl')) el('loginTitleEl').textContent = tx('loginTitle');
+  if(el('loginSubEl'))   el('loginSubEl').textContent   = tx('loginSub');
+  if(el('loginBtnEl'))   el('loginBtnEl').textContent   = tx('loginBtn');
+  if(el('startNewEl'))   el('startNewEl').textContent   = tx('startNew');
+}
+
+/* ── 페이지 로드 시 초기화 ──────────────────────────────── */
+(function initPage() {
+  var savedLang = localStorage.getItem('hc_lang') || 'ko';
+  setLang(savedLang);
+  applyLangToLogin();
+  // 이미 draft 존재 여부와 관계없이 항상 로그인 카드 먼저 보여줌
+  document.getElementById('step1').style.display = 'none';
+  document.getElementById('loginCard').style.display = 'block';
+})();
 </script>
 </body>
 </html>
