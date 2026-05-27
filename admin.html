@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>챌린지 관리자 페이지</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Noto Sans KR',sans-serif;background:#f0f4f8;color:#1a2a3a;min-height:100vh}
+.header{background:#0070c0;color:#fff;padding:16px 28px;display:flex;align-items:center;gap:14px}
+.header h1{font-size:1.25rem;font-weight:700}
+.header span{font-size:.85rem;opacity:.8}
+.login-wrap{display:flex;align-items:center;justify-content:center;min-height:80vh}
+.login-box{background:#fff;border-radius:14px;box-shadow:0 4px 24px rgba(0,112,192,.12);padding:40px 36px;width:340px;text-align:center}
+.login-box h2{color:#0070c0;margin-bottom:6px;font-size:1.15rem}
+.login-box p{color:#5a7090;font-size:.85rem;margin-bottom:22px}
+.login-box input{width:100%;padding:10px 14px;border:1.5px solid #c8dff5;border-radius:8px;font-size:.95rem;margin-bottom:12px;outline:none}
+.login-box input:focus{border-color:#0070c0}
+.login-box button{width:100%;padding:11px;background:#0070c0;color:#fff;border:none;border-radius:8px;font-size:.95rem;font-weight:700;cursor:pointer}
+.login-box button:hover{background:#005096}
+.login-err{color:#c0392b;font-size:.82rem;margin-top:8px;min-height:18px}
+.admin-wrap{padding:24px 28px}
+.top-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px}
+.top-bar h2{font-size:1.05rem;color:#0070c0;font-weight:700}
+.top-bar .actions{display:flex;gap:10px;align-items:center}
+.btn-refresh{background:#0070c0;color:#fff;border:none;border-radius:8px;padding:8px 18px;cursor:pointer;font-size:.88rem;font-weight:600}
+.btn-refresh:hover{background:#005096}
+.btn-logout{background:#eef5fc;color:#0070c0;border:1.5px solid #c8dff5;border-radius:8px;padding:7px 14px;cursor:pointer;font-size:.85rem}
+.stats{display:flex;gap:14px;margin-bottom:22px;flex-wrap:wrap}
+.stat-card{background:#fff;border-radius:10px;padding:14px 22px;box-shadow:0 2px 10px rgba(0,112,192,.08);min-width:130px;text-align:center;border-top:3px solid #0070c0}
+.stat-card.draft-card{border-top-color:#d4a017}
+.stat-card.done-card{border-top-color:#1a8a4a}
+.stat-card .num{font-size:1.8rem;font-weight:700;color:#0070c0}
+.stat-card.draft-card .num{color:#d4a017}
+.stat-card.done-card .num{color:#1a8a4a}
+.stat-card .label{font-size:.78rem;color:#5a7090;margin-top:2px}
+.tabs{display:flex;gap:6px;margin-bottom:16px;border-bottom:2px solid #c8dff5;padding-bottom:0}
+.tab{padding:9px 20px;cursor:pointer;font-size:.88rem;font-weight:600;color:#5a7090;border-radius:8px 8px 0 0;border:none;background:none;border-bottom:3px solid transparent;margin-bottom:-2px}
+.tab.active{color:#0070c0;border-bottom:3px solid #0070c0;background:#eef5fc}
+.tab:hover:not(.active){background:#f0f4f8}
+.table-wrap{background:#fff;border-radius:12px;box-shadow:0 2px 12px rgba(0,112,192,.08);overflow:auto}
+table{width:100%;border-collapse:collapse;font-size:.88rem}
+thead th{background:#eef5fc;color:#0070c0;font-weight:700;padding:12px 14px;text-align:left;white-space:nowrap;position:sticky;top:0}
+tbody tr{border-bottom:1px solid #eef5fc}
+tbody tr:hover{background:#f5f9ff}
+tbody td{padding:11px 14px;color:#2c3e5a;vertical-align:top}
+.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:.75rem;font-weight:700;white-space:nowrap}
+.badge-draft{background:#fff3cd;color:#d4a017}
+.badge-step2{background:#cce0f8;color:#0070c0}
+.badge-done{background:#d4edda;color:#1a8a4a}
+.badge-pending{background:#fff3cd;color:#d4a017}
+.badge-approved{background:#d4edda;color:#1a8a4a}
+.empty{text-align:center;padding:48px;color:#5a7090;font-size:.9rem}
+.loading{text-align:center;padding:48px;color:#0070c0}
+.detail-btn{background:#eef5fc;border:1px solid #c8dff5;color:#0070c0;border-radius:6px;padding:4px 10px;cursor:pointer;font-size:.8rem}
+.detail-btn:hover{background:#cce0f8}
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:100;align-items:center;justify-content:center}
+.modal-bg.show{display:flex}
+.modal{background:#fff;border-radius:14px;padding:28px 24px;width:560px;max-width:96vw;max-height:86vh;overflow-y:auto;box-shadow:0 8px 40px rgba(0,0,0,.18)}
+.modal h3{color:#0070c0;margin-bottom:16px;font-size:1rem}
+.modal .close-btn{float:right;background:none;border:none;font-size:1.3rem;cursor:pointer;color:#5a7090;line-height:1}
+.modal dl{display:grid;grid-template-columns:120px 1fr;gap:8px 12px}
+.modal dt{font-weight:700;color:#5a7090;font-size:.82rem;padding-top:2px}
+.modal dd{font-size:.88rem;color:#1a2a3a;word-break:break-all}
+.modal .img-thumb{width:80px;height:80px;object-fit:cover;border-radius:6px;border:1px solid #c8dff5;cursor:pointer}
+.img-preview-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;align-items:center;justify-content:center}
+.img-preview-bg.show{display:flex}
+.img-preview-bg img{max-width:92vw;max-height:88vh;border-radius:8px}
+.status-select{padding:4px 8px;border:1.5px solid #c8dff5;border-radius:6px;font-size:.82rem;cursor:pointer}
+.search-bar{padding:8px 14px;border:1.5px solid #c8dff5;border-radius:8px;font-size:.88rem;width:220px;outline:none}
+.search-bar:focus{border-color:#0070c0}
+</style>
+</head>
+<body>
+<div class="header">
+  <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="14" fill="white" fill-opacity=".15"/><path d="M8 14.5l4 4 8-9" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  <h1>챌린지 관리자 페이지</h1>
+  <span id="hSubtitle">로딩 중...</span>
+</div>
+
+<!-- Login -->
+<div class="login-wrap" id="loginWrap">
+  <div class="login-box">
+    <h2>🔐 관리자 로그인</h2>
+    <p>관리자 비밀번호를 입력하세요</p>
+    <input type="password" id="adminPw" placeholder="비밀번호" onkeydown="if(event.key==='Enter')doAdminLogin()">
+    <button onclick="doAdminLogin()">로그인</button>
+    <div class="login-err" id="loginErr"></div>
+  </div>
+</div>
+
+<!-- Admin Panel -->
+<div class="admin-wrap" id="adminWrap" style="display:none">
+  <div class="top-bar">
+    <h2>📋 신청자 현황</h2>
+    <div class="actions">
+      <input class="search-bar" type="text" id="searchInput" placeholder="이름 또는 전화번호 검색" oninput="renderTables()">
+      <button class="btn-refresh" onclick="loadAll()">🔄 새로고침</button>
+      <button class="btn-logout" onclick="doLogout()">로그아웃</button>
+    </div>
+  </div>
+
+  <div class="stats">
+    <div class="stat-card">
+      <div class="num" id="statTotal">-</div>
+      <div class="label">전체</div>
+    </div>
+    <div class="stat-card draft-card">
+      <div class="num" id="statDraft">-</div>
+      <div class="label">임시저장 (Step 1)</div>
+    </div>
+    <div class="stat-card" style="border-top-color:#0070c0">
+      <div class="num" id="statStep2" style="color:#0070c0">-</div>
+      <div class="label">진행중 (Step 2+)</div>
+    </div>
+    <div class="stat-card done-card">
+      <div class="num" id="statDone">-</div>
+      <div class="label">최종 제출 완료</div>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" id="tabAll" onclick="setTab('all')">전체</button>
+    <button class="tab" id="tabDraft" onclick="setTab('draft')">임시저장</button>
+    <button class="tab" id="tabApps" onclick="setTab('apps')">최종 제출</button>
+  </div>
+
+  <div class="table-wrap" id="tableWrap">
+    <div class="loading" id="loadingMsg">데이터 로딩 중...</div>
+  </div>
+</div>
+
+<!-- Detail Modal -->
+<div class="modal-bg" id="detailModal" onclick="if(event.target===this)closeModal()">
+  <div class="modal" id="modalInner">
+    <button class="close-btn" onclick="closeModal()">✕</button>
+    <h3 id="modalTitle">상세 정보</h3>
+    <div id="modalBody"></div>
+  </div>
+</div>
+
+<!-- Image Preview -->
+<div class="img-preview-bg" id="imgPreview" onclick="closeImgPreview()">
+  <img id="imgPreviewEl" src="" alt="미리보기">
+</div>
+
+<script>
+var DB_URL = 'https://health-challenge-990fd-default-rtdb.firebaseio.com';
+var ADMIN_PW = 'admin1234';  // 관리자 비밀번호 (필요시 변경)
+var allDrafts = {};
+var allApps = {};
+var currentTab = 'all';
+
+// ── Auth ──────────────────────────────────────────────
+function doAdminLogin() {
+  var pw = document.getElementById('adminPw').value;
+  if (pw === ADMIN_PW) {
+    document.getElementById('loginWrap').style.display = 'none';
+    document.getElementById('adminWrap').style.display = 'block';
+    sessionStorage.setItem('adminAuth', '1');
+    loadAll();
+  } else {
+    document.getElementById('loginErr').textContent = '비밀번호가 올바르지 않습니다.';
+  }
+}
+
+function doLogout() {
+  sessionStorage.removeItem('adminAuth');
+  document.getElementById('loginWrap').style.display = '';
+  document.getElementById('adminWrap').style.display = 'none';
+  document.getElementById('adminPw').value = '';
+  document.getElementById('loginErr').textContent = '';
+}
+
+// ── Data Loading ──────────────────────────────────────
+function loadAll() {
+  document.getElementById('loadingMsg') && (document.getElementById('loadingMsg').textContent = '데이터 로딩 중...');
+  document.getElementById('tableWrap').innerHTML = '<div class="loading">데이터 로딩 중...</div>';
+  Promise.all([
+    fetch(DB_URL + '/draft.json').then(function(r){ return r.json(); }),
+    fetch(DB_URL + '/applications.json').then(function(r){ return r.json(); })
+  ]).then(function(results) {
+    allDrafts = results[0] || {};
+    allApps = results[1] || {};
+    updateStats();
+    renderTables();
+    document.getElementById('hSubtitle').textContent = '마지막 업데이트: ' + new Date().toLocaleString('ko-KR');
+  }).catch(function(e) {
+    document.getElementById('tableWrap').innerHTML = '<div class="empty">❌ 데이터를 불러오지 못했습니다: ' + e.message + '</div>';
+  });
+}
+
+function updateStats() {
+  var draftArr = Object.values(allDrafts);
+  var appArr = Object.values(allApps);
+  var step2 = draftArr.filter(function(d){ return d.step && d.step > 1; }).length;
+  document.getElementById('statTotal').textContent = draftArr.length + appArr.length;
+  document.getElementById('statDraft').textContent = draftArr.filter(function(d){ return !d.step || d.step <= 1; }).length;
+  document.getElementById('statStep2').textContent = step2;
+  document.getElementById('statDone').textContent = appArr.length;
+}
+
+// ── Tabs ──────────────────────────────────────────────
+function setTab(tab) {
+  currentTab = tab;
+  ['all','draft','apps'].forEach(function(t){
+    document.getElementById('tab' + (t==='all'?'All':t==='draft'?'Draft':'Apps')).classList.toggle('active', t===tab);
+  });
+  renderTables();
+}
+
+// ── Render ────────────────────────────────────────────
+function renderTables() {
+  var q = (document.getElementById('searchInput').value || '').toLowerCase();
+  var rows = [];
+
+  if (currentTab !== 'apps') {
+    Object.entries(allDrafts).forEach(function(entry) {
+      var phone = entry[0];
+      var d = entry[1];
+      var name = d.name || '-';
+      var step = d.step || 1;
+      if (q && name.toLowerCase().indexOf(q) === -1 && phone.indexOf(q) === -1) return;
+      rows.push({
+        src: 'draft',
+        phone: phone,
+        name: name,
+        step: step,
+        stepLabel: step <= 1 ? '<span class="badge badge-draft">Step 1 임시저장</span>' : '<span class="badge badge-step2">Step ' + step + ' 진행중</span>',
+        ts: '-',
+        status: '-',
+        raw: d
+      });
+    });
+  }
+
+  if (currentTab !== 'draft') {
+    Object.entries(allApps).forEach(function(entry) {
+      var key = entry[0];
+      var d = entry[1];
+      var name = d.name || '-';
+      var phone = d.phone || '-';
+      if (q && name.toLowerCase().indexOf(q) === -1 && phone.indexOf(q) === -1) return;
+      rows.push({
+        src: 'app',
+        key: key,
+        phone: phone,
+        name: name,
+        step: 'done',
+        stepLabel: '<span class="badge badge-done">✅ 최종제출</span>',
+        ts: d.ts ? new Date(d.ts).toLocaleString('ko-KR') : '-',
+        status: d.status || 'pending',
+        raw: d
+      });
+    });
+  }
+
+  if (rows.length === 0) {
+    document.getElementById('tableWrap').innerHTML = '<div class="empty">신청 데이터가 없습니다.</div>';
+    return;
+  }
+
+  // Sort: done first, then by step desc
+  rows.sort(function(a,b){
+    if (a.src==='app' && b.src!=='app') return -1;
+    if (b.src==='app' && a.src!=='app') return 1;
+    return (b.step||0) - (a.step||0);
+  });
+
+  var html = '<table><thead><tr>' +
+    '<th>#</th><th>이름</th><th>전화번호</th><th>진행 단계</th><th>제출 시각</th><th>상태</th><th>상세</th>' +
+    '</tr></thead><tbody>';
+
+  rows.forEach(function(row, i) {
+    var statusBadge = '';
+    if (row.src === 'app') {
+      var st = row.status;
+      if (st === 'approved') statusBadge = '<span class="badge badge-approved">✅ 승인</span>';
+      else if (st === 'rejected') statusBadge = '<span class="badge" style="background:#fdecea;color:#c0392b">❌ 거절</span>';
+      else statusBadge = '<span class="badge badge-pending">⏳ 검토중</span>';
+    } else {
+      statusBadge = '<span style="color:#aaa;font-size:.8rem">-</span>';
+    }
+    html += '<tr>' +
+      '<td>' + (i+1) + '</td>' +
+      '<td><strong>' + escHtml(row.name) + '</strong></td>' +
+      '<td>' + escHtml(row.phone) + '</td>' +
+      '<td>' + row.stepLabel + '</td>' +
+      '<td style="font-size:.8rem;color:#5a7090">' + escHtml(row.ts) + '</td>' +
+      '<td>' + statusBadge + '</td>' +
+      '<td><button class="detail-btn" onclick="showDetail(' + i + ')">상세</button></td>' +
+      '</tr>';
+  });
+
+  html += '</tbody></table>';
+  document.getElementById('tableWrap').innerHTML = html;
+  window._rows = rows;
+}
+
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ── Detail Modal ──────────────────────────────────────
+function showDetail(idx) {
+  var row = window._rows[idx];
+  if (!row) return;
+  var d = row.raw;
+  document.getElementById('modalTitle').textContent = (row.src==='app'?'최종 제출':'임시저장') + ' 상세 — ' + row.name;
+  var html = '<dl>';
+
+  if (row.src === 'draft') {
+    html += '<dt>이름</dt><dd>' + escHtml(d.name||'-') + '</dd>';
+    html += '<dt>전화번호</dt><dd>' + escHtml(row.phone) + '</dd>';
+    html += '<dt>진행 단계</dt><dd>Step ' + (d.step||1) + '</dd>';
+  } else {
+    html += '<dt>이름</dt><dd>' + escHtml(d.name||'-') + '</dd>';
+    html += '<dt>전화번호</dt><dd>' + escHtml(d.phone||'-') + '</dd>';
+    if (d.wt) html += '<dt>체중 (kg)</dt><dd>' + escHtml(d.wt) + '</dd>';
+    if (d.mus) html += '<dt>근육량 (kg)</dt><dd>' + escHtml(d.mus) + '</dd>';
+    if (d.fat) html += '<dt>체지방률 (%)</dt><dd>' + escHtml(d.fat) + '</dd>';
+    if (d.products) html += '<dt>선택 제품</dt><dd>' + escHtml(d.products.join ? d.products.join(', ') : d.products) + '</dd>';
+    if (d.ts) html += '<dt>제출 시각</dt><dd>' + new Date(d.ts).toLocaleString('ko-KR') + '</dd>';
+    var st = d.status || 'pending';
+    html += '<dt>승인 상태</dt><dd><select class="status-select" onchange="updateStatus('' + escHtml(row.key) + '',this.value)">' +
+      '<option value="pending"' + (st==='pending'?' selected':'') + '>⏳ 검토중</option>' +
+      '<option value="approved"' + (st==='approved'?' selected':'') + '>✅ 승인</option>' +
+      '<option value="rejected"' + (st==='rejected'?' selected':'') + '>❌ 거절</option>' +
+      '</select></dd>';
+    if (d.receiptFiles) {
+      var rfs = Array.isArray(d.receiptFiles) ? d.receiptFiles : Object.values(d.receiptFiles);
+      html += '<dt>영수증</dt><dd>' + rfs.map(function(f){ return '<img class="img-thumb" src="' + f + '" onclick="previewImg('' + f + '')" title="클릭하여 확대">'; }).join(' ') + '</dd>';
+    }
+    if (d.labFiles) {
+      var lfs = Array.isArray(d.labFiles) ? d.labFiles : Object.values(d.labFiles);
+      html += '<dt>인바디</dt><dd>' + lfs.map(function(f){ return '<img class="img-thumb" src="' + f + '" onclick="previewImg('' + f + '')" title="클릭하여 확대">'; }).join(' ') + '</dd>';
+    }
+  }
+
+  html += '</dl>';
+  document.getElementById('modalBody').innerHTML = html;
+  document.getElementById('detailModal').classList.add('show');
+}
+
+function closeModal() {
+  document.getElementById('detailModal').classList.remove('show');
+}
+
+function previewImg(src) {
+  document.getElementById('imgPreviewEl').src = src;
+  document.getElementById('imgPreview').classList.add('show');
+}
+
+function closeImgPreview() {
+  document.getElementById('imgPreview').classList.remove('show');
+}
+
+// ── Status Update ─────────────────────────────────────
+function updateStatus(key, status) {
+  fetch(DB_URL + '/applications/' + key + '/status.json', {
+    method: 'PUT',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify(status)
+  }).then(function(){
+    // Update local data
+    if (allApps[key]) allApps[key].status = status;
+    renderTables();
+  }).catch(function(e){ alert('상태 업데이트 실패: ' + e.message); });
+}
+
+// ── Init ──────────────────────────────────────────────
+(function init() {
+  if (sessionStorage.getItem('adminAuth') === '1') {
+    document.getElementById('loginWrap').style.display = 'none';
+    document.getElementById('adminWrap').style.display = 'block';
+    loadAll();
+  }
+  document.getElementById('adminPw').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') doAdminLogin();
+  });
+})();
+</script>
+</body>
+</html>
