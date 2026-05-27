@@ -630,7 +630,7 @@ document.getElementById('bSub').addEventListener('click', function() {
         products:prods, receiptFiles:recData, labFiles:labData,
         status:'pending', appliedAt:new Date().toISOString(), startDate:''
       };
-      return dbPush('applications', payload);
+      return dbGet('applications').then(function(apps){ if(apps){ var avs=Object.values(apps); for(var ak=0;ak<avs.length;ak++){ if(avs[ak].phone===phone){ showToast('이미 신청이 완료된 전화번호입니다.'); return Promise.reject(new Error('dup')); } } } return dbPush('applications', payload); });
     })
     .then(function(key){
       var ko = lang==='ko';
@@ -647,6 +647,7 @@ document.getElementById('bSub').addEventListener('click', function() {
       showToast(tx('submitted'));
     })
     .catch(function(e){
+      if(e && e.message==='dup') return;
       console.error(e);
       showToast(tx('errNet'),'e');
       btn.disabled=false; btn.textContent=tx('bSub');
