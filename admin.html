@@ -422,7 +422,9 @@ document.getElementById('detailModal').addEventListener('click', function(e){ if
 document.getElementById('modalClose').addEventListener('click', closeModal);
 document.getElementById('imgPreview').addEventListener('click', closeImgPreview);
 
-if (sessionStorage.getItem('adminAuth') === '1') {
+// index.html 관리자 로그인 상태에서 자동 로그인 (localStorage.hc_adminAuth)
+if (sessionStorage.getItem('adminAuth') === '1' || localStorage.getItem('hc_adminAuth') === '1') {
+  if (localStorage.getItem('hc_adminAuth') === '1') sessionStorage.setItem('adminAuth', '1');
   document.getElementById('loginWrap').style.display = 'none';
   document.getElementById('adminWrap').style.display = 'block';
   loadAll();
