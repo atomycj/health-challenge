@@ -274,6 +274,11 @@ footer strong{color:var(--white);display:block;margin-bottom:6px;font-size:1rem;
 .cta-btn:hover{opacity:.85}
 .cta-btn-primary{background:var(--blue);color:#fff}
 .cta-btn-outline{background:transparent;color:var(--blue);border:2px solid var(--blue)}
+
+/* LANG SWITCHER */
+.lang-switcher{display:flex;gap:6px;margin-left:auto}
+.lang-btn{padding:4px 12px;border-radius:6px;font-size:.78rem;font-weight:700;cursor:pointer;border:1px solid rgba(255,255,255,.5);background:transparent;color:rgba(255,255,255,.7);transition:all .15s}
+.lang-btn.active,.lang-btn:hover{background:rgba(255,255,255,.25);color:#fff;border-color:#fff}
 </style>
 
 <title>헬스 챌린지 참여 안내 — Atomy Auckland Absolute Centre</title>
@@ -284,7 +289,8 @@ footer strong{color:var(--white);display:block;margin-bottom:6px;font-size:1rem;
 <div class="site-header">
   <div class="header-top">
     <span class="header-top-text">Atomy Auckland Absolute Education Centre — 헬스 챌린지 참여 안내</span>
-  </div>
+  
+    <div class="lang-switcher"><button class="lang-btn active" onclick="location.href='challenge-guide-ko.html';">한국어</button><button class="lang-btn" onclick="location.href='challenge-guide-en.html';">EN</button></div></div>
   <div class="container">
     <div class="header-main">
       <div class="logo-wrap">
@@ -675,9 +681,9 @@ footer strong{color:var(--white);display:block;margin-bottom:6px;font-size:1rem;
 <div class="cta-section">
   <div class="cta-inner">
     <div class="cta-btns">
-      <button onclick="location.href='index.html';" class="cta-btn cta-btn-primary">🏠 챔린지 사이트 이동</button>
-      <button onclick="window.open('success-stories-ko.html','_blank','width=480,height=800,scrollbars=yes,resizable=yes');" class="cta-btn cta-btn-outline">⭐ 성공 사례 보기</button>
-    </div>
+    <button onclick="location.href='index.html';" class="cta-btn cta-btn-primary">🏠 챌린지 사이트 이동</button>
+    <button onclick="location.href='success-stories-ko.html';" class="cta-btn cta-btn-outline">⭐ 성공 사례 보기</button>
+  </div>챌
   </div>
 </div>
 
