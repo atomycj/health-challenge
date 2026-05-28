@@ -1753,28 +1753,27 @@ function renderProgressGraphs(member, records) {
   }
 
   // ── HbA1c 표시 (데이터 있으면)
-  if (member.initHba1c) {
     html += `<div class="progress-chart">
       <div class="progress-chart-header">
         <div>
-          <div class="progress-chart-title">🩺 당화혈색소 HbA1c (%)</div>
-          <div style="font-size:.78rem;color:var(--muted);margin-top:2px">정상 Normal: 5.7% 미만</div>
+          <div class="progress-chart-title">🩺 당화혈색소 HbA1c (mmol/mol)</div>
+          <div style="font-size:.78rem;color:var(--muted);margin-top:2px">정상 Normal: 39 mmol/mol 미만</div>
         </div>
         <div style="text-align:right;display:flex;flex-direction:column;gap:6px">
-          <div style="font-size:.82rem;color:var(--muted)">초기 Initial: <strong style="color:var(--danger)">${member.initHba1c}%</strong></div>
-          <div style="font-size:.82rem;color:var(--muted)">최종 Final: <strong style="color:${member.finalHba1c?'var(--accent3)':'var(--muted)'}">${member.finalHba1c||'미입력 Pending'}${member.finalHba1c?'%':''}</strong></div>
+          <div style="font-size:.82rem;color:var(--muted)">초기 Initial: <strong style="color:var(--danger)">${member.initHba1c||'?'} mmol/mol</strong></div>
+          <div style="font-size:.82rem;color:var(--muted)">최종 Final: <strong style="color:${member.finalHba1c?'var(--accent3)':'var(--muted)'}">${member.finalHba1c||'미${member.finalHba1c||'입력 Pending'} mmol/mol</strong></div>
           ${member.finalHba1c ? changeChip(member.initHba1c, member.finalHba1c, true) : ''}
         </div>
       </div>
       <div style="display:flex;align-items:center;gap:16px;padding:12px 0">
         <div style="flex:1;height:12px;background:var(--border);border-radius:6px;overflow:hidden;position:relative">
-          <div style="position:absolute;left:0;top:0;bottom:0;width:${Math.min(100,(member.initHba1c/15)*100)}%;background:var(--danger);border-radius:6px;opacity:.5"></div>
-          ${member.finalHba1c?`<div style="position:absolute;left:0;top:0;bottom:0;width:${Math.min(100,(member.finalHba1c/15)*100)}%;background:var(--accent3);border-radius:6px"></div>`:''}
+          <div style="position:absolute;left:0;top:0;bottom:0;width:${Math.min(100,(member.initHba1c/20)*100)}%;background:var(--danger);border-radius:6px;opacity:.5"></div>
+          ${member.finalHba1c?`<div style="position:absolute;left:0;top:0;bottom:0;width:${Math.min(100,(member.finalHba1c/20)*100)}%;background:var(--accent3);border-radius:6px"></div>`:''}
         </div>
-        <div style="font-size:.8rem;color:var(--muted);white-space:nowrap">${member.initHba1c}% → ${member.finalHba1c||'?'}%</div>
+        <div style="font-size:.8rem;color:var(--muted);white-space:nowrap">${member.initHba1c||'?'} → ${member.finalHba1c||'?'} mmol/mol</div>
       </div>
     </div>`;
-  }
+ }
 
   html += '</div>';
   return html;
@@ -1798,10 +1797,8 @@ function renderRecordView(member, container, adminView) {
     html+=`<div class="stat-card"><div class="stat-val" style="color:#a78bfa">${fmtScore(scores.body)}</div><div class="stat-label">인바디점수 Body Comp.</div></div>`;
     html+=`<div class="stat-card"><div class="stat-val" style="color:var(--accent3)">${fmtScore(scores.ws)}</div><div class="stat-label">체중달성 Weight Goal</div></div>`;
     html+=`<div class="stat-card" style="border-color:var(--accent)"><div class="stat-val" style="background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">${fmtScore(scores.composite)}</div><div class="stat-label">${scores.hasFinalHba1c?currentLang==='en'?'Final Score':'최종 종합점수':currentLang==='en'?'Mid Score':'종합점수 (중간)'}</div></div>`;
-    if (member.initHba1c) {
-      html+=`<div class="stat-card" style="border-color:var(--danger)"><div class="stat-val" style="color:var(--danger);font-size:1.1rem;">${member.initHba1c}% → ${member.finalHba1c||'?'}%</div><div class="stat-label">HbA1c 변화 Change</div></div>`;
-    }
-  }
+      html+=`<div class="stat-card" style="border-color:var(--danger)"><div class="stat-val" style="color:var(--danger);font-size:1.1rem;">${member.initHba1c||'?'} → ${member.finalHba1c||'?'} mmol/mol</div><div class="stat-label">HbA1c 변화 Change</div></div>`;
+ 
   html+=`</div>`;
   // ─── Progress Graphs (member view only) ───
   if (!adminView && records.length >= 1) {
