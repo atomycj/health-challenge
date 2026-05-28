@@ -568,8 +568,8 @@ footer strong{color:#fff;display:block;margin-bottom:5px;font-size:.9rem;letter-
   <div class="cta-title">Ready to Join the Challenge?</div>
   <div class="cta-sub">Visit the challenge site to learn how to participate<br>and contact Auckland Absolute Education Centre today.</div>
   <div class="cta-btns">
-    <a href="index.html" class="cta-btn cta-btn-primary">🏆 Go to Challenge Site</a>
-    <a href="challenge-guide-en.html" class="cta-btn cta-btn-outline">📋 View Challenge Guide</a>
+    <button onclick="if(window.opener&&!window.opener.closed){window.opener.location.href='index.html';window.close();}else{location.href='index.html';}" class="cta-btn cta-btn-primary">🏆 Go to Challenge Site</button>
+    <button onclick="if(window.opener&&!window.opener.closed){window.opener.location.href='challenge-guide-en.html';window.close();}else{location.href='challenge-guide-en.html';}" class="cta-btn cta-btn-outline">📋 View Challenge Guide</button>
   </div>
 </div>
 
