@@ -1058,24 +1058,10 @@ window.applyLang = function() {
 
 // ─── Guide Modal ──────────────────────────────
 window.openGuide = (lang) => {
-  const modal = document.getElementById('guideModal');
-  const iframe = document.getElementById('guideIframe');
-  const title = document.getElementById('guideModalTitle');
-  const file = lang === 'en' ? 'challenge-guide-en.html' : 'challenge-guide-ko.html';
-  iframe.src = file;
-  title.textContent = lang==='en' ? '📋 Challenge Guide' : '📋 챌린지 안내 가이드';
-  modal.classList.add('show');
-  document.body.style.overflow = 'hidden';
+  location.href = lang === 'en' ? 'challenge-guide-en.html' : 'challenge-guide-ko.html';
 };
 window.openSuccessStories = () => {
-  const lang = currentLang === 'en' ? 'success-stories-en.html' : 'success-stories-ko.html';
-  const modal = document.getElementById('guideModal');
-  const iframe = document.getElementById('guideIframe');
-  const title = document.getElementById('guideModalTitle');
-  iframe.src = lang;
-  title.textContent = currentLang === 'en' ? '✨ Success Stories' : '✨ 성공 사례';
-  modal.classList.add('show');
-  document.body.style.overflow = 'hidden';
+  location.href = currentLang === 'en' ? 'success-stories-en.html' : 'success-stories-ko.html';
 };
 window.closeGuideModal = () => {
   document.getElementById('guideModal').classList.remove('show');
