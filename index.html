@@ -480,6 +480,7 @@ header{padding:0;border-bottom:3px solid var(--accent);margin-bottom:0;backgroun
           <button id="loginLangKo" class="lang-btn active" onclick="setLang('ko')">한국어</button>
           <button id="loginLangEn" class="lang-btn" onclick="setLang('en')">EN</button>
         </div>
+  <div id="login-period-banner" style="display:none;text-align:center;padding:8px 16px;background:rgba(0,112,192,0.1);color:#004a7c;font-size:.85rem;font-weight:600;border-radius:8px;margin:8px 16px 0;"></div>
       </div>
       <!-- 참여 신청 링크 -->
     <div style="margin-bottom:14px;text-align:center;flex-basis:100%;width:100%"">
@@ -608,6 +609,7 @@ header{padding:0;border-bottom:3px solid var(--accent);margin-bottom:0;backgroun
       </button>
     </div>
 
+        <div id="member-period-banner" style="display:none;text-align:center;padding:8px 24px;background:rgba(0,112,192,0.08);color:#004a7c;font-size:.85rem;font-weight:600;border-radius:8px;margin:8px 24px 12px;"></div>
     <!-- MEMBER TABS -->
     <div class="tabs" id="memberTabs">
       <button class="tab active" data-tab="leaderboard">🏆 순위표 Leaderboard</button>
@@ -1124,7 +1126,7 @@ async function boot() {
   onValue(path('settings'), snap => {
     if (snap.exists()) appData.settings = snap.val();
     if (!appData.settings.subAdmins) appData.settings.subAdmins = {};
-    if (session) { renderFormulaWeights(); updateHeaderStats(); }
+    if (session) { renderFormulaWeights(); updateChallengePeriodBanner(); updateHeaderStats(); }
   });
 
   splash.style.display = 'none';
@@ -1359,6 +1361,20 @@ window.renderFormulaWeights = function() {
       : '<div class="fw-item" style="width:100%;margin-top:6px;font-size:.68rem;color:var(--muted);">⚠️ '+(isKo?'당뇨 점수: 진행중=공복혈당(중간) / 최종=HbA1c 혈액검사':'Diabetes: Mid=Fasting BG / Final=HbA1c blood test')+'</div>'}
   `})()
 }
+window.updateChallengePeriodBanner = function() {
+  const s = appData.settings;
+  if (!s) return;
+  const lang = currentLang;
+  const fmt = (d, l) => d ? new Date(d).toLocaleDateString(l==='en'?'en-NZ':'ko-KR', {year:'numeric',month:'long',day:'numeric'}) : (l==='en'?'TBD':'미정');
+  const start = fmt(s.startDate, lang);
+  const end = fmt(s.endDate, lang);
+  const label = lang==='en' ? ('📅 Challenge Period: '+start+' ~ '+end) : ('📅 챌린지 기간: '+start+' ~ '+end);
+  const loginBanner = document.getElementById('login-period-banner');
+  if (loginBanner && (s.startDate || s.endDate)) { loginBanner.textContent = label; loginBanner.style.display = 'block'; }
+  const memberBanner = document.getElementById('member-period-banner');
+  if (memberBanner && (s.startDate || s.endDate)) { memberBanner.textContent = label; memberBanner.style.display = 'block'; }
+};
+
 
 // ─── Leaderboard ──────────────────────────────
 window.renderLeaderboard = function() {
