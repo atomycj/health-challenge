@@ -1125,8 +1125,9 @@ async function boot() {
   });
   onValue(path('settings'), snap => {
     if (snap.exists()) appData.settings = snap.val();
+    updateChallengePeriodBanner();
     if (!appData.settings.subAdmins) appData.settings.subAdmins = {};
-    if (session) { renderFormulaWeights(); updateChallengePeriodBanner(); updateHeaderStats(); }
+    if (session) { renderFormulaWeights(); updateHeaderStats(); }
   });
 
   splash.style.display = 'none';
