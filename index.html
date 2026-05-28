@@ -619,11 +619,11 @@ header{padding:0;border-bottom:3px solid var(--accent);margin-bottom:0;backgroun
 
     <!-- ADMIN TABS -->
     <div class="tabs" id="adminTabs" style="display:none">
-      <button class="tab active" data-tab="leaderboard">🏆 순위표 Leaderboard</button>
-      <button class="tab" data-tab="admin-applications">📨 신청 관리</button>
-      <button class="tab" data-tab="admin-records">📋 전체 기록 All Records</button>
-      <button class="tab" data-tab="admin-members">👥 참여자 Members Members</button>
-      <button class="tab" data-tab="admin-settings">⚙️ 설정 Settings</button>
+      <button class="tab active" id="adminTabLeaderboard" data-tab="leaderboard">🏆 순위표</button>
+      <button class="tab" id="adminTabApplications" data-tab="admin-applications">📨 신청 관리</button>
+      <button class="tab" id="adminTabRecords" data-tab="admin-records">📋 전체 기록</button>
+      <button class="tab" id="adminTabMembers" data-tab="admin-members">👥 참여자 관리</button>
+      <button class="tab" id="adminTabSettings" data-tab="admin-settings">⚙️ 설정</button>
     </div>
 
     <!-- LEADERBOARD -->
@@ -682,16 +682,16 @@ header{padding:0;border-bottom:3px solid var(--accent);margin-bottom:0;backgroun
       <div class="form-card">
         <div class="form-title" id="addMemberTitle">➕ 새 참여자 등록</div>
         <div class="form-grid">
-          <div class="form-group"><label class="form-label">이름 Name</label><input type="text" class="form-input" id="newName" placeholder="이름"></div>
-          <div class="form-group"><label class="form-label">비밀번호 Password (4자 이상)</label><input type="password" class="form-input" id="newPw" placeholder="참여자 Members 로그인 비밀번호 Password" maxlength="20"></div>
-          <div class="form-group"><label class="form-label">초기 HbA1c 당화혈색소 (%)</label><input type="number" class="form-input" id="newHba1c" placeholder="예: 7.2" step="0.1"><span class="form-hint">혈액검사 결과값 입력</span></div>
-          <div class="form-group"><label class="form-label">초기 체지방률 Body Fat% (%)</label><input type="number" class="form-input" id="newFat" placeholder="예: 28.0" step="0.1"></div>
-          <div class="form-group"><label class="form-label">초기 골격근량 Muscle Mass</label><div style="display:flex;gap:6px"><input type="number" class="form-input" id="newMuscle" placeholder="예: 26.0 또는 38%" step="0.1" style="flex:1"><span id="newMuscleUnit" style="display:flex;align-items:center;font-size:.8rem;color:var(--muted);white-space:nowrap;padding:0 6px">kg</span></div><span class="form-hint" id="newMuscleHint">단위: ⚙️ 설정 Settings에서 변경</span></div>
-          <div class="form-group"><label class="form-label">초기 체중 Initial Weight (kg)</label><input type="number" class="form-input" id="newWeight" placeholder="예: 78.0" step="0.1"></div>
-          <div class="form-group"><label class="form-label">목표 체중 Target Weight (kg)</label><input type="number" class="form-input" id="newTarget" placeholder="예: 68.0" step="0.1"></div>
-          <div class="form-group"><label class="form-label">챌린지 시작일 Start Date</label><input type="date" class="form-input" id="newStart"></div>
+          <div class="form-group"><label class="form-label" id="labelNewName">이름</label><input type="text" class="form-input" id="newName" placeholder="이름"></div>
+          <div class="form-group"><label class="form-label" id="labelNewPw">비밀번호 (4자 이상)</label><input type="password" class="form-input" id="newPw" placeholder="참여자 Members 로그인 비밀번호 Password" maxlength="20"></div>
+          <div class="form-group"><label class="form-label" id="labelNewHba1c">초기 HbA1c 당화혈색소 (mmol/mol)</label><input type="number" class="form-input" id="newHba1c" placeholder="예: 7.2" step="0.1"><span class="form-hint">혈액검사 결과값 입력</span></div>
+          <div class="form-group"><label class="form-label" id="labelNewFat">초기 체지방류 (%)</label><input type="number" class="form-input" id="newFat" placeholder="예: 28.0" step="0.1"></div>
+          <div class="form-group"><label class="form-label" id="labelNewMuscle">초기 골격근량</label><div style="display:flex;gap:6px"><input type="number" class="form-input" id="newMuscle" placeholder="예: 26.0 또는 38%" step="0.1" style="flex:1"><span id="newMuscleUnit" style="display:flex;align-items:center;font-size:.8rem;color:var(--muted);white-space:nowrap;padding:0 6px">kg</span></div><span class="form-hint" id="newMuscleHint">단위: ⚙️ 설정 Settings에서 변경</span></div>
+          <div class="form-group"><label class="form-label" id="labelNewWeight">초기 체중 (kg)</label><input type="number" class="form-input" id="newWeight" placeholder="예: 78.0" step="0.1"></div>
+          <div class="form-group"><label class="form-label" id="labelNewTarget">목표 체중 (kg)</label><input type="number" class="form-input" id="newTarget" placeholder="예: 68.0" step="0.1"></div>
+          <div class="form-group"><label class="form-label" id="labelNewStart">쳌린지 시작일</label><input type="date" class="form-input" id="newStart"></div>
         </div>
-        <button class="btn btn-primary" style="width:auto;padding:12px 28px" onclick="addMember()">참여자 Members 등록</button>
+        <button class="btn btn-primary" id="btnAddMember" style="width:auto;padding:12px 28px" onclick="addMember()">상여자 등록</button>
       </div>
       <div class="leaderboard-header"><div class="section-title" id="memberListTitle">참여자 목록</div></div>
       <div id="memberList" style="display:flex;flex-direction:column;gap:10px"></div>
@@ -927,6 +927,7 @@ window.setLang = (lang) => {
   if(lko){ lko.classList.toggle('active', lang==='ko'); }
   if(len){ len.classList.toggle('active', lang==='en'); }
   applyLang();
+  updateChallengePeriodBanner();
 };
 
 window.applyLang = function() {
@@ -949,7 +950,21 @@ window.applyLang = function() {
     muscleUnitTitle:           ko ? '💪 골격근량 입력 단위 설정'    : '💪 Muscle Mass Unit',
     weightsTitle:              ko ? '⚖️ 점수 가중치 설정'           : '⚖️ Score Weights',
     challengeInfoTitle:        ko ? '🏷️ 챌린지 이름 & 기간'        : '🏷️ Challenge Info & Period',
-  };
+  
+    adminTabLeaderboard:   ko ? '🏆 순위표'        : '🏆 Leaderboard',
+    adminTabApplications:  ko ? '📨 신청 관리'     : '📨 Applications',
+    adminTabRecords:       ko ? '📋 전체 기록'     : '📋 All Records',
+    adminTabMembers:       ko ? '👥 참여자 관리'    : '👥 Members',
+    adminTabSettings:      ko ? '⚙️ 설정'           : '⚙️ Settings',
+    labelNewName:      ko ? '이름'                                  : 'Name',
+    labelNewPw:        ko ? '비밀번호 (4자 이상)'            : 'Password (4+ chars)',
+    labelNewHba1c:     ko ? '초기 HbA1c 당화혈색소 (mmol/mol)' : 'Initial HbA1c (mmol/mol)',
+    labelNewFat:       ko ? '초기 체지방류 (%)'            : 'Initial Body Fat (%)',
+    labelNewMuscle:    ko ? '초기 골격근량'                    : 'Initial Muscle Mass',
+    labelNewWeight:    ko ? '초긲 체중 (kg)'                 : 'Initial Weight (kg)',
+    labelNewTarget:    ko ? '목표 체중 (kg)'                 : 'Target Weight (kg)',
+    labelNewStart:     ko ? '쳌린지 시작일'                   : 'Challenge Start Date',
+    btnAddMember:      ko ? '상여자 등록'                         : 'Register Member',};
   Object.entries(staticTitles).forEach(([id, txt]) => {
     const el = document.getElementById(id);
     if(el) el.textContent = txt;
