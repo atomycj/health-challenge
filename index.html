@@ -481,7 +481,7 @@ header{padding:0;border-bottom:3px solid var(--accent);margin-bottom:0;backgroun
         </div>
       </div>
       <!-- 참여 신청 링크 -->
-    <div style="margin-bottom:14px;text-align:center">
+    <div style="margin-bottom:14px;text-align:center;flex-basis:100%;width:100%"">
       <a href="register.html" id="loginRegisterLink" style="display:inline-flex;align-items:center;gap:8px;padding:11px 20px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--teal));color:#fff;text-decoration:none;font-weight:700;font-size:.88rem;letter-spacing:.3px;box-shadow:0 3px 10px rgba(0,112,192,.25);transition:all .2s;width:100%;justify-content:center">
         <span>✋</span>
         <span id="loginRegisterText">처음 참여하시나요? 참여 신청하기</span>
@@ -1009,7 +1009,7 @@ window.applyLang = function() {
   const loginSub = document.getElementById('loginSubTitle');
   if(loginSub) loginSub.textContent = L.loginSubTitle;
   const loginRegisterEl = document.getElementById('loginRegisterText');
-  if(loginRegisterEl) loginRegisterEl.textContent = ko ? '첫음 참여하시나요? 참여 신청하기' : 'New here? Register now';
+  if(loginRegisterEl) loginRegisterEl.textContent = ko ? '처음 참여하시나요? 참여 신청하기' : 'New here? Register now';
 
   const ltMember = document.getElementById('ltMember');
   const ltAdmin  = document.getElementById('ltAdmin');
