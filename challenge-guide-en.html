@@ -259,6 +259,15 @@ footer strong{color:var(--white);display:block;margin-bottom:6px;font-size:1rem;
   .pkg-mandatory-body{flex-direction:column}
   .pkg-mand-plus{align-self:center;transform:rotate(90deg)}
 }
+
+/* CTA BUTTONS */
+.cta-section{background:var(--off);border-top:1px solid var(--border-l);padding:32px 16px;text-align:center}
+.cta-inner{max-width:480px;margin:0 auto}
+.cta-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.cta-btn{display:inline-block;padding:13px 24px;border-radius:10px;font-size:.95rem;font-weight:700;cursor:pointer;border:none;transition:opacity .2s}
+.cta-btn:hover{opacity:.85}
+.cta-btn-primary{background:var(--blue);color:#fff}
+.cta-btn-outline{background:transparent;color:var(--blue);border:2px solid var(--blue)}
 </style>
 <title>Health Challenge Guide — Atomy Auckland Absolute Centre</title>
 </head>
@@ -653,6 +662,16 @@ footer strong{color:var(--white);display:block;margin-bottom:6px;font-size:1rem;
 </div>
 
 </div><!-- /container -->
+
+
+<div class="cta-section">
+  <div class="cta-inner">
+    <div class="cta-btns">
+      <button onclick="location.href='index.html';" class="cta-btn cta-btn-primary">🏠 Go to Challenge Site</button>
+      <button onclick="window.open('success-stories-en.html','_blank','width=480,height=800,scrollbars=yes,resizable=yes');" class="cta-btn cta-btn-outline">⭐ View Success Stories</button>
+    </div>
+  </div>
+</div>
 
 <footer>
   <strong>ATOMY AUCKLAND ABSOLUTE EDUCATION CENTRE</strong>
