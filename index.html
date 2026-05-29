@@ -683,6 +683,8 @@ header{padding:0;border-bottom:3px solid var(--accent);margin-bottom:0;backgroun
         <div class="form-title" id="addMemberTitle">➕ 새 참여자 등록</div>
         <div class="form-grid">
           <div class="form-group"><label class="form-label" id="labelNewName">이름</label><input type="text" class="form-input" id="newName" placeholder="이름"></div>
+          <div class="form-group"><label class="form-label" id="labelNewGender">성별 Gender</label><select class="form-input" id="newGender"><option value="male">남성 Male</option><option value="female">여성 Female</option></select></div>
+          <div class="form-group"><label class="form-label" id="labelNewHeight">키 Height (cm)</label><input type="number" class="form-input" id="newHeight" placeholder="예: 170" step="0.1"><span class="form-hint">권장체중 자동 산출에 사용</span></div>
           <div class="form-group"><label class="form-label" id="labelNewPw">비밀번호 (4자 이상)</label><input type="password" class="form-input" id="newPw" placeholder="참여자 Members 로그인 비밀번호 Password" maxlength="20"></div>
           <div class="form-group"><label class="form-label" id="labelNewHba1c">초기 HbA1c 당화혈색소 (mmol/mol)</label><input type="number" class="form-input" id="newHba1c" placeholder="예: 7.2" step="0.1"><span class="form-hint">혈액검사 결과값 입력</span></div>
           <div class="form-group"><label class="form-label" id="labelNewFat">초기 체지방류 (%)</label><input type="number" class="form-input" id="newFat" placeholder="예: 28.0" step="0.1"></div>
@@ -786,7 +788,7 @@ header{padding:0;border-bottom:3px solid var(--accent);margin-bottom:0;backgroun
     </div>
     <div id="editHba1cSection" style="display:none;margin-top:14px;padding:14px 16px;background:#fff0f0;border:1px solid #f5ccc9;border-radius:10px;">
       <div style="font-size:.72rem;color:var(--danger);font-weight:700;letter-spacing:1px;margin-bottom:10px;">🩸 당화혈색소(HbA1c) 최종값 수정</div>
-      <div class="form-group"><label class="form-label">최종 HbA1c Final (%)</label><input type="number" class="form-input" id="editFinalHba1c" step="0.1" placeholder="예: 6.1"></div>
+      <div class="form-group"><label class="form-label">최종 HbA1c Final (mmol/mol)</label><input type="number" class="form-input" id="editFinalHba1c" step="0.1" placeholder="예: 48"></div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-outline btn-sm" onclick="closeModal('editModal')">취소 Cancel</button>
@@ -1153,22 +1155,31 @@ async function boot() {
 
 // ─── Score calc ───────────────────────────────
 function getWeights() { return appData.settings.weights || { blood:40, body:35, weight:25 }; }
+const HBA1C_TARGET = 41, HBA1C_FLOOR = 31;
+const GLUCOSE_TARGET = 5.5, GLUCOSE_FLOOR = 4.0;
+function bodyFatFloor(gender){ return gender==='female' ? 21 : 14; }
+function recommendedWeight(heightCm){ if(!heightCm) return null; const m=heightCm/100; return +(21.7*m*m).toFixed(1); }
+function effectiveTarget(member){ return member.targetWeight || recommendedWeight(member.heightCm); }
 
 // HbA1c 최종 점수 (피검사 결과 기반) - 최종 집계용
 function calcHba1cScore(initHba1c, finalHba1c) {
   if (!initHba1c || !finalHba1c) return null;
-  // 개선율 = (초기 - 최종) / 초기 * 100, 1% 개선 = 20점, 최대 100점
-  const rate = (initHba1c - finalHba1c) / initHba1c * 100;
-  return Math.min(100, Math.max(0, rate * 20));
+  if (initHba1c <= HBA1C_TARGET) return finalHba1c <= initHba1c ? 100 : 0;
+  const eff = Math.max(finalHba1c, HBA1C_FLOOR);
+  return Math.min(100, Math.max(0, (initHba1c - eff) / (initHba1c - HBA1C_TARGET) * 100));
 }
 // 공복혈당 Fasting Blood Sugar 점수 (매일 기록 기반) - 중간 추이용
 function calcBloodScore(init, cur) {
   if (!init||!cur) return null;
-  return Math.min(100, Math.max(0, (init-cur)/init*100*5));
+  if (init <= GLUCOSE_TARGET) return cur <= init ? 100 : 0;
+  const eff = Math.max(cur, GLUCOSE_FLOOR);
+  return Math.min(100, Math.max(0, (init - eff) / (init - GLUCOSE_TARGET) * 100));
 }
-function calcBodyScore(iF, iM, cF, cM) {
+function calcBodyScore(iF, iM, cF, cM, gender) {
   if (!iF||!cF) return null;
-  const fR = (iF-cF)/iF*100;
+  const floor = bodyFatFloor(gender);
+  const effCF = Math.max(cF, Math.min(iF, floor));
+  const fR = (iF-effCF)/iF*100;
   const mR = (iM&&cM) ? (cM-iM)/iM*100 : 0;
   return Math.min(100, Math.max(0, fR*3+mR*2));
 }
@@ -1210,8 +1221,8 @@ function getMemberScores(member) {
   }
   const iMkg = muscleToKg(member.initMuscle, member.initWeight);
   const cMkg = muscleToKg(latest.muscle, latest.weight);
-  const body = calcBodyScore(member.initFat, iMkg, latest.fat, cMkg);
-  const ws   = calcWeightScore(member.initWeight, member.targetWeight, latest.weight);
+  const body = calcBodyScore(member.initFat, iMkg, latest.fat, cMkg, member.gender);
+  const ws   = calcWeightScore(member.initWeight, effectiveTarget(member), latest.weight);
   return { bs, body, ws, composite:calcComposite(bs,body,ws), latest, hasFinalHba1c };
 }
 function fmtScore(n) { return (n!==null&&n!==undefined)?Math.round(n):'-'; }
@@ -1447,8 +1458,8 @@ window.renderRecordForm = function() {
   const todayStr = new Date().toISOString().split('T')[0];
   const isChallengeEnded = challengeEndDate && todayStr >= challengeEndDate;
   let html = `<div class="member-info-card">
-    <div class="member-info-item"><div class="member-info-val" style="color:var(--danger)">${member.initHba1c||'-'}%</div><div class="member-info-label">초기 HbA1c</div></div>
-    ${member.finalHba1c ? `<div class="member-info-item"><div class="member-info-val" style="color:var(--accent3)">${member.finalHba1c}%</div><div class="member-info-label">최종 HbA1c ✅</div></div>` : ''}
+    <div class="member-info-item"><div class="member-info-val" style="color:var(--danger)">${member.initHba1c||'-'} mmol/mol</div><div class="member-info-label">초기 HbA1c</div></div>
+    ${member.finalHba1c ? `<div class="member-info-item"><div class="member-info-val" style="color:var(--accent3)">${member.finalHba1c} mmol/mol</div><div class="member-info-label">최종 HbA1c ✅</div></div>` : ''}
     <div class="member-info-item"><div class="member-info-val">${member.initFat||'-'}%</div><div class="member-info-label">초기체지방</div></div>
     <div class="member-info-item"><div class="member-info-val">${member.initWeight||'-'}kg</div><div class="member-info-label">초기체중</div></div>
     <div class="member-info-item"><div class="member-info-val">${member.targetWeight||'-'}kg</div><div class="member-info-label">목표체중</div></div>
@@ -1492,13 +1503,13 @@ window.renderRecordForm = function() {
       <div style="font-size:.75rem;color:var(--muted);margin-bottom:14px;">혈액검사 결과지의 당화혈색소(HbA1c) 수치를 입력하세요. 최종 당뇨 점수 산정에 사용됩니다.</div>
       <div class="form-group" style="max-width:200px">
         <label class="form-label">최종 HbA1c Final (%)</label>
-        <input type="number" class="form-input" id="recFinalHba1c" placeholder="예: 6.1" step="0.1" min="3" max="15">
+        <input type="number" class="form-input" id="recFinalHba1c" placeholder="예: 48" step="0.1" min="20" max="150">
       </div>
       <button class="btn btn-danger" style="margin-top:10px;width:auto;padding:10px 20px;font-size:.82rem;" onclick="submitFinalHba1c()">HbA1c 최종 제출 Final Submit</button>
     </div>` : ''}
     ${isChallengeEnded && member.finalHba1c ? `
     <div style="margin-top:14px;padding:12px 16px;background:rgba(16,185,129,0.08);border:1px solid rgba(16,185,129,0.3);border-radius:10px;font-size:.8rem;color:var(--accent3);">
-      ✅ 최종 HbA1c <strong>${member.finalHba1c}%</strong> 제출 완료 — 최종 당뇨 점수가 반영되었습니다.
+      ✅ 최종 HbA1c <strong>${member.finalHba1c} mmol/mol</strong> 제출 완료 — 최종 당뇨 점수가 반영되었습니다.
     </div>` : ''}
     <div class="score-preview" id="scorePreview">
       <div style="font-size:.7rem;color:var(--muted);letter-spacing:1px;margin-bottom:10px">📊 예상 점수 미리보기 Score Preview</div>
@@ -1568,8 +1579,8 @@ window.submitFinalHba1c = async () => {
   const member = appData.members[myId()];
   if (!member) return;
   const val = parseFloat(document.getElementById('recFinalHba1c')?.value);
-  if (!val || val < 3 || val > 15) { toast('올바른 HbA1c 값을 입력해주세요 (3~15%).', 'warn'); return; }
-  if (!confirm(`최종 HbA1c ${val}%를 제출합니다.\n제출 후에는 관리자만 수정 가능합니다.\n계속할까요?`)) return;
+  if (!val || val < 20 || val > 150) { toast('올바른 HbA1c 값을 입력해주세요 (20~150 mmol/mol).', 'warn'); return; }
+  if (!confirm(`최종 HbA1c ${val} mmol/mol를 제출합니다.\n제출 후에는 관리자만 수정 가능합니다.\n계속할까요?`)) return;
   try {
     await dbUpdate('members/'+myId(), { finalHba1c: val, finalHba1cDate: new Date().toISOString() });
     toast('최종 HbA1c가 제출되었습니다! 최종 점수가 반영됩니다. 🎯');
@@ -1766,8 +1777,8 @@ function renderProgressGraphs(member, records) {
       </div>
       <div style="display:flex;align-items:center;gap:16px;padding:12px 0">
         <div style="flex:1;height:12px;background:var(--border);border-radius:6px;overflow:hidden;position:relative">
-          <div style="position:absolute;left:0;top:0;bottom:0;width:${Math.min(100,(member.initHba1c/20)*100)}%;background:var(--danger);border-radius:6px;opacity:.5"></div>
-          ${member.finalHba1c?`<div style="position:absolute;left:0;top:0;bottom:0;width:${Math.min(100,(member.finalHba1c/20)*100)}%;background:var(--accent3);border-radius:6px"></div>`:''}
+          <div style="position:absolute;left:0;top:0;bottom:0;width:${Math.min(100,(member.initHba1c/130)*100)}%;background:var(--danger);border-radius:6px;opacity:.5"></div>
+          ${member.finalHba1c?`<div style="position:absolute;left:0;top:0;bottom:0;width:${Math.min(100,(member.finalHba1c/130)*100)}%;background:var(--accent3);border-radius:6px"></div>`:''}
         </div>
         <div style="font-size:.8rem;color:var(--muted);white-space:nowrap">${member.initHba1c||'?'} → ${member.finalHba1c||'?'} mmol/mol</div>
       </div>
@@ -1947,7 +1958,7 @@ window.renderAdminMemberList = function() {
       <div class="rank-num" style="font-size:1.1rem">👤</div>
       <div class="rank-info">
         <div class="rank-name">${m.name}</div>
-        <div style="font-size:.73rem;color:var(--muted);margin-top:3px">HbA1c ${m.initHba1c||'-'}%${m.finalHba1c?'→'+m.finalHba1c+'%(최종)':''} · 체지방 ${m.initFat||'-'}% · 체중 ${m.initWeight||'-'}→목표 ${m.targetWeight||'-'}kg</div>
+        <div style="font-size:.73rem;color:var(--muted);margin-top:3px">HbA1c ${m.initHba1c||'-'}${m.finalHba1c?'→'+m.finalHba1c:''} mmol/mol · 체지방 ${m.initFat||'-'}% · 체중 ${m.initWeight||'-'}→목표 ${m.targetWeight||'-'}kg</div>
       </div>
       <div class="rank-days" style="display:block"><span>${cnt}</span>회 기록 records</div>
       <div style="display:flex;gap:6px;flex-wrap:wrap">
@@ -1969,14 +1980,17 @@ window.addMember=async()=>{
   const muscle=parseFloat(document.getElementById('newMuscle').value);
   const weight=parseFloat(document.getElementById('newWeight').value);
   const target=parseFloat(document.getElementById('newTarget').value);
+  const gender=document.getElementById('newGender').value;
+  const height=parseFloat(document.getElementById('newHeight').value)||null;
+  const finalTarget=target||recommendedWeight(height);
   const start=document.getElementById('newStart').value||appData.settings.startDate||new Date().toISOString().split('T')[0];
   if(!hba1c){toast('초기 당화혈색소(HbA1c) 수치를 입력해주세요.','warn');return;}
-  if(!fat||!weight||!target){toast('초기 체지방/체중과 목표 체중을 입력해주세요.','warn');return;}
+  if(!fat||!weight){toast('초기 체지방과 체중을 입력해주세요.','warn');return;}
   try {
-    const newKey=await dbPush('members',{name,password:pw,initHba1c:hba1c,initFat:fat,initMuscle:muscle,initWeight:weight,targetWeight:target,startDate:start,createdAt:new Date().toISOString()});
+    const newKey=await dbPush('members',{name,password:pw,initHba1c:hba1c,initFat:fat,initMuscle:muscle,initWeight:weight,targetWeight:finalTarget,gender,heightCm:height,startDate:start,createdAt:new Date().toISOString()});
     await dbUpdate(`members/${newKey}`,{id:newKey});
     toast(`${name} 참여자 Members가 등록되었습니다! 🎉`);
-    ['newName','newPw','newHba1c','newFat','newMuscle','newWeight','newTarget'].forEach(id=>document.getElementById(id).value='');
+    ['newName','newPw','newHba1c','newFat','newMuscle','newWeight','newTarget','newHeight'].forEach(id=>document.getElementById(id).value='');
     document.getElementById('newStart').value='';
   } catch(e){toast('등록 실패: '+e.message,'error');}
 };
@@ -2022,7 +2036,7 @@ window.loadApplications = async () => {
       </div>
       <div style="padding:16px 20px;display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px">
         <div><div style="font-size:.68rem;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.5px">${ko?'구매 제품':'Products'}</div><div style="font-size:.85rem;color:var(--ink);margin-top:3px">${(a.products||[]).join(', ')||'-'}</div></div>
-        <div><div style="font-size:.68rem;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.5px">${ko?'초기 HbA1c':'Initial HbA1c'}</div><div style="font-size:.85rem;color:var(--ink);margin-top:3px">${a.initHba1c||'-'}%</div></div>
+        <div><div style="font-size:.68rem;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.5px">${ko?'초기 HbA1c':'Initial HbA1c'}</div><div style="font-size:.85rem;color:var(--ink);margin-top:3px">${a.initHba1c||'-'} mmol/mol</div></div>
         <div><div style="font-size:.68rem;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.5px">${ko?'체중 → 목표':'Weight → Target'}</div><div style="font-size:.85rem;color:var(--ink);margin-top:3px">${a.initWeight||'-'} → ${a.targetWeight||'-'} kg</div></div>
         <div><div style="font-size:.68rem;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.5px">${ko?'체지방 / 근육':'Body Fat / Muscle'}</div><div style="font-size:.85rem;color:var(--ink);margin-top:3px">${a.initFat||'-'}% / ${a.initMuscle||'-'}</div></div>
       </div>
@@ -2100,18 +2114,18 @@ window.editMemberQuick=async(id)=>{
     await dbUpdate(`members/${id}`,{targetWeight:v});
     toast(`목표체중이 ${v}kg으로 변경되었습니다.`);
   } else if(choice==='3'){
-    const nH=prompt(`초기 HbA1c 수정 (현재: ${m.initHba1c||'-'}%):`);
+    const nH=prompt(`초기 HbA1c 수정 mmol/mol (현재: ${m.initHba1c||'-'}):`);
     if(!nH) return;
     const v=parseFloat(nH);
-    if(isNaN(v)||v<3||v>15){toast('올바른 HbA1c 값을 입력해주세요 (3~15).','warn');return;}
+    if(isNaN(v)||v<20||v>150){toast('올바른 HbA1c 값을 입력해주세요 (20~150).','warn');return;}
     await dbUpdate(`members/${id}`,{initHba1c:v});
     toast(`초기 HbA1c가 ${v}%로 수정되었습니다.`);
     renderLeaderboard();
   } else if(choice==='4'){
-    const nF=prompt(`최종 HbA1c 입력 (현재: ${m.finalHba1c||'미입력'}%):\n혈액검사 결과지 수치 입력:`);
+    const nF=prompt(`최종 HbA1c 입력 mmol/mol (현재: ${m.finalHba1c||'미입력'}):\n혈액검사 결과지 수치 입력:`);
     if(!nF) return;
     const v=parseFloat(nF);
-    if(isNaN(v)||v<3||v>15){toast('올바른 HbA1c 값을 입력해주세요 (3~15).','warn');return;}
+    if(isNaN(v)||v<20||v>150){toast('올바른 HbA1c 값을 입력해주세요 (20~150).','warn');return;}
     await dbUpdate(`members/${id}`,{finalHba1c:v, finalHba1cDate:new Date().toISOString(), finalHba1cByAdmin:true});
     toast(`${m.name}의 최종 HbA1c가 ${v}%로 등록되었습니다. 최종 점수 반영! 🎯`);
     renderLeaderboard();
