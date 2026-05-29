@@ -804,7 +804,7 @@ header{padding:0;border-bottom:3px solid var(--accent);margin-bottom:0;backgroun
 // Wait for Firebase
 await new Promise(resolve => {
   if (window._db) return resolve();
-  window.addEventListener('firebaseReady', resolve, { once: true });
+  window.addEventListener('firebaseReady', resolve, { once: true }); var _p=setInterval(function(){ if(window._db){ clearInterval(_p); resolve(); } },30);
 });
 
 const { ref, set, get, update, remove, onValue, push, db, path } = window._db;
