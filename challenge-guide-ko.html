@@ -402,7 +402,49 @@ footer strong{color:var(--white);display:block;margin-bottom:6px;font-size:1rem;
   </div>
 </div>
 
-<!-- SECTION: 목표 체중 설정 -->
+<!-- SECTION: 측정값 및 계산 방법 -->
+    <div class="section">
+      <div class="section-label">Measurements &amp; Method</div>
+      <div class="section-title">입력 값과 계산 방법</div>
+      <div class="divider"></div>
+      <p class="section-sub">아래 값만 입력하면 앱이 <strong>개선도를 자동 계산</strong>해 <strong>실시간 순위</strong>를 보여줍니다. 기준치는 세계보건기구(WHO) 등 공신력 있는 기준을 따릅니다.</p>
+
+      <div class="inbody-grid">
+        <div class="inbody-card home">
+          <div class="card-icon">📝</div>
+          <h3>처음 한 번 입력 (기준값)</h3>
+          <ul>
+            <li>성별 · 키(cm)</li>
+            <li>초기 당화혈색소 HbA1c <strong>(mmol/mol)</strong></li>
+            <li>초기 공복혈당 · 체지방률(%) · 근육량 · 체중(kg)</li>
+          </ul>
+          <div class="note">키를 입력하면 권장체중(목표)이 자동 산출됩니다.</div>
+        </div>
+        <div class="inbody-card centre">
+          <div class="card-icon">📈</div>
+          <h3>주기적으로 입력 (추이)</h3>
+          <ul>
+            <li>현재 공복혈당 · 체지방률(%) · 근육량 · 체중(kg)</li>
+            <li>챌린지 종료 후 최종 HbA1c <strong>(mmol/mol)</strong></li>
+          </ul>
+          <div class="note">뉴질랜드 혈액검사는 HbA1c를 <strong>mmol/mol</strong>로 보고합니다.</div>
+        </div>
+      </div>
+
+      <div class="score-box" style="margin-top:20px">
+        <h3>📐 각 지표 계산 방법</h3>
+        <div class="score-row"><div class="score-label">🩸 당뇨 (HbA1c·공복혈당)</div></div>
+        <div class="score-note" style="margin-left:0">정상 목표치까지 좁힌 비율로 점수화. HbA1c 목표 41 mmol/mol, 공복혈당 목표 5.5. 이미 정상이면 유지 시 만점, 안전 하한 미만은 추가 점수 없음.</div>
+        <div class="score-row"><div class="score-label">💪 체성분 (체지방·근육)</div></div>
+        <div class="score-note" style="margin-left:0">체지방률 상대 감소율 중심. 건강 하한(남 14% / 여 21%) 미만으로 내려간 부분은 보상하지 않아 과도한 감량을 방지합니다.</div>
+        <div class="score-row"><div class="score-label">⚖️ 체중 달성도</div></div>
+        <div class="score-note" style="margin-left:0">키 기반 권장체중(목표)까지 줄인 비율. 목표 도달 시 만점.</div>
+      </div>
+
+      <div class="note" style="margin-top:16px">종합점수 가중치(당뇨 · 체성분 · 체중)는 <strong>관리자 페이지에서 설정한 값이 계산에 자동 반영</strong>됩니다. 순위표 상단에 현재 가중치가 표시됩니다.</div>
+    </div>
+
+    <!-- SECTION: 목표 체중 설정 -->
 <div class="section">
   <div class="section-label">Target Weight</div>
   <div class="section-title">목표 체중 설정 기준</div>
