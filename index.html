@@ -1798,7 +1798,7 @@ function renderRecordView(member, container, adminView) {
     html+=`<div class="stat-card"><div class="stat-val" style="color:var(--accent3)">${fmtScore(scores.ws)}</div><div class="stat-label">체중달성 Weight Goal</div></div>`;
     html+=`<div class="stat-card" style="border-color:var(--accent)"><div class="stat-val" style="background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">${fmtScore(scores.composite)}</div><div class="stat-label">${scores.hasFinalHba1c?currentLang==='en'?'Final Score':'최종 종합점수':currentLang==='en'?'Mid Score':'종합점수 (중간)'}</div></div>`;
       html+=`<div class="stat-card" style="border-color:var(--danger)"><div class="stat-val" style="color:var(--danger);font-size:1.1rem;">${member.initHba1c||'?'} → ${member.finalHba1c||'?'} mmol/mol</div><div class="stat-label">HbA1c 변화 Change</div></div>`;
- 
+  } 
   html+=`</div>`;
   // ─── Progress Graphs (member view only) ───
   if (!adminView && records.length >= 1) {
@@ -2300,7 +2300,6 @@ window.toast=(msg,type='success')=>{
 // ─── Init ─────────────────────────────────────
 document.getElementById('editModal').addEventListener('click', e=>{if(e.target===document.getElementById('editModal'))closeModal('editModal');});
 boot();
-}
 </script>
 </body>
 </html>
