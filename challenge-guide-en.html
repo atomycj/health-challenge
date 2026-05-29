@@ -394,7 +394,49 @@ footer strong{color:var(--white);display:block;margin-bottom:6px;font-size:1rem;
   </div>
 </div>
 
-<!-- SECTION: Target Weight -->
+<!-- SECTION: Measurements & Method -->
+    <div class="section">
+      <div class="section-label">Measurements &amp; Method</div>
+      <div class="section-title">What to Enter &amp; How Scoring Works</div>
+      <div class="divider"></div>
+      <p class="section-sub">Just enter the values below and the app <strong>auto-calculates your improvement</strong> and shows a <strong>live ranking</strong>. Reference values follow authoritative standards such as the World Health Organization (WHO).</p>
+
+      <div class="inbody-grid">
+        <div class="inbody-card home">
+          <div class="card-icon">📝</div>
+          <h3>Enter once (baseline)</h3>
+          <ul>
+            <li>Gender &amp; height (cm)</li>
+            <li>Initial HbA1c <strong>(mmol/mol)</strong></li>
+            <li>Initial fasting glucose · body fat (%) · muscle · weight (kg)</li>
+          </ul>
+          <div class="note">Entering your height auto-derives your recommended target weight.</div>
+        </div>
+        <div class="inbody-card centre">
+          <div class="card-icon">📈</div>
+          <h3>Enter regularly (progress)</h3>
+          <ul>
+            <li>Current fasting glucose · body fat (%) · muscle · weight (kg)</li>
+            <li>Final HbA1c after the challenge <strong>(mmol/mol)</strong></li>
+          </ul>
+          <div class="note">In New Zealand, HbA1c is reported in <strong>mmol/mol</strong>.</div>
+        </div>
+      </div>
+
+      <div class="score-box" style="margin-top:20px">
+        <h3>📐 How each metric is scored</h3>
+        <div class="score-row"><div class="score-label">🩸 Diabetes (HbA1c · glucose)</div></div>
+        <div class="score-note" style="margin-left:0">Scored by how far you close the gap to the normal target. HbA1c target 41 mmol/mol, fasting glucose target 5.5. Already-normal values get full marks for maintaining; drops below the safe floor earn no extra points.</div>
+        <div class="score-row"><div class="score-label">💪 Body composition (fat · muscle)</div></div>
+        <div class="score-note" style="margin-left:0">Based on relative body-fat reduction. Reductions below the healthy floor (men 14% / women 21%) are not rewarded, preventing over-dieting.</div>
+        <div class="score-row"><div class="score-label">⚖️ Weight goal</div></div>
+        <div class="score-note" style="margin-left:0">How far you close the gap to your height-based recommended weight. Reaching the target gives full marks.</div>
+      </div>
+
+      <div class="note" style="margin-top:16px">The composite weighting (diabetes · body composition · weight) is <strong>set by the administrator and applied to scoring automatically</strong>. The current weighting is shown at the top of the leaderboard.</div>
+    </div>
+
+    <!-- SECTION: Target Weight -->
 <div class="section">
   <div class="section-label">Target Weight</div>
   <div class="section-title">How to Set Your Target Weight</div>
