@@ -686,7 +686,7 @@ header{padding:0;border-bottom:3px solid var(--accent);margin-bottom:0;backgroun
           <div class="form-group"><label class="form-label" id="labelNewGender">성별 Gender</label><select class="form-input" id="newGender"><option value="male">남성 Male</option><option value="female">여성 Female</option></select></div>
           <div class="form-group"><label class="form-label" id="labelNewHeight">키 Height (cm)</label><input type="number" class="form-input" id="newHeight" placeholder="예: 170" step="0.1"><span class="form-hint">권장체중 자동 산출에 사용</span></div>
           <div class="form-group"><label class="form-label" id="labelNewPw">비밀번호 (4자 이상)</label><input type="password" class="form-input" id="newPw" placeholder="참여자 Members 로그인 비밀번호 Password" maxlength="20"></div>
-          <div class="form-group"><label class="form-label" id="labelNewHba1c">초기 HbA1c 당화혈색소 (mmol/mol)</label><input type="number" class="form-input" id="newHba1c" placeholder="예: 7.2" step="0.1"><span class="form-hint">혈액검사 결과값 입력</span></div>
+          <div class="form-group"><label class="form-label" id="labelNewHba1c">초기 HbA1c 당화혈색소 (mmol/mol)</label><input type="number" class="form-input" id="newHba1c" placeholder="예: 53" step="1"><span class="form-hint">혈액검사 결과값 입력</span></div>
           <div class="form-group"><label class="form-label" id="labelNewFat">초기 체지방류 (%)</label><input type="number" class="form-input" id="newFat" placeholder="예: 28.0" step="0.1"></div>
           <div class="form-group"><label class="form-label" id="labelNewMuscle">초기 골격근량</label><div style="display:flex;gap:6px"><input type="number" class="form-input" id="newMuscle" placeholder="예: 26.0 또는 38%" step="0.1" style="flex:1"><span id="newMuscleUnit" style="display:flex;align-items:center;font-size:.8rem;color:var(--muted);white-space:nowrap;padding:0 6px">kg</span></div><span class="form-hint" id="newMuscleHint">단위: ⚙️ 설정 Settings에서 변경</span></div>
           <div class="form-group"><label class="form-label" id="labelNewWeight">초기 체중 (kg)</label><input type="number" class="form-input" id="newWeight" placeholder="예: 78.0" step="0.1"></div>
@@ -780,7 +780,7 @@ header{padding:0;border-bottom:3px solid var(--accent);margin-bottom:0;backgroun
     <input type="hidden" id="editRecordId"><input type="hidden" id="editRecordMemberId">
     <div class="form-grid">
       <div class="form-group"><label class="form-label">날짜 Date</label><input type="date" class="form-input" id="editDate"></div>
-      <div class="form-group"><label class="form-label">공복혈당 Fasting Blood Sugar (mg/dL)</label><input type="number" class="form-input" id="editBlood"></div>
+      <div class="form-group"><label class="form-label">공복혈당 Fasting Blood Sugar (mmol/L)</label><div style="display:flex;gap:6px"><input type="number" class="form-input" id="editBlood" style="flex:1"><select class="form-input" id="editBloodUnit" style="flex:0 0 100px"><option value="mgdl">mg/dL</option><option value="mmol">mmol/L</option></select></div></div>
       <div class="form-group"><label class="form-label">체지방률 Body Fat (%)</label><input type="number" class="form-input" id="editFat" step="0.1"></div>
       <div class="form-group"><label class="form-label" id="editMuscleLabel">골격근량 Muscle Mass</label><div style="display:flex;gap:6px"><input type="number" class="form-input" id="editMuscle" step="0.1" style="flex:1"><span id="editMuscleUnitBadge" style="display:flex;align-items:center;background:var(--border);border-radius:6px;padding:0 10px;font-size:.8rem;font-weight:700;white-space:nowrap">kg</span></div></div>
       <div class="form-group"><label class="form-label">체중 Weight (kg)</label><input type="number" class="form-input" id="editWeight" step="0.1"></div>
@@ -1491,7 +1491,7 @@ window.renderRecordForm = function() {
     </div>
     <div class="form-grid">
       <div class="form-group"><label class="form-label">날짜 Date</label><input type="date" class="form-input" value="${today}" readonly style="cursor:not-allowed;opacity:.55"></div>
-      <div class="form-group"><label class="form-label">공복혈당 Fasting Blood Sugar (mg/dL)</label><input type="number" class="form-input" id="recBlood" placeholder="예: 105" oninput="updateScorePreview()"><span class="form-hint">정상: 70~99 mg/dL (중간 추이용)</span></div>
+      <div class="form-group"><label class="form-label">공복혈당 Fasting Blood Sugar (mmol/L)</label><div style="display:flex;gap:6px"><input type="number" class="form-input" id="recBlood" placeholder="예: 95" oninput="updateScorePreview()" style="flex:1"><select class="form-input" id="recBloodUnit" oninput="updateScorePreview()" style="flex:0 0 100px"><option value="mgdl">mg/dL</option><option value="mmol">mmol/L</option></select></div><span class="form-hint">정상: 4.0~5.5 mmol/L (중간 추이용)</span></div>
       <div class="form-group"><label class="form-label">체지방률 Body Fat (%)</label><input type="number" class="form-input" id="recFat" placeholder="예: 24.5" step="0.1" oninput="updateScorePreview()"></div>
       <div class="form-group"><label class="form-label" id="recMuscleLabel">골격근량 Muscle Mass</label><div style="display:flex;gap:6px"><input type="number" class="form-input" id="recMuscle" placeholder="예: 28.3" step="0.1" oninput="updateScorePreview()" style="flex:1"><span id="recMuscleUnitBadge" style="display:flex;align-items:center;background:var(--border);border-radius:6px;padding:0 10px;font-size:.8rem;font-weight:700;white-space:nowrap">kg</span></div></div>
       <div class="form-group"><label class="form-label">체중 Weight (kg)</label><input type="number" class="form-input" id="recWeight" placeholder="예: 72.5" step="0.1" oninput="updateScorePreview()"></div>
@@ -1502,7 +1502,7 @@ window.renderRecordForm = function() {
       <div style="font-size:.8rem;font-weight:700;color:var(--danger);margin-bottom:10px;">🏁 챌린지 종료 — 최종 HbA1c 입력 필요</div>
       <div style="font-size:.75rem;color:var(--muted);margin-bottom:14px;">혈액검사 결과지의 당화혈색소(HbA1c) 수치를 입력하세요. 최종 당뇨 점수 산정에 사용됩니다.</div>
       <div class="form-group" style="max-width:200px">
-        <label class="form-label">최종 HbA1c Final (%)</label>
+        <label class="form-label">최종 HbA1c Final (mmol/mol)</label>
         <input type="number" class="form-input" id="recFinalHba1c" placeholder="예: 48" step="0.1" min="20" max="150">
       </div>
       <button class="btn btn-danger" style="margin-top:10px;width:auto;padding:10px 20px;font-size:.82rem;" onclick="submitFinalHba1c()">HbA1c 최종 제출 Final Submit</button>
@@ -1531,7 +1531,7 @@ window.renderRecordForm = function() {
 window.updateScorePreview = () => {
   const member = appData.members[myId()];
   if (!member) return;
-  const blood=parseFloat(document.getElementById('recBlood')?.value)||null;
+  let bloodRaw=parseFloat(document.getElementById('recBlood')?.value)||null; const blood=bloodRaw==null?null:((document.getElementById('recBloodUnit')||{}).value==='mmol'?+bloodRaw.toFixed(2):+(bloodRaw/18.0182).toFixed(2));
   const fat=parseFloat(document.getElementById('recFat')?.value)||null;
   const muscle=parseFloat(document.getElementById('recMuscle')?.value)||null;
   const weight=parseFloat(document.getElementById('recWeight')?.value)||null;
@@ -1554,7 +1554,7 @@ window.submitRecord = async () => {
   const today = new Date().toISOString().split('T')[0];
   const dup = Object.values(appData.records).find(r=>r.memberId===member.id&&r.date===today);
   if (dup) { toast('오늘 Today 기록은 이미 제출되었습니다. Already submitted.','warn'); return; }
-  const blood=parseFloat(document.getElementById('recBlood').value)||null;
+  let bloodRaw=parseFloat(document.getElementById('recBlood').value)||null; const blood=bloodRaw==null?null:((document.getElementById('recBloodUnit')||{}).value==='mmol'?+bloodRaw.toFixed(2):+(bloodRaw/18.0182).toFixed(2));
   const fat=parseFloat(document.getElementById('recFat').value)||null;
   const muscle=parseFloat(document.getElementById('recMuscle').value)||null;
   const weight=parseFloat(document.getElementById('recWeight').value)||null;
@@ -1702,11 +1702,11 @@ function renderProgressGraphs(member, records) {
     html += `<div class="progress-chart">
       <div class="progress-chart-header">
         <div>
-          <div class="progress-chart-title">🩸 공복혈당 Fasting Blood Sugar (mg/dL)</div>
-          <div style="font-size:.78rem;color:var(--muted);margin-top:2px">정상범위 Normal: 70~99 mg/dL</div>
+          <div class="progress-chart-title">🩸 공복혈당 Fasting Blood Sugar (mmol/L)</div>
+          <div style="font-size:.78rem;color:var(--muted);margin-top:2px">정상범위 Normal: 4.0~5.5 mmol/L</div>
         </div>
         <div style="text-align:right">
-          <div class="progress-chart-current" style="color:var(--danger)">${last.blood!=null?last.blood:'-'} mg/dL</div>
+          <div class="progress-chart-current" style="color:var(--danger)">${last.blood!=null?last.blood:'-'} mmol/L</div>
           ${changeChip(first.blood,last.blood,true)}
         </div>
       </div>
@@ -1847,7 +1847,7 @@ function renderRecordView(member, container, adminView) {
       const edited=r.adminEdited?'<span title="관리자 수정됨" style="color:var(--admin);font-size:.7rem;margin-left:4px">✏️</span>':'';
       html+=`<tr>
         <td>${r.date}${edited}</td>
-        <td>${r.blood!=null?r.blood+' mg/dL':'-'}</td>
+        <td>${r.blood!=null?r.blood+' mmol/L':'-'}</td>
         <td>${r.fat!=null?r.fat+'%':'-'}</td>
         <td>${r.muscle!=null?r.muscle+(getMuscleUnit()==='%'?' %':' kg'):'-'}</td>
         <td>${r.weight!=null?r.weight+' kg':'-'}</td>
@@ -1910,7 +1910,7 @@ window.saveEditRecord=async()=>{
   const memberId=document.getElementById('editRecordMemberId').value;
   const updates={
     date:document.getElementById('editDate').value,
-    blood:parseFloat(document.getElementById('editBlood').value)||null,
+    blood:(function(){var rv=parseFloat(document.getElementById('editBlood').value)||null; if(rv==null)return null; return (document.getElementById('editBloodUnit')||{}).value==='mmol'?+rv.toFixed(2):+(rv/18.0182).toFixed(2);})(),
     fat:parseFloat(document.getElementById('editFat').value)||null,
     muscle:parseFloat(document.getElementById('editMuscle').value)||null,
     weight:parseFloat(document.getElementById('editWeight').value)||null,
