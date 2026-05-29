@@ -245,8 +245,8 @@ body{background:var(--off);color:var(--body);font-family:'Noto Sans KR',sans-ser
       <div class="fg">
         <label class="fl" id="lGender">성별 <span class="req">*</span></label>
         <select class="fi" id="iGender">
-          <option value="male">남성</option>
-          <option value="female">여성</option>
+          <option value="male" id="oGenderM">남성</option>
+          <option value="female" id="oGenderF">여성</option>
         </select>
         <span class="fe" id="eGender"></span>
       </div>
@@ -367,7 +367,7 @@ var TX = {
     lWt:'체중 (kg) <span class="req">*</span>', lFat:'체지방률 (%)', hFat:'인바디 측정값 (선택)',
     lMus:'골격근량 (kg)', hMus:'인바디 측정값 (선택)',
     lTgt:'목표 체중 (kg)', lBg:'공복혈당', hBg:'아침 식전 측정 (선택) · 단위 선택',
-    lGender:'성별 <span class="req">*</span>', lHeight:'키 (cm) <span class="req">*</span>', hHeight:'권장 체중 자동 산출에 사용',
+    lGender:'성별 <span class="req">*</span>', oGenderM:'남성', oGenderF:'여성', lHeight:'키 (cm) <span class="req">*</span>', hHeight:'권장 체중 자동 산출에 사용',
     s3Warn:'⚠️ 초기 건강 기록은 관리자 승인 후 챌린지 시작일부터 유효합니다.',
     dTitle:'신청이 완료되었습니다! 🎉',
     dSub:'관리자가 검토 후 승인하면 챌린지를 시작할 수 있습니다.',
@@ -412,7 +412,7 @@ var TX = {
     lWt:'Weight (kg) <span class="req">*</span>', lFat:'Body Fat (%)', hFat:'InBody measurement (optional)',
     lMus:'Skeletal Muscle (kg)', hMus:'InBody measurement (optional)',
     lTgt:'Target Weight (kg)', lBg:'Fasting Blood Glucose', hBg:'Morning fasting (optional) · select unit',
-    lGender:'Gender <span class="req">*</span>', lHeight:'Height (cm) <span class="req">*</span>', hHeight:'Used to auto-calc recommended weight',
+    lGender:'Gender <span class="req">*</span>', oGenderM:'Male', oGenderF:'Female', lHeight:'Height (cm) <span class="req">*</span>', hHeight:'Used to auto-calc recommended weight',
     s3Warn:'⚠️ Your initial health records will be held as pending until admin approval.',
     dTitle:'Application Submitted! 🎉',
     dSub:'The admin will review and approve your application shortly.',
@@ -462,6 +462,8 @@ function applyLang() {
     var el = document.getElementById(id);
     if(el) el.innerHTML = tx(id);
   });
+  var gm=document.getElementById('oGenderM'); if(gm) gm.textContent=tx('oGenderM');
+  var gf=document.getElementById('oGenderF'); if(gf) gf.textContent=tx('oGenderF');
   var btns = ['bBack1','bNext1','bBack2','bNext2','bBack3','bSub','bGo'];
   btns.forEach(function(id){
     var el = document.getElementById(id);
