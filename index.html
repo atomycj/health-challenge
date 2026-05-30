@@ -2291,7 +2291,6 @@ window.editSubAdmin=async(id)=>{
     toast(`${sa.name} 권한이 '${newLevel==='readonly'?'조회전용':'부관리자'}'으로 변경되었습니다.`);
   }
   renderSubAdminList();
-index: rename muscle label to 근육량 / Muscle Mass
 window.removeSubAdmin=async(id,name)=>{
   if(!session.isSuper){toast('최고 관리자만 삭제 가능합니다.','warn');return;}
   if(!confirm(`'${name}' 관리자를 삭제할까요?`)) return;
