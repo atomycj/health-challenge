@@ -280,6 +280,7 @@ body{background:var(--off);color:var(--body);font-family:'Noto Sans KR',sans-ser
       <div class="fg">
         <label class="fl" id="lTgt">목표 체중 (kg)</label>
         <input class="fi" id="iTgt" type="number" placeholder="예: 70.0" step="0.1">
+        <span class="fh" id="hTgt">임시</span>
         <span class="fe" id="eTgt"></span>
       </div>
       <div class="fg">
@@ -366,7 +367,7 @@ var TX = {
     lHba:'초기 HbA1c (mmol/mol) <span class="req">*</span>', hHba:'혈액검사 당화혈색소 수치 (NZ 단위)',
     lWt:'체중 (kg) <span class="req">*</span>', lFat:'체지방률 (%)', hFat:'인바디 측정값 (선택)',
     lMus:'근육량 (kg)', hMus:'인바디 측정값 (선택)',
-    lTgt:'목표 체중 (kg)', lBg:'공복혈당', hBg:'아침 식전 측정 (선택) · 단위 선택',
+    lTgt:'목표 체중 (kg)', hTgt:'키 기준 권장 체중이 자동 적용됩니다. 따로 설정하려면만 입력하세요.', lBg:'공복혈당', hBg:'아침 식전 측정 (선택) · 단위 선택',
     lGender:'성별 <span class="req">*</span>', oGenderM:'남성', oGenderF:'여성', lHeight:'키 (cm) <span class="req">*</span>', hHeight:'권장 체중 자동 산출에 사용',
     s3Warn:'⚠️ 초기 건강 기록은 관리자 승인 후 챌린지 시작일부터 유효합니다.',
     dTitle:'신청이 완료되었습니다! 🎉',
@@ -411,7 +412,7 @@ var TX = {
     lHba:'Initial HbA1c (mmol/mol) <span class="req">*</span>', hHba:'From your blood test result (NZ unit)',
     lWt:'Weight (kg) <span class="req">*</span>', lFat:'Body Fat (%)', hFat:'InBody measurement (optional)',
     lMus:'Muscle Mass (kg)', hMus:'InBody measurement (optional)',
-    lTgt:'Target Weight (kg)', lBg:'Fasting Blood Glucose', hBg:'Morning fasting (optional) · select unit',
+    lTgt:'Target Weight (kg)', hTgt:'Auto-calculated from your height. Only enter a value if you want to set a custom target.', lBg:'Fasting Blood Glucose', hBg:'Morning fasting (optional) · select unit',
     lGender:'Gender <span class="req">*</span>', oGenderM:'Male', oGenderF:'Female', lHeight:'Height (cm) <span class="req">*</span>', hHeight:'Used to auto-calc recommended weight',
     s3Warn:'⚠️ Your initial health records will be held as pending until admin approval.',
     dTitle:'Application Submitted! 🎉',
@@ -456,7 +457,7 @@ function applyLang() {
     's1Title','s1Sub','s1Info',
     's2Title','s2Sub','s2Warn','pt1','ps1','pt2','ps2','ut1','us1',
     's3Title','s3Sub','s3Info','s3Warn',
-    'lGender','lHeight','hHeight','lHba','hHba','lWt','lFat','hFat','lMus','hMus','lTgt','lBg','hBg',
+    'lGender','lHeight','hHeight','lHba','hHba','lWt','lFat','hFat','lMus','hMus','lTgt','hTgt','lBg','hBg',
     'dTitle','dSub','dInfo'];
   ids.forEach(function(id){
     var el = document.getElementById(id);
