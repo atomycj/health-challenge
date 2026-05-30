@@ -688,7 +688,7 @@ header{padding:0;border-bottom:3px solid var(--accent);margin-bottom:0;backgroun
           <div class="form-group"><label class="form-label" id="labelNewPw">비밀번호 (4자 이상)</label><input type="password" class="form-input" id="newPw" placeholder="참여자 Members 로그인 비밀번호 Password" maxlength="20"></div>
           <div class="form-group"><label class="form-label" id="labelNewHba1c">초기 HbA1c 당화혈색소 (mmol/mol)</label><input type="number" class="form-input" id="newHba1c" placeholder="예: 53" step="1"><span class="form-hint">혈액검사 결과값 입력</span></div>
           <div class="form-group"><label class="form-label" id="labelNewFat">초기 체지방류 (%)</label><input type="number" class="form-input" id="newFat" placeholder="예: 28.0" step="0.1"></div>
-          <div class="form-group"><label class="form-label" id="labelNewMuscle">초기 골격근량</label><div style="display:flex;gap:6px"><input type="number" class="form-input" id="newMuscle" placeholder="예: 26.0 또는 38%" step="0.1" style="flex:1"><span id="newMuscleUnit" style="display:flex;align-items:center;font-size:.8rem;color:var(--muted);white-space:nowrap;padding:0 6px">kg</span></div><span class="form-hint" id="newMuscleHint">단위: ⚙️ 설정 Settings에서 변경</span></div>
+          <div class="form-group"><label class="form-label" id="labelNewMuscle">초기 근육량</label><div style="display:flex;gap:6px"><input type="number" class="form-input" id="newMuscle" placeholder="예: 26.0 또는 38%" step="0.1" style="flex:1"><span id="newMuscleUnit" style="display:flex;align-items:center;font-size:.8rem;color:var(--muted);white-space:nowrap;padding:0 6px">kg</span></div><span class="form-hint" id="newMuscleHint">단위: ⚙️ 설정 Settings에서 변경</span></div>
           <div class="form-group"><label class="form-label" id="labelNewWeight">초기 체중 (kg)</label><input type="number" class="form-input" id="newWeight" placeholder="예: 78.0" step="0.1"></div>
           <div class="form-group"><label class="form-label" id="labelNewTarget">목표 체중 (kg)</label><input type="number" class="form-input" id="newTarget" placeholder="예: 68.0" step="0.1"></div>
           <div class="form-group"><label class="form-label" id="labelNewStart">쳌린지 시작일</label><input type="date" class="form-input" id="newStart"></div>
@@ -736,8 +736,8 @@ header{padding:0;border-bottom:3px solid var(--accent);margin-bottom:0;backgroun
         <div id="subAdminList" style="margin-top:20px;display:flex;flex-direction:column;gap:8px;"></div>
       </div>
       <div class="form-card">
-        <div class="form-title" id="muscleUnitTitle">💪 골격근량 입력 단위</div>
-        <div style="font-size:.8rem;color:var(--muted);margin-bottom:16px;">참여자 Members들이 인바디 기기에서 골격근량을 <strong>kg</strong> 또는 <strong>%</strong> 중 어떤 단위로 보는지 선택하세요. 모든 참여자 Members에게 동일하게 적용됩니다.</div>
+        <div class="form-title" id="muscleUnitTitle">💪 근육량 입력 단위</div>
+        <div style="font-size:.8rem;color:var(--muted);margin-bottom:16px;">참여자 Members들이 인바디 기기에서 근육량을 <strong>kg</strong> 또는 <strong>%</strong> 중 어떤 단위로 보는지 선택하세요. 모든 참여자 Members에게 동일하게 적용됩니다.</div>
         <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;">
           <button id="unitBtnKg" class="btn btn-outline" style="padding:10px 24px;font-size:.85rem;" onclick="setMuscleUnit('kg')">⚖️ kg (킬로그램)</button>
           <button id="unitBtnPct" class="btn btn-outline" style="padding:10px 24px;font-size:.85rem;" onclick="setMuscleUnit('%')">📊 % (퍼센트)</button>
@@ -782,7 +782,7 @@ header{padding:0;border-bottom:3px solid var(--accent);margin-bottom:0;backgroun
       <div class="form-group"><label class="form-label">날짜 Date</label><input type="date" class="form-input" id="editDate"></div>
       <div class="form-group"><label class="form-label">공복혈당 Fasting Blood Sugar (mmol/L)</label><div style="display:flex;gap:6px"><input type="number" class="form-input" id="editBlood" style="flex:1"><select class="form-input" id="editBloodUnit" style="flex:0 0 100px"><option value="mgdl">mg/dL</option><option value="mmol">mmol/L</option></select></div></div>
       <div class="form-group"><label class="form-label">체지방률 Body Fat (%)</label><input type="number" class="form-input" id="editFat" step="0.1"></div>
-      <div class="form-group"><label class="form-label" id="editMuscleLabel">골격근량 Muscle Mass</label><div style="display:flex;gap:6px"><input type="number" class="form-input" id="editMuscle" step="0.1" style="flex:1"><span id="editMuscleUnitBadge" style="display:flex;align-items:center;background:var(--border);border-radius:6px;padding:0 10px;font-size:.8rem;font-weight:700;white-space:nowrap">kg</span></div></div>
+      <div class="form-group"><label class="form-label" id="editMuscleLabel">근육량 Muscle Mass</label><div style="display:flex;gap:6px"><input type="number" class="form-input" id="editMuscle" step="0.1" style="flex:1"><span id="editMuscleUnitBadge" style="display:flex;align-items:center;background:var(--border);border-radius:6px;padding:0 10px;font-size:.8rem;font-weight:700;white-space:nowrap">kg</span></div></div>
       <div class="form-group"><label class="form-label">체중 Weight (kg)</label><input type="number" class="form-input" id="editWeight" step="0.1"></div>
       <div class="form-group"><label class="form-label">메모 Memo</label><input type="text" class="form-input" id="editMemo"></div>
     </div>
@@ -949,7 +949,7 @@ window.applyLang = function() {
     memberListTitle:           ko ? '참여자 목록'                   : 'Member List',
     adminPwTitle:              ko ? '🔑 관리자 비밀번호 변경'       : '🔑 Change Admin Password',
     subAdminTitle:             ko ? '👑 추가 관리자 관리'           : '👑 Sub-Admin Management',
-    muscleUnitTitle:           ko ? '💪 골격근량 입력 단위 설정'    : '💪 Muscle Mass Unit',
+    muscleUnitTitle:           ko ? '💪 근육량 입력 단위 설정'    : '💪 Muscle Mass Unit',
     weightsTitle:              ko ? '⚖️ 점수 가중치 설정'           : '⚖️ Score Weights',
     challengeInfoTitle:        ko ? '🏷️ 챌린지 이름 & 기간'        : '🏷️ Challenge Info & Period',
   
@@ -962,7 +962,7 @@ window.applyLang = function() {
     labelNewPw:        ko ? '비밀번호 (4자 이상)'            : 'Password (4+ chars)',
     labelNewHba1c:     ko ? '초기 HbA1c 당화혈색소 (mmol/mol)' : 'Initial HbA1c (mmol/mol)',
     labelNewFat:       ko ? '초기 체지방류 (%)'            : 'Initial Body Fat (%)',
-    labelNewMuscle:    ko ? '초기 골격근량'                    : 'Initial Muscle Mass',
+    labelNewMuscle:    ko ? '초기 근육량'                    : 'Initial Muscle Mass',
     labelNewWeight:    ko ? '초긲 체중 (kg)'                 : 'Initial Weight (kg)',
     labelNewTarget:    ko ? '목표 체중 (kg)'                 : 'Target Weight (kg)',
     labelNewStart:     ko ? '쳌린지 시작일'                   : 'Challenge Start Date',
@@ -1493,7 +1493,7 @@ window.renderRecordForm = function() {
       <div class="form-group"><label class="form-label">날짜 Date</label><input type="date" class="form-input" value="${today}" readonly style="cursor:not-allowed;opacity:.55"></div>
       <div class="form-group"><label class="form-label">공복혈당 Fasting Blood Sugar (mmol/L)</label><div style="display:flex;gap:6px"><input type="number" class="form-input" id="recBlood" placeholder="예: 95" oninput="updateScorePreview()" style="flex:1"><select class="form-input" id="recBloodUnit" oninput="updateScorePreview()" style="flex:0 0 100px"><option value="mgdl">mg/dL</option><option value="mmol">mmol/L</option></select></div><span class="form-hint">정상: 4.0~5.5 mmol/L (중간 추이용)</span></div>
       <div class="form-group"><label class="form-label">체지방률 Body Fat (%)</label><input type="number" class="form-input" id="recFat" placeholder="예: 24.5" step="0.1" oninput="updateScorePreview()"></div>
-      <div class="form-group"><label class="form-label" id="recMuscleLabel">골격근량 Muscle Mass</label><div style="display:flex;gap:6px"><input type="number" class="form-input" id="recMuscle" placeholder="예: 28.3" step="0.1" oninput="updateScorePreview()" style="flex:1"><span id="recMuscleUnitBadge" style="display:flex;align-items:center;background:var(--border);border-radius:6px;padding:0 10px;font-size:.8rem;font-weight:700;white-space:nowrap">kg</span></div></div>
+      <div class="form-group"><label class="form-label" id="recMuscleLabel">근육량 Muscle Mass</label><div style="display:flex;gap:6px"><input type="number" class="form-input" id="recMuscle" placeholder="예: 28.3" step="0.1" oninput="updateScorePreview()" style="flex:1"><span id="recMuscleUnitBadge" style="display:flex;align-items:center;background:var(--border);border-radius:6px;padding:0 10px;font-size:.8rem;font-weight:700;white-space:nowrap">kg</span></div></div>
       <div class="form-group"><label class="form-label">체중 Weight (kg)</label><input type="number" class="form-input" id="recWeight" placeholder="예: 72.5" step="0.1" oninput="updateScorePreview()"></div>
       <div class="form-group"><label class="form-label">메모 Memo (선택)</label><input type="text" class="form-input" id="recMemo" placeholder="오늘의 컨디션 등"></div>
     </div>
@@ -1732,7 +1732,7 @@ function renderProgressGraphs(member, records) {
     </div>`;
   }
 
-  // ── 체지방률 + 골격근량 나란히
+  // ── 체지방률 + 근육량 나란히
   const hasFat = fatData.length >= 1, hasMuscle = muscleData.length >= 1;
   if (hasFat || hasMuscle) {
     html += `<div style="display:grid;grid-template-columns:${hasFat&&hasMuscle?'1fr 1fr':'1fr'};gap:14px">`;
@@ -1751,7 +1751,7 @@ function renderProgressGraphs(member, records) {
     if (hasMuscle) {
       html += `<div class="progress-chart">
         <div class="progress-chart-header">
-          <div><div class="progress-chart-title">💪 골격근량 Muscle Mass (${unit})</div></div>
+          <div><div class="progress-chart-title">💪 근육량 Muscle Mass (${unit})</div></div>
           <div style="text-align:right">
             <div class="progress-chart-current" style="color:var(--accent)">${last.muscle!=null?last.muscle:'-'}${unit}</div>
             ${changeChip(first.muscle,last.muscle,false)}
@@ -2136,7 +2136,7 @@ window.editMemberQuick=async(id)=>{
 // ─── Admin: Settings ──────────────────────────
 window.setMuscleUnit=async(unit)=>{
   await dbUpdate('settings',{muscleUnit:unit});
-  toast(`골격근량 단위가 ${unit==='%'?'퍼센트(%)':'킬로그램(kg)'}으로 변경되었습니다.`);
+  toast(`근육량 단위가 ${unit==='%'?'퍼센트(%)':'킬로그램(kg)'}으로 변경되었습니다.`);
   updateMuscleUnitUI();
 };
 window.updateMuscleUnitUI = function(){
@@ -2159,9 +2159,9 @@ window.updateMuscleUnitUI = function(){
   const hint=document.getElementById('newMuscleHint');
   if(hint) hint.textContent=unit==='%'?'예: 38 (체중의 38%)':'예: 26.0 kg';
   const recLabel=document.getElementById('recMuscleLabel');
-  if(recLabel) recLabel.textContent=`골격근량 (${unit})`;
+  if(recLabel) recLabel.textContent=`근육량 (${unit})`;
   const editLabel=document.getElementById('editMuscleLabel');
-  if(editLabel) editLabel.textContent=`골격근량 (${unit})`;
+  if(editLabel) editLabel.textContent=`근육량 (${unit})`;
 }
 window.loadWeightInputs = function(){
   const w=getWeights();
@@ -2291,8 +2291,7 @@ window.editSubAdmin=async(id)=>{
     toast(`${sa.name} 권한이 '${newLevel==='readonly'?'조회전용':'부관리자'}'으로 변경되었습니다.`);
   }
   renderSubAdminList();
-};
-
+index: rename muscle label to 근육량 / Muscle Mass
 window.removeSubAdmin=async(id,name)=>{
   if(!session.isSuper){toast('최고 관리자만 삭제 가능합니다.','warn');return;}
   if(!confirm(`'${name}' 관리자를 삭제할까요?`)) return;
