@@ -167,26 +167,26 @@ body{background:var(--off);color:var(--body);font-family:'Noto Sans KR',sans-ser
     <div class="hr"></div>
     <div class="g2">
       <div class="fg">
-        <label class="fl">이름 <span class="req">*</span></label>
+        <label class="fl" id="lName">이름 <span class="req">*</span></label>
         <input class="fi" id="iName" type="text" maxlength="20" placeholder="홍길동">
         <span class="fe" id="eName"></span>
       </div>
       <div class="fg">
-        <label class="fl">전화번호 <span class="req">*</span></label>
+        <label class="fl" id="lPhone">전화번호 <span class="req">*</span></label>
         <input class="fi" id="iPhone" type="text" maxlength="15" placeholder="021-123-4567"
                oninput="onPhone(this)">
         <span class="fh" id="hPhone">0으로 시작하는 전화번호</span>
         <span class="fe" id="ePhone"></span>
       </div>
       <div class="fg">
-        <label class="fl">비밀번호 <span class="req">*</span></label>
+        <label class="fl" id="lPw">비밀번호 <span class="req">*</span></label>
         <input class="fi" id="iPw" type="password" maxlength="20" oninput="onPwStrength(this)">
         <div class="pw-bar"><div class="pw-fill" id="pwBar" style="width:0"></div></div>
         <span class="fh" id="hPw">4자 이상 입력해주세요.</span>
         <span class="fe" id="ePw"></span>
       </div>
       <div class="fg">
-        <label class="fl">비밀번호 확인 <span class="req">*</span></label>
+        <label class="fl" id="lPw2">비밀번호 확인 <span class="req">*</span></label>
         <input class="fi" id="iPw2" type="password" maxlength="20">
         <span class="fe" id="ePw2"></span>
       </div>
@@ -290,11 +290,11 @@ body{background:var(--off);color:var(--body);font-family:'Noto Sans KR',sans-ser
       </div>
     </div>
     <div class="fg" style="margin-top:12px">
-      <label class="fl">혈액검사 결과지 (선택)</label>
+      <label class="fl" id="lLabResult">혈액검사 결과지 (선택)</label>
       <div class="uz" id="uz2">
         <input type="file" accept="image/*,.pdf" multiple onchange="onFile(this,'lab')">
         <div class="ui">🩸</div>
-        <div class="ut">혈액검사 결과지 업로드 (선택)</div>
+        <div class="ut" id="utLabResult">혈액검사 결과지 업로드 (선택)</div>
       </div>
       <div class="prevs" id="prev2"></div>
     </div>
@@ -387,16 +387,15 @@ var TX = {
     submitted:'신청이 완료되었습니다! ✅', errNet:'오류가 발생했습니다. 다시 시도해주세요.',
     pwStrength:['너무 짧음','보통','좋음','매우 강함'],
     hPhone:'0으로 시작하는 전화번호', hPw:'4자 이상 입력해주세요.',
-    nameLabel:'이름', phoneLabel:'전화번호', pwLabel:'비밀번호', pw2Label:'비밀번호 확인',
+    lName:'이름 <span class="req">*</span>', lPhone:'전화번호 <span class="req">*</span>', lPw:'비밀번호 <span class="req">*</span>', lPw2:'비밀번호 확인 <span class="req">*</span>',            nameLabel:'이름', phoneLabel:'전화번호', pwLabel:'비밀번호', pw2Label:'비밀번호 확인',
     loginTitle:'로그인',
     loginSub:'이전에 저장한 내용으로 이어서 진행합니다.',
     loginBtn:'로그인하여 이어서 진행', startNew:'새로 신청하기',
     errLogin:'전화번호 또는 비밀번호가 올바르지 않습니다.',
-    savedDraft:'임시 저장되었습니다.'
+    bSave:'💾 임시저장', savedDraft:'임시 저장되었습니다.'
   },
   en: {
-    hLogo:'HEALTH CHALLENGE', hBadge:'📝 Register',
-    hTopbar:'Atomy Auckland Absolute Education Centre — Health Challenge Registration',
+      'lLabResult','utLabResult'    hTopbar:'Atomy Auckland Absolute Education Centre — Health Challenge Registration',
     hTag:'Challenge Registration', hTitle:'Register',
     hDesc:'Complete the steps below. Once approved by the admin, you can start the challenge.',
     lb1:'Account', lb2:'Purchase', lb3:'Health', lb4:'Done',
@@ -432,12 +431,12 @@ var TX = {
     submitted:'Application submitted! ✅', errNet:'An error occurred. Please try again.',
     pwStrength:['Too short','Fair','Good','Strong'],
     hPhone:'Must start with 0', hPw:'At least 4 characters.',
-    nameLabel:'Full Name', phoneLabel:'Phone Number', pwLabel:'Password', pw2Label:'Confirm Password',
+    lName:'Name <span class="req">*</span>', lPhone:'Phone Number <span class="req">*</span>', lPw:'Password <span class="req">*</span>', lPw2:'Confirm Password <span class="req">*</span>',            nameLabel:'Full Name', phoneLabel:'Phone Number', pwLabel:'Password', pw2Label:'Confirm Password',
     loginTitle:'Login',
     loginSub:'Continue where you left off.',
     loginBtn:'Login to continue', startNew:'Start a new application',
     errLogin:'Phone number or password is incorrect.',
-    savedDraft:'Progress saved.'
+    bSave:'💾 Save Draft', savedDraft:'Progress saved.'
   }
 };
 
@@ -458,7 +457,7 @@ function applyLang() {
     's2Title','s2Sub','s2Warn','pt1','ps1','pt2','ps2','ut1','us1',
     's3Title','s3Sub','s3Info','s3Warn',
     'lGender','lHeight','hHeight','lHba','hHba','lWt','lFat','hFat','lMus','hMus','lTgt','hTgt','lBg','hBg',
-    'dTitle','dSub','dInfo'];
+    'dTitle','dSub','dInfo',      'hPhone','hPw','lName','lPhone','lPw','lPw2'];
   ids.forEach(function(id){
     var el = document.getElementById(id);
     if(el) el.innerHTML = tx(id);
@@ -470,11 +469,12 @@ function applyLang() {
     var el = document.getElementById(id);
     if(el) el.textContent = tx(id);
   });
-  document.getElementById('lbKo').classList.toggle('on', lang==='ko');
+  ['bSave1','bSave2','bSave3'].forEach(function(id){ var el=document.getElementById(id); if(el) el.textContent=tx('bSave'); });    document.getElementById('lbKo').classList.toggle('on', lang==='ko');
   document.getElementById('lbEn').classList.toggle('on', lang==='en');
   applyLangToLogin();
 }
 
+      if(lang!=='ko'){ var llr=document.getElementById('lLabResult'); if(llr) llr.innerHTML='Blood Test Results (optional)'; var ulr=document.getElementById('utLabResult'); if(ulr) ulr.textContent='Upload Blood Test Results (optional)'; }
 /* ── Step 이동 ─────────────────────────────── */
 function goStep(n) {
   var lc=document.getElementById('loginCard'); if(lc) lc.style.display='none';
