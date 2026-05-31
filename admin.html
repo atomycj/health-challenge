@@ -2388,6 +2388,15 @@ if(!window.location.pathname.endsWith('admin.html')){boot();}
 </script>
 
 <script>
+// Bridge: expose module-scope functions for admin integration
+window.dbGet = async function(p) {
+  const s = await window._db.get(window._db.path(p));
+  return s.exists() ? s.val() : null;
+};
+window.dbSet = async function(p, v) { await window._db.set(window._db.path(p), v); };
+window.dbUpdate = async function(p, v) { await window._db.update(window._db.path(p), v); };
+window.dbRemove = async function(p) { await window._db.remove(window._db.path(p)); };
+
 // ===============================================
 // Admin Page Integration Script
 // ===============================================
