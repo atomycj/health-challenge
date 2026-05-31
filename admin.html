@@ -2559,6 +2559,10 @@ function reloadAdminPage() {
 }
 
 function switchAdminTab(tabId, btn) {
+  // 모듈 session 동기화
+  if (typeof window.setModuleSession === 'function' && window.session) {
+    window.setModuleSession(window.session);
+  }
   document.querySelectorAll('.admin-panel').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.utab-btn').forEach(b => b.classList.remove('active'));
   const panel = document.getElementById(tabId);
