@@ -853,6 +853,7 @@ const { ref, set, get, update, remove, onValue, push, db, path } = window._db;
 let appData = { members:{}, records:{}, settings:{} };
 window._appData = appData; // admin.html bridge
 let session = null;
+window.setModuleSession = function(s) { session = s; }; // admin.html bridge
 const isAdmin  = () => session?.role === 'admin';
 const isMember = () => session?.role === 'member';
 const myId     = () => session?.memberId;
@@ -2485,6 +2486,10 @@ function showAdminDashboard(sessionData) {
 }
 
 async function initAdminViews() {
+  // 모듈의 session 변수를 admin 세션으로 설정
+  if (typeof window.setModuleSession === 'function' && window.session) {
+    window.setModuleSession(window.session);
+  }
   // appData 초기화 - Firebase에서 데이터 로드 (window._appData는 모듈의 appData와 동일 객체)
   try {
     const [membersSnap, recordsSnap, settingsSnap] = await Promise.all([
