@@ -982,6 +982,21 @@ window.applyLang = function() {
   // Update placeholders
   const pwInput = document.getElementById('newPw');
   if(pwInput) pwInput.placeholder = ko ? '참여자 로그인 비밀번호' : 'Member login password';
+  // Name, height, and other input placeholders
+  const nameInput = document.getElementById('newName');
+  if(nameInput) nameInput.placeholder = ko ? '이름' : 'Name';
+  const heightInput = document.getElementById('newHeight');
+  if(heightInput) heightInput.placeholder = ko ? '예: 170' : 'e.g. 170';
+  const hba1cInput = document.getElementById('newHba1c');
+  if(hba1cInput) hba1cInput.placeholder = ko ? '예: 53' : 'e.g. 53';
+  const fatInput = document.getElementById('newFat');
+  if(fatInput) fatInput.placeholder = ko ? '예: 28.0' : 'e.g. 28.0';
+  const muscleInput = document.getElementById('newMuscle');
+  if(muscleInput) muscleInput.placeholder = ko ? '예: 26.0 또는 38%' : 'e.g. 26.0 or 38%';
+  const weightInput = document.getElementById('newWeight');
+  if(weightInput) weightInput.placeholder = ko ? '예: 78.0' : 'e.g. 78.0';
+  const targetInput = document.getElementById('newTarget');
+  if(targetInput) targetInput.placeholder = ko ? '예: 68.0' : 'e.g. 68.0';
   const heightHint = document.querySelector('#newHeight + .form-hint');
   if(heightHint) heightHint.textContent = ko ? '권장체중 자동 산출에 사용' : 'Used for recommended weight calculation';
   const hba1cHint = document.querySelector('#newHba1c + .form-hint');
