@@ -24,6 +24,19 @@
     appId:             "1:519481744840:web:d92de5e21a00129a5cb4fd"
   };
   // ════════════════════════════════════════
+    const app = initializeApp(firebaseConfig);
+    const db  = getDatabase(app);
+
+    // DB 접근 헬퍼
+    window._db = {
+          ref, set, get, update, remove, onValue, push,
+          db,
+          path: (p) => ref(db, p),
+    };
+
+    // Firebase 준비 완료 이벤트
+    window.dispatchEvent(new Event("firebaseReady"));
+</script>
 
 <style>
 :root {
