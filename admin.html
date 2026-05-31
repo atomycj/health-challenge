@@ -851,6 +851,7 @@ const { ref, set, get, update, remove, onValue, push, db, path } = window._db;
 
 // ─── State ───────────────────────────────────
 let appData = { members:{}, records:{}, settings:{} };
+window._appData = appData; // admin.html bridge
 let session = null;
 const isAdmin  = () => session?.role === 'admin';
 const isMember = () => session?.role === 'member';
@@ -2484,32 +2485,30 @@ function showAdminDashboard(sessionData) {
 }
 
 async function initAdminViews() {
-  // appData 초기화 - Firebase에서 데이터 로드
+  // appData 초기화 - Firebase에서 데이터 로드 (window._appData는 모듈의 appData와 동일 객체)
   try {
     const [membersSnap, recordsSnap, settingsSnap] = await Promise.all([
       window._db.get(window._db.path('members')),
       window._db.get(window._db.path('records')),
       window._db.get(window._db.path('settings'))
     ]);
-    window.appData = {
-      members: membersSnap.exists() ? membersSnap.val() : {},
-      records: recordsSnap.exists() ? recordsSnap.val() : {},
-      settings: settingsSnap.exists() ? settingsSnap.val() : {}
-    };
+    // window._appData === appData (module scope) - 같은 객체에 값을 할당
+    if (window._appData) {
+      window._appData.members = membersSnap.exists() ? membersSnap.val() : {};
+      window._appData.records = recordsSnap.exists() ? recordsSnap.val() : {};
+      window._appData.settings = settingsSnap.exists() ? settingsSnap.val() : {};
+    }
     // 실시간 리스너 설정
     window._db.onValue(window._db.path('members'), snap => {
-      if (!window.appData) window.appData = {};
-      window.appData.members = snap.exists() ? snap.val() : {};
+      if (window._appData) window._appData.members = snap.exists() ? snap.val() : {};
       try { if (typeof renderAdminMemberList === 'function') renderAdminMemberList(); } catch(e) {}
       try { if (typeof refreshAdminSelects === 'function') refreshAdminSelects(); } catch(e) {}
     });
     window._db.onValue(window._db.path('records'), snap => {
-      if (!window.appData) window.appData = {};
-      window.appData.records = snap.exists() ? snap.val() : {};
+      if (window._appData) window._appData.records = snap.exists() ? snap.val() : {};
     });
     window._db.onValue(window._db.path('settings'), snap => {
-      if (!window.appData) window.appData = {};
-      window.appData.settings = snap.exists() ? snap.val() : {};
+      if (window._appData) window._appData.settings = snap.exists() ? snap.val() : {};
       try { if (typeof loadWeightInputs === 'function') loadWeightInputs(); } catch(e) {}
       try { if (typeof loadChallengeName === 'function') loadChallengeName(); } catch(e) {}
       try { if (typeof applyLang === 'function') applyLang(); } catch(e) {}
@@ -2524,7 +2523,7 @@ async function initAdminViews() {
     try { if (typeof loadWeightInputs === 'function') loadWeightInputs(); } catch(e) {}
     try { if (typeof loadChallengeName === 'function') loadChallengeName(); } catch(e) {}
     try { if (typeof applyLang === 'function') applyLang(); } catch(e) {}
-  }, 1200);
+  }, 1500);
 }
 
 function doAdminPageLogout() {
