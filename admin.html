@@ -2486,6 +2486,10 @@ function showAdminDashboard(sessionData) {
 }
 
 async function initAdminViews() {
+  // Firebase가 준비될 때까지 대기
+  if (!window._db) {
+    await new Promise(resolve => window.addEventListener('firebaseReady', resolve, { once: true }));
+  }
   // 모듈의 session 변수를 admin 세션으로 설정
   if (typeof window.setModuleSession === 'function' && window.session) {
     window.setModuleSession(window.session);
@@ -2503,32 +2507,37 @@ async function initAdminViews() {
       window._appData.records = recordsSnap.exists() ? recordsSnap.val() : {};
       window._appData.settings = settingsSnap.exists() ? settingsSnap.val() : {};
     }
-    // 실시간 리스너 설정
-    window._db.onValue(window._db.path('members'), snap => {
-      if (window._appData) window._appData.members = snap.exists() ? snap.val() : {};
-      try { if (typeof renderAdminMemberList === 'function') renderAdminMemberList(); } catch(e) {}
-      try { if (typeof refreshAdminSelects === 'function') refreshAdminSelects(); } catch(e) {}
-    });
-    window._db.onValue(window._db.path('records'), snap => {
-      if (window._appData) window._appData.records = snap.exists() ? snap.val() : {};
-    });
-    window._db.onValue(window._db.path('settings'), snap => {
-      if (window._appData) window._appData.settings = snap.exists() ? snap.val() : {};
-      try { if (typeof loadWeightInputs === 'function') loadWeightInputs(); } catch(e) {}
-      try { if (typeof loadChallengeName === 'function') loadChallengeName(); } catch(e) {}
-      try { if (typeof applyLang === 'function') applyLang(); } catch(e) {}
-    });
-  } catch(err) { console.error('initAdminViews 데이터 로드 오류:', err); }
-
-  setTimeout(() => {
-    try { if (typeof loadAll === 'function') loadAll(); } catch(e) {}
+    // 실시간 리스너 설정 (한 번만 등록)
+    if (!window._adminListenersRegistered) {
+      window._adminListenersRegistered = true;
+      window._db.onValue(window._db.path('members'), snap => {
+        if (window._appData) window._appData.members = snap.exists() ? snap.val() : {};
+        try { if (typeof renderAdminMemberList === 'function') renderAdminMemberList(); } catch(e) {}
+        try { if (typeof refreshAdminSelects === 'function') refreshAdminSelects(); } catch(e) {}
+      });
+      window._db.onValue(window._db.path('records'), snap => {
+        if (window._appData) window._appData.records = snap.exists() ? snap.val() : {};
+      });
+      window._db.onValue(window._db.path('settings'), snap => {
+        if (window._appData) window._appData.settings = snap.exists() ? snap.val() : {};
+        try { if (typeof loadWeightInputs === 'function') loadWeightInputs(); } catch(e) {}
+        try { if (typeof loadChallengeName === 'function') loadChallengeName(); } catch(e) {}
+        try { if (typeof applyLang === 'function') applyLang(); } catch(e) {}
+      });
+    }
+    // 즉시 렌더링
     try { if (typeof renderAdminMemberList === 'function') renderAdminMemberList(); } catch(e) {}
     try { if (typeof refreshAdminSelects === 'function') refreshAdminSelects(); } catch(e) {}
     try { if (typeof renderSubAdminList === 'function') renderSubAdminList(); } catch(e) {}
     try { if (typeof loadWeightInputs === 'function') loadWeightInputs(); } catch(e) {}
     try { if (typeof loadChallengeName === 'function') loadChallengeName(); } catch(e) {}
     try { if (typeof applyLang === 'function') applyLang(); } catch(e) {}
-  }, 1500);
+  } catch(err) { console.error('initAdminViews 데이터 로드 오류:', err); }
+
+  // 신청자 현황 탭 데이터 로드 (별도)
+  setTimeout(() => {
+    try { if (typeof loadAll === 'function') loadAll(); } catch(e) {}
+  }, 500);
 }
 
 function doAdminPageLogout() {
