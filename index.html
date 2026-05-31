@@ -1327,6 +1327,14 @@ window.doLogout = () => {
 
 // ─── App Start ────────────────────────────────
 function startApp() {
+  // Redirect admin users to admin.html
+  if (isAdmin()) {
+    localStorage.setItem('hc_adminPageAuth', JSON.stringify({
+      level: session.level, isSuper: session.isSuper, role: session.role, name: session.name || '관리자'
+    }));
+    window.location.href = 'admin.html';
+    return;
+  }
   document.getElementById('loginScreen').style.display = 'none';
   document.getElementById('mainApp').style.display = 'block';
   if (isAdmin()) {
