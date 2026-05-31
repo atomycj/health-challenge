@@ -579,12 +579,6 @@ tbody td{padding:11px 14px;color:#2c3e5a;vertical-align:top}
 </style>
 </head>
 <body>
-<!-- Required by boot() function from index.html JS -->
-<div id="splash" style="display:none;"><span id="splashMsg"></span></div>
-<div id="configScreen" style="display:none;"></div>
-<div id="loginWrap" style="display:none;"></div>
-<div id="app" style="display:none;"></div>
-
 
 <!-- ===== ADMIN LOGIN ===== -->
 <div id="adminLoginWrap">
@@ -2389,7 +2383,8 @@ window.toast=(msg,type='success')=>{
 // ─── Init ─────────────────────────────────────
 // force cache refresh
 document.getElementById('editModal').addEventListener('click', e=>{if(e.target===document.getElementById('editModal'))closeModal('editModal');});
-boot();
+// Admin page: call boot() only if not on admin.html
+if(!window.location.pathname.endsWith('admin.html')){boot();}
 </script>
 
 <script>
