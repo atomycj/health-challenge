@@ -688,7 +688,7 @@ header{padding:0;border-bottom:3px solid var(--accent);margin-bottom:0;backgroun
           <div class="form-group"><label class="form-label" id="labelNewPw">비밀번호 (4자 이상)</label><input type="password" class="form-input" id="newPw" placeholder="참여자 로그인 비밀번호" maxlength="20"></div>
           <div class="form-group"><label class="form-label" id="labelNewHba1c">초기 HbA1c 당화혈색소 (mmol/mol)</label><input type="number" class="form-input" id="newHba1c" placeholder="예: 53" step="1"><span class="form-hint">혈액검사 결과값 입력</span></div>
           <div class="form-group"><label class="form-label" id="labelNewFat">초기 체지방류 (%)</label><input type="number" class="form-input" id="newFat" placeholder="예: 28.0" step="0.1"></div>
-          <div class="form-group"><label class="form-label" id="labelNewMuscle">초기 근육량</label><div style="display:flex;gap:6px"><input type="number" class="form-input" id="newMuscle" placeholder="예: 26.0 또는 38%" step="0.1" style="flex:1"><span id="newMuscleUnit" style="display:flex;align-items:center;font-size:.8rem;color:var(--muted);white-space:nowrap;padding:0 6px">kg</span></div><span class="form-hint" id="newMuscleHint">단위: ⚙️ 설정 Settings에서 변경</span></div>
+          <div class="form-group"><label class="form-label" id="labelNewMuscle">초기 근육량</label><div style="display:flex;gap:6px"><input type="number" class="form-input" id="newMuscle" placeholder="예: 26.0 또는 38%" step="0.1" style="flex:1"><span id="newMuscleUnit" style="display:flex;align-items:center;font-size:.8rem;color:var(--muted);white-space:nowrap;padding:0 6px">kg</span></div><span class="form-hint" id="newMuscleHint">단위: ⚙️ 설정에서 변경</span></div>
           <div class="form-group"><label class="form-label" id="labelNewWeight">초기 체중 (kg)</label><input type="number" class="form-input" id="newWeight" placeholder="예: 78.0" step="0.1"></div>
           <div class="form-group"><label class="form-label" id="labelNewTarget">목표 체중 (kg)</label><input type="number" class="form-input" id="newTarget" placeholder="예: 68.0" step="0.1"></div>
           <div class="form-group"><label class="form-label" id="labelNewStart">쳌린지 시작일</label><input type="date" class="form-input" id="newStart"></div>
@@ -1001,6 +1001,8 @@ window.applyLang = function() {
   if(heightHint) heightHint.textContent = ko ? '권장체중 자동 산출에 사용' : 'Used for recommended weight calculation';
   const hba1cHint = document.querySelector('#newHba1c + .form-hint');
   if(hba1cHint) hba1cHint.textContent = ko ? '혈액검사 결과값 입력' : 'Enter blood test result value';
+  const muscleHint = document.getElementById('newMuscleHint');
+  if(muscleHint) muscleHint.textContent = ko ? '단위: ⚙️ 설정에서 변경' : 'Unit: Change in ⚙️ Settings';
   // 헤더 탑바
   const topbarEl = document.getElementById('headerTopBar');
   if(topbarEl) topbarEl.textContent = L.topbarText;
