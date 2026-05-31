@@ -2535,6 +2535,13 @@ async function initAdminViews() {
   } catch(err) { console.error('initAdminViews 데이터 로드 오류:', err); }
 
   // 신청자 현황 탭 데이터 로드 (별도)
+  
+  // 내부 탭 div 표시 (tab-admin-* 요소들이 기본적으로 display:none이므로)
+  ['tab-admin-members', 'tab-admin-records', 'tab-admin-settings'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = 'block';
+  });
+
   setTimeout(() => {
     try { if (typeof loadAll === 'function') loadAll(); } catch(e) {}
   }, 500);
