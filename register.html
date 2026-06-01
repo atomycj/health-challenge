@@ -84,6 +84,7 @@ body{background:var(--off);color:var(--body);font-family:'Noto Sans KR',sans-ser
 .bs:hover{border-color:var(--blue);color:var(--blue)}
 .brow{display:flex;gap:10px;justify-content:flex-end;margin-top:22px;flex-wrap:wrap}
 .btn.bsave{background:#fff;color:#0070c0;border:1.5px solid #0070c0;padding:9px 20px;border-radius:8px;font-size:.9rem;font-weight:600;cursor:pointer;}
+.bsave-home{background:#fff3cd;color:#856404;border:1.5px solid #ffc107;padding:9px 20px;border-radius:8px;font-size:.9rem;font-weight:600;cursor:pointer;}
 .done-card{background:var(--white);border:2px solid var(--border);border-radius:16px;padding:32px;text-align:center;box-shadow:0 6px 24px rgba(0,112,192,.12)}
 .done-icon{font-size:3.2rem;margin-bottom:14px}
 .done-title{font-size:1.25rem;font-weight:800;color:var(--ink);margin-bottom:7px}
@@ -196,6 +197,7 @@ body{background:var(--off);color:var(--body);font-family:'Noto Sans KR',sans-ser
     <div class="brow">
       <a href="index.html" class="btn bs" id="bBack1">← 돌아가기</a>
       <button class="btn bsave" id="bSave1" type="button" onclick="saveDraft(1)">💾 임시저장</button>
+      <button class="btn bsave-home" id="bSaveHome1" type="button" onclick="saveDraftAndGoHome(1)">💾 임시저장 후 메인으로</button>
       <button class="btn bp" id="bNext1" type="button">다음 →</button>
     </div>
   </div>
@@ -232,6 +234,7 @@ body{background:var(--off);color:var(--body);font-family:'Noto Sans KR',sans-ser
     <div class="brow">
       <button class="btn bs" id="bBack2" type="button" onclick="goStep(1)">← 이전</button>
       <button class="btn bsave" id="bSave2" type="button" onclick="saveDraft(2)">💾 임시저장</button>
+      <button class="btn bsave-home" id="bSaveHome2" type="button" onclick="saveDraftAndGoHome(2)">💾 임시저장 후 메인으로</button>
       <button class="btn bp" id="bNext2" type="button">다음 →</button>
     </div>
   </div>
@@ -303,6 +306,7 @@ body{background:var(--off);color:var(--body);font-family:'Noto Sans KR',sans-ser
     <div class="brow">
       <button class="btn bs" id="bBack3" type="button" onclick="goStep(2)">← 이전</button>
       <button class="btn bsave" id="bSave3" type="button" onclick="saveDraft(3)">💾 임시저장</button>
+      <button class="btn bsave-home" id="bSaveHome3" type="button" onclick="saveDraftAndGoHome(3)">💾 임시저장 후 메인으로</button>
       <button class="btn bp" id="bSub" type="button">신청 제출 →</button>
     </div>
   </div>
@@ -393,7 +397,7 @@ var TX = {
     loginSub:'이전에 저장한 내용으로 이어서 진행합니다.',
     loginBtn:'로그인하여 이어서 진행', startNew:'새로 신청하기',
     errLogin:'전화번호 또는 비밀번호가 올바르지 않습니다.',
-    bSave:'💾 임시저장', savedDraft:'임시 저장되었습니다.'
+    bSave:'💾 임시저장', bSaveHome:'💾 임시저장 후 메인으로', savedDraft:'임시 저장되었습니다.'
   },
   en: {
     hTopbar:'Atomy Auckland Absolute Education Centre — Health Challenge Registration',
@@ -437,7 +441,7 @@ var TX = {
     loginSub:'Continue where you left off.',
     loginBtn:'Login to continue', startNew:'Start a new application',
     errLogin:'Phone number or password is incorrect.',
-    bSave:'💾 Save Draft', savedDraft:'Progress saved.'
+    bSave:'💾 Save Draft', bSaveHome:'💾 Save & Go Home', savedDraft:'Progress saved.'
   }
 };
 
@@ -470,7 +474,7 @@ function applyLang() {
     var el = document.getElementById(id);
     if(el) el.textContent = tx(id);
   });
-  ['bSave1','bSave2','bSave3'].forEach(function(id){ var el=document.getElementById(id); if(el) el.textContent=tx('bSave'); });    document.getElementById('lbKo').classList.toggle('on', lang==='ko');
+  ['bSave1','bSave2','bSave3'].forEach(function(id){ var el=document.getElementById(id); if(el) el.textContent=tx('bSave'); });  ['bSaveHome1','bSaveHome2','bSaveHome3'].forEach(function(id){ var el=document.getElementById(id); if(el) el.textContent=tx('bSaveHome'); });    document.getElementById('lbKo').classList.toggle('on', lang==='ko');
   document.getElementById('lbEn').classList.toggle('on', lang==='en');
   applyLangToLogin();
 }
@@ -711,6 +715,41 @@ function dbSet(path, data) {
     headers: {'Content-Type':'application/json'},
     body: JSON.stringify(data)
   }).then(function(r){ return r.json(); });
+}
+
+function saveDraftAndGoHome(step) {
+  var phone = document.getElementById('iPhone').value.trim().replace(/-/g,'');
+  if(!phone) { alert(lang==='ko'?'전화번호를 입력해주세요.':'Please enter your phone number.'); return; }
+  var pw = document.getElementById('iPw').value;
+  if(!pw) { alert(lang==='ko'?'비밀번호를 입력해주세요.':'Please enter your password.'); return; }
+  var btn = document.getElementById('bSaveHome' + step);
+  if(btn) btn.disabled = true;
+  var name = document.getElementById('iName').value.trim();
+  var draftData = { name: name, pw: pw, step: step };
+  if(step >= 2) {
+    draftData.prod1 = document.getElementById('iP1').checked;
+    draftData.prod2 = document.getElementById('iP2').checked;
+  }
+  if(step >= 3) {
+    var hba = document.getElementById('iHba').value;
+    var wt  = document.getElementById('iWt').value;
+    var fat = document.getElementById('iFat').value;
+    var mus = document.getElementById('iMus').value;
+    var tgt = document.getElementById('iTgt').value;
+    var bg  = document.getElementById('iBg').value;
+    if(hba!=='') draftData.hba1c = parseFloat(hba);
+    if(wt!=='')  draftData.weight = parseFloat(wt);
+    if(fat!=='') draftData.fat = parseFloat(fat);
+    if(mus!=='') draftData.muscle = parseFloat(mus);
+    if(tgt!=='') draftData.targetWeight = parseFloat(tgt);
+    if(bg!=='')  draftData.blood = parseFloat(bg);
+  }
+  dbSet('draft/' + phone, draftData).then(function() {
+    location.href = 'index.html';
+  }).catch(function(e) {
+    if(btn) btn.disabled = false;
+    alert((lang==='ko'?'저장 실패: ':'Save failed: ') + e.message);
+  });
 }
 
 function saveDraft(step) {
