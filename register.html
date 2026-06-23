@@ -660,8 +660,8 @@ document.getElementById('bSub').addEventListener('click', function() {
 
   function toB64(f){ return new Promise(function(res,rej){ var r=new FileReader(); r.onload=function(){res(r.result);}; r.onerror=rej; r.readAsDataURL(f); }); }
 
-  var recPromises = files.receipt.slice(0,3).map(function(f){ return toB64(f).then(function(b){ return {name:f.name,type:f.type,data:b.substring(0,50000)}; }); });
-  var labPromises = files.lab.slice(0,2).map(function(f){ return toB64(f).then(function(b){ return {name:f.name,type:f.type,data:b.substring(0,50000)}; }); });
+  var recPromises = files.receipt.slice(0,3).map(function(f){ return toB64(f).then(function(b){ return {name:f.name,type:f.type,data:b}; }); });
+  var labPromises = files.lab.slice(0,2).map(function(f){ return toB64(f).then(function(b){ return {name:f.name,type:f.type,data:b}; }); });
 
   Promise.all([Promise.all(recPromises), Promise.all(labPromises)])
     .then(function(results){
