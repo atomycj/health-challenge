@@ -2080,7 +2080,7 @@ window.deleteMember=async(id)=>{
 };
 // ─── Applications Management ──────────────────
 window.loadApplications = async () => {
-  const container = document.getElementById('applicationsList');
+  const container = document.getElementById('tableWrap');
   if(!container) return;
   const snap = await dbGet('applications');
   if(!snap || Object.keys(snap).length === 0) {
