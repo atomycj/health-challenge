@@ -2406,7 +2406,7 @@ window.dbRemove = async function(p) { await window._db.remove(window._db.path(p)
 const ADMIN_PAGE_SESSION_KEY = 'hc_adminPageAuth';
 
 // Auto-login if session exists
-(function initAdminPage() {
+function initAdminPage() {
   const stored = localStorage.getItem(ADMIN_PAGE_SESSION_KEY);
   if (stored) {
     try {
@@ -2417,7 +2417,7 @@ const ADMIN_PAGE_SESSION_KEY = 'hc_adminPageAuth';
       }
     } catch(e) {}
   }
-})();
+}
 
 async function doAdminPageLogin() {
   const pw = document.getElementById('adminPagePw').value;
