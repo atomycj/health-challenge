@@ -2392,7 +2392,7 @@ if(!window.location.pathname.endsWith('admin.html')){boot();}
 <script>
 // Bridge: expose module-scope functions for admin integration
 window.dbGet = async function(p) {
-  const s = await window._db.get(window._db.path(p));
+  if(!window._db){const r=await fetch('https://health-challenge-990fd-default-rtdb.firebaseio.com/'+p+'.json');return r.json();}  const s = await window._db.get(window._db.path(p));
   return s.exists() ? s.val() : null;
 };
 window.dbSet = async function(p, v) { await window._db.set(window._db.path(p), v); };
