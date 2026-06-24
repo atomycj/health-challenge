@@ -2857,7 +2857,7 @@ function showDetail(idx) {
   });
   document.querySelectorAll('#modalBody .img-thumb').forEach(function(img) {
     img.addEventListener('click', function() {
-      previewImg(img.getAttribute('data-preview'));
+                previewImg(img.src);
     });
   });
 
@@ -2871,11 +2871,11 @@ function closeImgPreview() { document.getElementById('imgPreview').classList.rem
 
 // ─── 자동 초기화 ────────────────────────────────────
 // Firebase 준비 완료 후 admin page 초기화
-if (window._db) {
-  initAdminPage();
-} else {
-  window.addEventListener('firebaseReady', initAdminPage, { once: true });
-}
+    if (window._db) {
+          initAdminPage();
+    } else {
+          initAdminPage(); // REST API fallback
+    }
 </script>
 
 </body>
