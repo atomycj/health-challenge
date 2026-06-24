@@ -2676,7 +2676,7 @@ function loadAll() {
     allApps = results[1] || {};
     updateStats();
     renderTables();
-    document.getElementById('hSubtitle').textContent = '마지막 업데이트: ' + new Date().toLocaleString('ko-KR');
+    (document.getElementById('hSubtitle')||{}).textContent = '마지막 업데이트: ' + new Date().toLocaleString('ko-KR');
   }).catch(function(e) {
     document.getElementById('tableWrap').innerHTML = '<div class="empty">❌ 데이터를 불러오지 못했습니다.</div>';
   });
