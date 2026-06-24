@@ -7,7 +7,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=Bebas+Neue&display=swap" rel="stylesheet">
     <!--- ★★★ Firebase SDK ★★★ -->
 <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { initializeApp } from "https://ww.gstatic.com/firebasejs/10.12.2/firebase-app.js";
   import { getDatabase, ref, set, get, update, remove, onValue, push }
     from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
@@ -2464,7 +2464,7 @@ function showAdminDashboard(sessionData) {
   };
   
   document.getElementById('adminLoginWrap').style.display = 'none';
-  document.getElementById('adminPageWrap').style.display = 'block';
+  document.getElementById('adminPageWrap').style.display = 'block';  document.getElementById('adminWrap').style.display = 'block';
   
   const badge = (window.session.isSuper ? '👑 최고 관리자' : 
     (window.session.level === 'readonly' ? '👁 조회전용' : '🔑 부관리자') + ' ' + (sessionData.name || ''));
