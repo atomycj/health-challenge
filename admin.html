@@ -2804,6 +2804,7 @@ function deleteRow(src, key) {
 
 /* ---- Detail ---- */
 function showDetail(idx) {
+  window._fileCache = [];
   var row = window._rows[idx];
   if (!row) return;
   var d = row.raw;
@@ -2837,7 +2838,7 @@ function showDetail(idx) {
     if (d.receiptFiles) {
       var rfs = Array.isArray(d.receiptFiles) ? d.receiptFiles : Object.values(d.receiptFiles);
       html += '<dt>영수증</dt><dd>';
-      rfs.forEach(function(f){ var fd=(f&&f.data)?f.data:String(f); var fn=(f&&f.name)?f.name:'영수증'; var ft=(f&&f.type)?f.type:''; if(ft.indexOf('pdf')>=0||fn.toLowerCase().endsWith('.pdf')){ html+='<a class="file-link" href="#" onclick="openFileData(event,this.getAttribute('data-fd'),this.getAttribute('data-ft'))" data-fd=''+fd.replace(/'/g,"&#39;")+'' data-ft="'+ft+'">&#128196; '+escHtml(fn)+'</a>'; }else{ html+='<img class="img-thumb" src="'+fd+'" title="'+escHtml(fn)+'" data-preview="'+fd+'">'; } });
+      rfs.forEach(function(f){ var fd=(f&&f.data)?f.data:String(f); var fn=(f&&f.name)?f.name:'영수증'; var ft=(f&&f.type)?f.type:''; if(ft.indexOf('pdf')>=0||fn.toLowerCase().endsWith('.pdf')){ window._fileCache = window._fileCache || []; var _fIdx = window._fileCache.push({data:fd,type:ft})-1; html+='<a class="file-link" href="#" onclick="openFileData(event,'+_fIdx+')">\u{1F4C4} '+escHtml(fn)+'</a>'; }else{ html+='<img class="img-thumb" src="'+fd+'" title="'+escHtml(fn)+'" data-preview="'+fd+'">'; } });
       html += '</dd>';
     }
     if (d.labFiles) {
@@ -2864,11 +2865,13 @@ function showDetail(idx) {
   document.getElementById('detailModal').classList.add('show');
 }
 
-function openFileData(e, dataUrl, mimeType) {
+function openFileData(e, idx) {
   e.preventDefault();
+  var f = window._fileCache && window._fileCache[idx];
+  if (!f) return;
   try {
-    var arr = dataUrl.split(',');
-    var mime = mimeType || (arr[0].match(/:(.*?);/) || [])[1] || 'application/octet-stream';
+    var arr = f.data.split(',');
+    var mime = f.type || (arr[0].match(/:(.*?);/) || [])[1] || 'application/octet-stream';
     var bstr = atob(arr[1]);
     var n = bstr.length;
     var u8arr = new Uint8Array(n);
@@ -2878,7 +2881,7 @@ function openFileData(e, dataUrl, mimeType) {
     var win = window.open(url, '_blank');
     if (win) { setTimeout(function() { URL.revokeObjectURL(url); }, 30000); }
   } catch (err) {
-    window.open(dataUrl, '_blank');
+    window.open(f.data, '_blank');
   }
 }
 function closeModal() { document.getElementById('detailModal').classList.remove('show'); }
