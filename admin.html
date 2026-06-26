@@ -2579,6 +2579,7 @@ function switchAdminTab(tabId, btn) {
   } else if (tabId === 'utab-applications') {
     try { if (typeof loadAll === 'function') loadAll(); } catch(e) {}
   } else if (tabId === 'utab-settings') {
+    document.querySelectorAll('#utab-settings .panel').forEach(p => p.classList.add('active'));
     try { if (typeof renderSubAdminList === 'function') renderSubAdminList(); } catch(e) {}
     try { if (typeof loadWeightInputs === 'function') loadWeightInputs(); } catch(e) {}
     try { if (typeof loadChallengeName === 'function') loadChallengeName(); } catch(e) {}
