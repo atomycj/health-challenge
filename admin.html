@@ -2161,6 +2161,7 @@ window.approveApplication = async (appKey) => {
   toast(`${a.name} 님이 승인되었습니다! ✅`);
   loadApplications();
   renderAdminMemberList();
+  closeModal();
 };
 
 window.rejectApplication = async (appKey) => {
@@ -2169,6 +2170,7 @@ window.rejectApplication = async (appKey) => {
   await dbUpdate(`applications/${appKey}`, { status: 'rejected', rejectedAt: new Date().toISOString() });
   toast(`신청이 거절되었습니다.`);
   loadApplications();
+  closeModal();
 };
 
 window.editMemberQuick=async(id)=>{
