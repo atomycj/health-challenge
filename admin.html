@@ -496,6 +496,8 @@ tbody td{padding:11px 14px;color:#2c3e5a;vertical-align:top}
 .img-preview-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;align-items:center;justify-content:center}
 .img-preview-bg.show{display:flex}
 .img-preview-bg img{max-width:92vw;max-height:88vh;border-radius:8px}
+.img-preview-close{position:fixed;top:16px;right:20px;z-index:201;background:rgba(0,0,0,.6);color:#fff;border:none;border-radius:50%;width:40px;height:40px;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.img-preview-close:hover{background:rgba(0,0,0,.9);}
 .status-select{padding:4px 8px;border:1.5px solid #c8dff5;border-radius:6px;font-size:.82rem;cursor:pointer}
 .search-bar{padding:8px 14px;border:1.5px solid #c8dff5;border-radius:8px;font-size:.88rem;width:220px;outline:none}
 .search-bar:focus{border-color:#0070c0}
@@ -830,8 +832,9 @@ tbody td{padding:11px 14px;color:#2c3e5a;vertical-align:top}
   </div>
 </div>
 
-<div class="img-preview-bg" id="imgPreview">
-  <img id="imgPreviewEl" src="" alt="미리보기">
+<div class="img-preview-bg" id="imgPreview" onclick="closeImgPreview()">
+  <button class="close-btn img-preview-close" onclick="closeImgPreview(); event.stopPropagation()">✕</button>
+  <img id="imgPreviewEl" src="" alt="미리보기" onclick="event.stopPropagation()">
 </div>
 
 
