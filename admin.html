@@ -14,7 +14,7 @@
   // ════════════════════════════════════════
   // ★ 여기에 본인의 Firebase 설정을 붙여넣으세요 
   // ════════════════════════════════════════
-  const firebaseConfig = {
+  const firebaseConfig = 
     apiKey:            "AIzaSyAwJyMMhtCJmDe0QGWHJMeAN-IrgO9UULo",
     authDomain:        "health-challenge-990fd.firebaseapp.com",
     databaseURL:       "https://health-challenge-990fd-default-rtdb.firebaseio.com",
@@ -2890,7 +2890,37 @@ function openFileData(e, idx) {
     window.open(f.data, '_blank');
   }
 }
-function closeModal() { document.getElementById('detailModal').classList.remove('show'); }
+function updateStatus(key, status) {
+  var appsRef = window.dbGet ? window.dbGet('applications/' + key) : Promise.resolve(null);
+  appsRef.then(function(snap) {
+    var a = snap;
+    if (status === 'approved') {
+      window.approveApplication(key);
+    } else if (status === 'rejected') {
+      var name = (a && a.name) ? a.name : key;
+      if (!confirm(name + ' 님의 신청을 거절할까요?')) {
+        var prev = (a && a.status) || 'pending';
+        document.querySelectorAll('.status-select[data-key="' + key + '"]').forEach(function(s) { s.value = prev; });
+        return;
+      }
+      window.dbUpdate('applications/' + key, { status: 'rejected', rejectedAt: new Date().toISOString() })
+        .then(function() {
+          toast('신청이 거절되었습니다.');
+          window.loadApplications && window.loadApplications();
+          closeModal('detailModal');
+        }).catch(function(e) { toast('거절 실패: ' + e.message, 'error'); });
+    } else {
+      window.dbUpdate('applications/' + key, { status: 'pending' })
+        .then(function() {
+          toast('상태가 변경되었습니다.');
+          window.loadApplications && window.loadApplications();
+        }).catch(function(e) { toast('변경 실패: ' + e.message, 'error'); });
+    }
+  }).catch(function() {
+    if (status === 'approved') window.approveApplication(key);
+  });
+}
+function closeModal(id) { var el = document.getElementById(id || 'detailModal'); if(el) el.classList.remove('show'); }
 function previewImg(src) { document.getElementById('imgPreviewEl').src = src; document.getElementById('imgPreview').classList.add('show'); }
 function closeImgPreview() { document.getElementById('imgPreview').classList.remove('show'); }
 
