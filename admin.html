@@ -2403,6 +2403,50 @@ window.toast=(msg,type='success')=>{
 // force cache refresh
 document.getElementById('editModal').addEventListener('click', e=>{if(e.target===document.getElementById('editModal'))closeModal('editModal');});
 // Admin page: call boot() only if not on admin.html
+
+// ─── Admin Ranking Tab (inside module for getMemberScores access) ──
+window.renderAdminRankingTab = function() {
+  const container = document.getElementById("adminRankingList");
+  const updated = document.getElementById("rankingLastUpdated");
+  if (!container) return;
+  const members = Object.values(appData.members || {});
+  const records = Object.values(appData.records || {});
+  if (!members.length) {
+    container.innerHTML = "<div style=\"text-align:center;padding:40px;color:#8099b4\">등록된 참여자가 없습니다.</div>";
+    return;
+  }
+  const ranked = members.map(m => ({ member: m, scores: getMemberScores(m) })).filter(x => x.scores).sort((a, b) => (b.scores.composite || 0) - (a.scores.composite || 0));
+  const noRecord = members.filter(m => !getLatestRecord(m.id));
+  if (updated) { const t = new Date().toLocaleTimeString("ko-KR", { hour: "2-digit", minute: "2-digit" }); updated.textContent = "업데이트: " + t; }
+  if (!ranked.length) { container.innerHTML = "<div style=\"text-align:center;padding:40px;color:#8099b4\">📝 아직 기록된 데이터가 없습니다.</div>"; return; }
+  const cards = ranked.map(({ member: m, scores: s }, i) => {
+    const rank = i + 1;
+    const medal = rank===1?"🥇":rank===2?"🥈":rank===3?"🥉":rank;
+    const cnt = records.filter(r => r.memberId === m.id).length;
+    const rc = rank===1?"#d4a017":rank===2?"#607080":rank===3?"#8a5a30":"#0070c0";
+    const bg = rank===1?"#fffbea":rank===2?"#f4f6f8":rank===3?"#fdf5ee":"#f8fbff";
+    const bc = rank<=3?rc:"#c8dff5";
+    return `<div style="display:flex;align-items:center;gap:16px;background:${bg};border:1.5px solid ${bc};border-radius:14px;padding:16px 20px;margin-bottom:10px;cursor:pointer;transition:box-shadow .15s" onclick="adminViewMember('${m.id}')" onmouseover="this.style.boxShadow='0 4px 16px rgba(0,112,192,.13)'" onmouseout="this.style.boxShadow=''">
+      <div style="font-size:${rank<=3?'1.8rem':'1.1rem'};font-weight:700;min-width:36px;text-align:center;color:${rc}">${medal}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-weight:700;font-size:1rem;color:#0d1a2e;margin-bottom:5px">${m.name}</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <span style="font-size:.75rem;background:rgba(192,57,43,.08);color:#c0392b;padding:2px 8px;border-radius:12px">혈당 ${fmtScore(s.bs)}점</span>
+          <span style="font-size:.75rem;background:rgba(139,92,246,.08);color:#7c3aed;padding:2px 8px;border-radius:12px">인바디 ${fmtScore(s.body)}점</span>
+          <span style="font-size:.75rem;background:rgba(26,138,74,.08);color:#1a8a4a;padding:2px 8px;border-radius:12px">체중 ${fmtScore(s.ws)}점</span>
+          <span style="font-size:.75rem;background:rgba(0,112,192,.08);color:#0070c0;padding:2px 8px;border-radius:12px">📅 ${cnt}회 기록</span>
+          <span style="font-size:.73rem;color:#8099b4">최근: ${s.latest?.date||"없음"}</span>
+        </div>
+      </div>
+      <div style="text-align:right;min-width:70px">
+        <div style="font-size:1.6rem;font-weight:900;color:${rc}">${fmtScore(s.composite)}</div>
+        <div style="font-size:.7rem;color:#8099b4">종합점수</div>
+      </div>
+    </div>`;
+  }).join("");
+  let extra = noRecord.length ? `<div style="margin-top:12px;padding:10px 16px;border:1px dashed #c8dff5;border-radius:8px;font-size:.8rem;color:#8099b4">⚠️ 미기록 참여자: ${noRecord.map(m=>m.name).join(", ")}</div>` : "";
+  container.innerHTML = `<div style="font-size:.8rem;color:#8099b4;margin-bottom:12px">총 ${ranked.length}명 순위 집계 (카드 클릭 시 상세 기록 확인)</div>` + cards + extra;
+};
 if(!window.location.pathname.endsWith('admin.html')){boot();}
 </script>
 
@@ -2602,61 +2646,6 @@ function switchAdminTab(tabId, btn) {
   }
 }
 
-// ─── Admin Ranking Tab ───────────────────────
-window.renderAdminRankingTab = function() {
-  const container = document.getElementById("adminRankingList");
-  const updated = document.getElementById("rankingLastUpdated");
-  if (!container) return;
-  const members = Object.values(appData.members || {});
-  const records = Object.values(appData.records || {});
-  if (!members.length) {
-    container.innerHTML = "<div style=\"text-align:center;padding:40px;color:#8099b4\">등록된 참여자가 없습니다.</div>";
-    return;
-  }
-  const ranked = members
-    .map(m => ({ member: m, scores: getMemberScores(m) }))
-    .filter(x => x.scores)
-    .sort((a, b) => (b.scores.composite || 0) - (a.scores.composite || 0));
-  const noRecord = members.filter(m => !getLatestRecord(m.id));
-  if (updated) {
-    const t = new Date().toLocaleTimeString("ko-KR", { hour: "2-digit", minute: "2-digit" });
-    updated.textContent = "업데이트: " + t;
-  }
-  if (!ranked.length) {
-    container.innerHTML = "<div style=\"text-align:center;padding:40px;color:#8099b4\">📝 아직 기록된 데이터가 없습니다.</div>";
-    return;
-  }
-  const cards = ranked.map(({ member: m, scores: s }, i) => {
-    const rank = i + 1;
-    const medal = rank === 1 ? "🥇" : rank === 2 ? "🥈" : rank === 3 ? "🥉" : rank;
-    const cnt = records.filter(r => r.memberId === m.id).length;
-    const rankColor = rank === 1 ? "#d4a017" : rank === 2 ? "#607080" : rank === 3 ? "#8a5a30" : "#0070c0";
-    const bgColor = rank === 1 ? "#fffbea" : rank === 2 ? "#f4f6f8" : rank === 3 ? "#fdf5ee" : "#f8fbff";
-    const borderColor = rank <= 3 ? rankColor : "#c8dff5";
-    return `<div style="display:flex;align-items:center;gap:16px;background:${bgColor};border:1.5px solid ${borderColor};border-radius:14px;padding:16px 20px;margin-bottom:10px;cursor:pointer;transition:box-shadow .15s" onclick="adminViewMember('${m.id}')" onmouseover="this.style.boxShadow='0 4px 16px rgba(0,112,192,.13)'" onmouseout="this.style.boxShadow=''">
-      <div style="font-size:${rank<=3?'1.8rem':'1.1rem'};font-weight:700;min-width:36px;text-align:center;color:${rankColor}">${medal}</div>
-      <div style="flex:1;min-width:0">
-        <div style="font-weight:700;font-size:1rem;color:#0d1a2e;margin-bottom:5px">${m.name}</div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap">
-          <span style="font-size:.75rem;background:rgba(192,57,43,.08);color:#c0392b;padding:2px 8px;border-radius:12px">혈당 ${fmtScore(s.bs)}점</span>
-          <span style="font-size:.75rem;background:rgba(139,92,246,.08);color:#7c3aed;padding:2px 8px;border-radius:12px">인바디 ${fmtScore(s.body)}점</span>
-          <span style="font-size:.75rem;background:rgba(26,138,74,.08);color:#1a8a4a;padding:2px 8px;border-radius:12px">체중 ${fmtScore(s.ws)}점</span>
-          <span style="font-size:.75rem;background:rgba(0,112,192,.08);color:#0070c0;padding:2px 8px;border-radius:12px">📅 ${cnt}회 기록</span>
-          <span style="font-size:.73rem;color:#8099b4">최근: ${s.latest?.date||"없음"}</span>
-        </div>
-      </div>
-      <div style="text-align:right;min-width:70px">
-        <div style="font-size:1.6rem;font-weight:900;color:${rankColor}">${fmtScore(s.composite)}</div>
-        <div style="font-size:.7rem;color:#8099b4">종합점수</div>
-      </div>
-    </div>`;
-  }).join("");
-  let extra = "";
-  if (noRecord.length) {
-    extra = `<div style="margin-top:12px;padding:10px 16px;border:1px dashed #c8dff5;border-radius:8px;font-size:.8rem;color:#8099b4">⚠️ 미기록 참여자: ${noRecord.map(m=>m.name).join(", ")}</div>`;
-  }
-  container.innerHTML = `<div style="font-size:.8rem;color:#8099b4;margin-bottom:12px">총 ${ranked.length}명 순위 집계 (카드 클릭 시 상세 기록 확인)</div>` + cards + extra;
-};
 
 // Override showTab from index.html's JS (used by adminViewMember etc.)
 window.showTab = function(tab) {
