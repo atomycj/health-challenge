@@ -1461,17 +1461,50 @@ window.renderLeaderboard = function() {
     return;
   }
   const noRecord = members.filter(m=>!getLatestRecord(m.id));
+  const totalParticipants = ranked.length;
+
+  // 참여자(member) 로그인 시: 본인 기록만 표시, 총 참여자 수와 본인 등수 공개
+  if (isMember()) {
+    const myRankIdx = ranked.findIndex(({member:m}) => m.id === myId());
+    const myRank = myRankIdx + 1;
+    const myData = myRankIdx >= 0 ? ranked[myRankIdx] : null;
+    const medal = myRank===1?'🥇':myRank===2?'🥈':myRank===3?'🥉':myRank;
+    let html = `<div style="background:var(--blue-l);border:1px solid var(--border);border-radius:12px;padding:14px 18px;margin-bottom:14px;display:flex;align-items:center;gap:12px;font-size:.9rem;">
+      <span style="font-size:1.2rem">👥</span>
+      <span><strong style="color:var(--accent)">${totalParticipants}</strong>명 참여 중 &nbsp;|&nbsp; 내 순위: <strong style="color:var(--accent);font-size:1.1rem">${myRank > 0 ? medal + ' ' + myRank + '위' : '-'}</strong></span>
+    </div>`;
+    if (myData) {
+      const {member:m, scores:s} = myData;
+      const cnt = Object.values(appData.records).filter(r=>r.memberId===m.id).length;
+      html += `<div class="rank-card rank-mine clickable" onclick="showTabGlobal('myrecords');loadMyRecords()">
+        <div class="rank-num">${medal}</div>
+        <div class="rank-info">
+          <div class="rank-name">${m.name}<span class="mine-tag">나</span></div>
+          <div class="rank-bars">
+            <div class="mini-bar"><span style="color:var(--danger);font-size:.65rem">혈</span><div class="mini-bar-fill"><div class="bar-blood" style="width:${s.bs||0}%"></div></div><span>${fmtScore(s.bs)}</span></div>
+            <div class="mini-bar"><span style="color:#a78bfa;font-size:.65rem">인</span><div class="mini-bar-fill"><div class="bar-body" style="width:${s.body||0}%"></div></div><span>${fmtScore(s.body)}</span></div>
+            <div class="mini-bar"><span style="color:var(--accent3);font-size:.65rem">체</span><div class="mini-bar-fill"><div class="bar-weight" style="width:${s.ws||0}%"></div></div><span>${fmtScore(s.ws)}</span></div>
+          </div>
+        </div>
+        <div class="rank-days"><span>${cnt}</span>회 기록 records<br><span style="font-size:.65rem;color:var(--muted)">${s.latest?.date||''}</span></div>
+        <div class="rank-score"><div class="score-val">${fmtScore(s.composite)}</div><div class="score-label">점</div></div>
+      </div>`;
+    } else {
+      html += `<div class="empty"><div class="empty-icon">📝</div><div class="empty-text">${L.noRecords}</div></div>`;
+    }
+    container.innerHTML = html;
+    return;
+  }
+
+  // 관리자(admin): 전체 목록 표시
   container.innerHTML = ranked.map(({member:m,scores:s},i)=>{
-    const rank=i+1, isMe=isMember()&&m.id===myId();
+    const rank=i+1;
     const medal=rank===1?'🥇':rank===2?'🥈':rank===3?'🥉':rank;
     const cnt = Object.values(appData.records).filter(r=>r.memberId===m.id).length;
-    const clickable = isAdmin()||isMe;
-    const oc = isAdmin()?`onclick="adminViewMember('${m.id}')"`
-                        :isMe?`onclick="showTabGlobal('myrecords');loadMyRecords()"` :'';
-    return `<div class="rank-card ${rank<=3?'rank-'+rank:''} ${isMe?'rank-mine':''} ${clickable?'clickable':''}" ${oc}>
+    return `<div class="rank-card ${rank<=3?'rank-'+rank:''} clickable" onclick="adminViewMember('${m.id}')">
       <div class="rank-num">${medal}</div>
       <div class="rank-info">
-        <div class="rank-name">${m.name}${isMe?'<span class="mine-tag">나</span>':''}</div>
+        <div class="rank-name">${m.name}</div>
         <div class="rank-bars">
           <div class="mini-bar"><span style="color:var(--danger);font-size:.65rem">혈</span><div class="mini-bar-fill"><div class="bar-blood" style="width:${s.bs||0}%"></div></div><span>${fmtScore(s.bs)}</span></div>
           <div class="mini-bar"><span style="color:#a78bfa;font-size:.65rem">인</span><div class="mini-bar-fill"><div class="bar-body" style="width:${s.body||0}%"></div></div><span>${fmtScore(s.body)}</span></div>
