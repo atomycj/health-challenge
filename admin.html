@@ -619,6 +619,7 @@ tbody td{padding:11px 14px;color:#2c3e5a;vertical-align:top}
     <button class="utab-btn active" data-utab="utab-applications" onclick="switchAdminTab('utab-applications',this)">📋 신청자 현황</button>
     <button class="utab-btn" data-utab="utab-members" onclick="switchAdminTab('utab-members',this)">👥 참여자 관리</button>
     <button class="utab-btn" data-utab="utab-records" onclick="switchAdminTab('utab-records',this)">📝 기록 관리</button>
+    <button class="utab-btn" data-utab="utab-ranking" onclick="switchAdminTab('utab-ranking',this)">🏆 현재 순위</button>
     <button class="utab-btn" data-utab="utab-settings" onclick="switchAdminTab('utab-settings',this)">⚙️ 설정</button>
   </div>
 
@@ -713,6 +714,19 @@ tbody td{padding:11px 14px;color:#2c3e5a;vertical-align:top}
     </div>
 
     <!-- ADMIN: MEMBERS -->
+  </div>
+
+  <!-- TAB: Ranking (현재 순위) -->
+  <div class="admin-panel" id="utab-ranking">
+    <div style="padding:8px 0 20px 0">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px;flex-wrap:wrap">
+        <span style="font-size:1.2rem">🏆</span>
+        <span style="font-size:1.1rem;font-weight:700;color:#0070c0">현재 순위 Current Rankings</span>
+        <span id="rankingLastUpdated" style="margin-left:auto;font-size:.75rem;color:#8099b4"></span>
+        <button onclick="renderAdminRankingTab()" style="padding:6px 14px;background:#0070c0;color:#fff;border:none;border-radius:8px;font-size:.8rem;font-weight:700;cursor:pointer">🔄 새로고침</button>
+      </div>
+      <div id="adminRankingList"></div>
+    </div>
   </div>
 
   <!-- TAB: Settings -->
@@ -2578,6 +2592,8 @@ function switchAdminTab(tabId, btn) {
     try { if (typeof refreshAdminSelects === 'function') refreshAdminSelects(); } catch(e) {}
   } else if (tabId === 'utab-applications') {
     try { if (typeof loadAll === 'function') loadAll(); } catch(e) {}
+  } else if (tabId === 'utab-ranking') {
+    try { if (typeof renderAdminRankingTab === 'function') renderAdminRankingTab(); } catch(e) {}
   } else if (tabId === 'utab-settings') {
     document.querySelectorAll('#utab-settings .panel').forEach(p => p.classList.add('active'));
     try { if (typeof renderSubAdminList === 'function') renderSubAdminList(); } catch(e) {}
@@ -2585,6 +2601,62 @@ function switchAdminTab(tabId, btn) {
     try { if (typeof loadChallengeName === 'function') loadChallengeName(); } catch(e) {}
   }
 }
+
+// ─── Admin Ranking Tab ───────────────────────
+window.renderAdminRankingTab = function() {
+  const container = document.getElementById("adminRankingList");
+  const updated = document.getElementById("rankingLastUpdated");
+  if (!container) return;
+  const members = Object.values(appData.members || {});
+  const records = Object.values(appData.records || {});
+  if (!members.length) {
+    container.innerHTML = "<div style=\"text-align:center;padding:40px;color:#8099b4\">등록된 참여자가 없습니다.</div>";
+    return;
+  }
+  const ranked = members
+    .map(m => ({ member: m, scores: getMemberScores(m) }))
+    .filter(x => x.scores)
+    .sort((a, b) => (b.scores.composite || 0) - (a.scores.composite || 0));
+  const noRecord = members.filter(m => !getLatestRecord(m.id));
+  if (updated) {
+    const t = new Date().toLocaleTimeString("ko-KR", { hour: "2-digit", minute: "2-digit" });
+    updated.textContent = "업데이트: " + t;
+  }
+  if (!ranked.length) {
+    container.innerHTML = "<div style=\"text-align:center;padding:40px;color:#8099b4\">📝 아직 기록된 데이터가 없습니다.</div>";
+    return;
+  }
+  const cards = ranked.map(({ member: m, scores: s }, i) => {
+    const rank = i + 1;
+    const medal = rank === 1 ? "🥇" : rank === 2 ? "🥈" : rank === 3 ? "🥉" : rank;
+    const cnt = records.filter(r => r.memberId === m.id).length;
+    const rankColor = rank === 1 ? "#d4a017" : rank === 2 ? "#607080" : rank === 3 ? "#8a5a30" : "#0070c0";
+    const bgColor = rank === 1 ? "#fffbea" : rank === 2 ? "#f4f6f8" : rank === 3 ? "#fdf5ee" : "#f8fbff";
+    const borderColor = rank <= 3 ? rankColor : "#c8dff5";
+    return `<div style="display:flex;align-items:center;gap:16px;background:${bgColor};border:1.5px solid ${borderColor};border-radius:14px;padding:16px 20px;margin-bottom:10px;cursor:pointer;transition:box-shadow .15s" onclick="adminViewMember('${m.id}')" onmouseover="this.style.boxShadow='0 4px 16px rgba(0,112,192,.13)'" onmouseout="this.style.boxShadow=''">
+      <div style="font-size:${rank<=3?'1.8rem':'1.1rem'};font-weight:700;min-width:36px;text-align:center;color:${rankColor}">${medal}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-weight:700;font-size:1rem;color:#0d1a2e;margin-bottom:5px">${m.name}</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <span style="font-size:.75rem;background:rgba(192,57,43,.08);color:#c0392b;padding:2px 8px;border-radius:12px">혈당 ${fmtScore(s.bs)}점</span>
+          <span style="font-size:.75rem;background:rgba(139,92,246,.08);color:#7c3aed;padding:2px 8px;border-radius:12px">인바디 ${fmtScore(s.body)}점</span>
+          <span style="font-size:.75rem;background:rgba(26,138,74,.08);color:#1a8a4a;padding:2px 8px;border-radius:12px">체중 ${fmtScore(s.ws)}점</span>
+          <span style="font-size:.75rem;background:rgba(0,112,192,.08);color:#0070c0;padding:2px 8px;border-radius:12px">📅 ${cnt}회 기록</span>
+          <span style="font-size:.73rem;color:#8099b4">최근: ${s.latest?.date||"없음"}</span>
+        </div>
+      </div>
+      <div style="text-align:right;min-width:70px">
+        <div style="font-size:1.6rem;font-weight:900;color:${rankColor}">${fmtScore(s.composite)}</div>
+        <div style="font-size:.7rem;color:#8099b4">종합점수</div>
+      </div>
+    </div>`;
+  }).join("");
+  let extra = "";
+  if (noRecord.length) {
+    extra = `<div style="margin-top:12px;padding:10px 16px;border:1px dashed #c8dff5;border-radius:8px;font-size:.8rem;color:#8099b4">⚠️ 미기록 참여자: ${noRecord.map(m=>m.name).join(", ")}</div>`;
+  }
+  container.innerHTML = `<div style="font-size:.8rem;color:#8099b4;margin-bottom:12px">총 ${ranked.length}명 순위 집계 (카드 클릭 시 상세 기록 확인)</div>` + cards + extra;
+};
 
 // Override showTab from index.html's JS (used by adminViewMember etc.)
 window.showTab = function(tab) {
