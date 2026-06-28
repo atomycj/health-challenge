@@ -2409,8 +2409,8 @@ window.renderAdminRankingTab = function() {
   const container = document.getElementById("adminRankingList");
   const updated = document.getElementById("rankingLastUpdated");
   if (!container) return;
-  const members = Object.values(appData.members || {});
-  const records = Object.values(appData.records || {});
+  const members = Object.values((window._appData||appData).members || {});
+  const records = Object.values((window._appData||appData).records || {});
   if (!members.length) {
     container.innerHTML = "<div style=\"text-align:center;padding:40px;color:#8099b4\">등록된 참여자가 없습니다.</div>";
     return;
